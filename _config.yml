@@ -42,8 +42,8 @@ timezone:      null
 #title: Violet
 title: Seven
 subTitle: Just another Jekyll blog.
-description: 这是 utf7seven 的一个博客,在这里，用来快速记录工作，学习，生活的一点一滴的地方。
-url: http://utf7seven.github.io
+description: 这是 utf7 的一个博客,在这里，用来快速记录工作，学习，生活的一点一滴的地方。
+url: http://utf7.github.io
 feed: /atom.xml
 
 #菜单配置
@@ -55,7 +55,7 @@ nav:
   - text: 作品
     url: /works.html
   - text: 联系我
-    url: http://utf7seven.github.io/contact.html
+    url: http://utf7.github.io/contact.html
   - text: 博客源代码
     url: https://github.com/pizn/pizn.github.com
 
