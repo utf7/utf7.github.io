@@ -1,7 +1,7 @@
 ---
-layout:        post
-title:        Git/SVN 常用命令笔记
-description:    很久没有更新 GitHub 了，以至于那些熟悉的命令也忘记了。今天更新一下，把最基础的内容记下。
+layout: post
+title: Git/SVN 常用命令笔记
+description: 很久没有更新 GitHub 了，以至于那些熟悉的命令也忘记了。今天更新一下，把最基础的内容记下。
 keywords: git, svn
 ---
 很久没有更新 GitHub 了，以至于那些熟悉的命令也忘记了。今天更新一下，最基础的一些
@@ -28,6 +28,12 @@ keywords: git, svn
 
 #### 查看提交内容的差异
     git log -p -1(1是最新的一条)
+### 放弃本地所有修改
+	```
+	git reset --hard ORIGIN/BRANCH
+	比如：
+	git reset --hard origin/master
+    ```	
  
 ### SVN相关
 
