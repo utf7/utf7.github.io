@@ -9,7 +9,7 @@ keywords: git, svn
 加之最近工作团队需要，经常使用 SVN ，所有将 SVN 的常用命令也记在后面。以备后用。
 
 #### **下载源码**
-    git clone xx@xx:/xxx.git
+   ``` git clone xx@xx:/xxx.git ```
     
 #### **更新源码**
     git pull
