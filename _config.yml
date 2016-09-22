@@ -41,7 +41,7 @@ timezone:      null
 #站点基础配置
 #title: Violet
 title: Seven
-subTitle: Just another Jekyll blog.
+subTitle: utf7's blog.
 description: 这是 utf7 的一个博客,在这里，用来快速记录工作，学习，生活的一点一滴的地方。
 url: http://utf7.github.io
 feed: /atom.xml
@@ -57,7 +57,7 @@ nav:
   - text: 联系我
     url: http://utf7.github.io/contact.html
   - text: 博客源代码
-    url: https://github.com/pizn/pizn.github.com
+    url: https://github.com/utf7/utf7.github.io
 
 #theme config
 themes: /themes/violet
@@ -72,32 +72,28 @@ headimg:
 #关注我
 follow:
   - class: fa-google-plus
-    url: http://www.zhanxin.info
+    url: http://utf7.github.io/
   - class: fa-facebook
-    url: http://www.zhanxin.info
+    url: https://www.facebook.com/seven.chen.756
   - class: fa-github
-    url: http://github.com/utf7seven
+    url: http://github.com/utf7
   - class: fa-weibo
     url: http://weibo.com/chenyechao
-  - class: fa-renren
-    url: http://www.zhanxin.info
-  - class: fa-pinterest
-    url: http://www.zhanxin.info
   - class: fa-twitter
-    url: http://www.zhanxin.info
+    url: http://weibo.com/chenyechao
   - class: fa-rss
-    url: http://www.zhanxin.info
+    url: http://utf7.github.io/
 
 #作者信息
 author:
-  link: http://www.zhanxin.info/contact.html
-  img: http://tp2.sinaimg.cn/1832671293/180/40020872447/1
+  link: http://utf7.github.io/
+  img: https://avatars2.githubusercontent.com/u/8858683?v=3&s=466
 
 #评论信息
 disqus:
   config: true
-  id: piznblog
+  id: utf7blog
 
 duoshuo:
   config: false
-  id: zhanxin
+  id: utf7

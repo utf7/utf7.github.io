@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Hello world
-description: 这是 utf7seven 在 GitHub 上面的第一篇文章，您好，世界。
-keywords: utf7seven,GitHub
+description: 这是 utf7在 GitHub 上面的第一篇文章，您好，世界。
+keywords: utf7,GitHub
 ---
 这是我的新博客。记录我的学习，生活。原有的CSDN博客<a href="http://blog.csdn.net/seven_3306" target="_blank"></a>将会迁移到此。
 
