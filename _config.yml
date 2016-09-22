@@ -52,12 +52,8 @@ nav:
     url: /index.html
   - text: 文章归档
     url: /archives.html
-  - text: 作品
-    url: /works.html
   - text: 联系我
     url: http://utf7.github.io/contact.html
-  - text: 博客源代码
-    url: https://github.com/utf7/utf7.github.io
 
 #theme config
 themes: /themes/violet
