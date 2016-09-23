@@ -16,8 +16,11 @@ git config -l
 ```
 git config key value
 ```
+比如
+```
 $git config user.name utf7
 $git config user.emial xxx@xxx
+```
 #### **下载源码**
    ```
    git clone xx@xx:/xxx.git
