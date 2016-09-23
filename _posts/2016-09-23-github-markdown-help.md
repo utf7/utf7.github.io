@@ -1,13 +1,22 @@
 ---
 layout: post
-title: Git/SVN 常用命令笔记
-description: 很久没有更新 GitHub 了，以至于那些熟悉的命令也忘记了。今天更新一下，把最基础的内容记下。
-keywords: git, svn
+title: Github Markdown 写作帮助
+description: Github Markdown 写作帮助
+keywords: github，markdown,writing,notes
 ---
-很久没有更新 GitHub 了，以至于那些熟悉的命令也忘记了。今天更新一下，最基础的一些
-命令，以备以后翻阅。
-加之最近工作团队需要，经常使用 SVN ，所有将 SVN 的常用命令也记在后面。以备后用。
 
+## Github Markdown写作帮助
+
+#### **基本格式写作语法**
+	参考：[Basic Writing and formatting syntax](https://help.github.com/articles/basic-writing-and-formatting-syntax/)
+	注意：
+		支持emji表情,支持@某个github用户或者组织,
+		用法 ```:EMOJICODE:```,```@user```
+		\```@octocat :+1: This PR looks great - it's ready to merge! :shipit:\```
+		@utf7 :+1: This PR looks great-it's ready to merge!:shipit:
+		 
+#### 设置配置
+	``` git config key value ```
 #### **下载源码**
    ``` git clone xx@xx:/xxx.git ```
     
