@@ -8,12 +8,20 @@ keywords: git, svn
 ## Git和SVN常用命令
 
 #### **查看git配置**
-	``` git config -l ```
+```
+git config -l
+```
 
 #### 设置配置
-	``` git config key value ```
+```
+git config key value
+```
+$git config user.name utf7
+$git config user.emial xxx@xxx
 #### **下载源码**
-   ``` git clone xx@xx:/xxx.git ```
+   ```
+   git clone xx@xx:/xxx.git
+   ```
     
 #### **更新源码**
     git pull
@@ -33,11 +41,11 @@ keywords: git, svn
 #### **查看提交内容的差异**
     git log -p -1(1是最新的一条)
 ### **放弃本地所有修改**
-	```
+```
 	git reset --hard ORIGIN/BRANCH
 	比如：
 	git reset --hard origin/master
-    ```	
+```
  
 ### **SVN相关**
 
