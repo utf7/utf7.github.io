@@ -8,19 +8,16 @@ keywords: git, svn
 ## Git和SVN常用命令
 
 #### **查看git配置**
-```
+```ssh
 git config -l
 ```
 
 #### 设置配置
 ```
 git config key value
-```
-比如
-```
-$git config user.name utf7
-$git config user.emial xxx@xxx
-```
+```  
+`git config user.name utf7`  
+`git config user.emial your_email`	
 #### **下载源码**
    ```
    git clone xx@xx:/xxx.git
