@@ -1,8 +1,8 @@
-##http://utf7.github.io/
-博客
+This is my Blog
+[blog]http://utf7.github.io/
 
-##联系我
-邮箱: chenyechao@gmail.com
-[微博](http://weibo.com/chenyechao)
+##Contact me
+Email: chenyechao@gmail.com  
+[Weibo](http://weibo.com/chenyechao)
 
 
