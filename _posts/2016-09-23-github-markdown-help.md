@@ -40,11 +40,13 @@ keywords: github，markdown,writing,notes
 
 #### **查看提交内容的差异**
     git log -p -1(1是最新的一条)
+    
 ### **放弃本地所有修改**
-```
+```ssh
 git reset --hard ORIGIN/BRANCH
 比如：
 git reset --hard origin/master
+
 ```	
  
 ### **SVN相关**
