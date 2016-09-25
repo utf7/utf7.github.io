@@ -18,6 +18,7 @@ git config key value
 ```  
 `git config user.name utf7`  
 `git config user.emial your_email`	
+
 #### **下载源码**
    ```
    git clone xx@xx:/xxx.git
