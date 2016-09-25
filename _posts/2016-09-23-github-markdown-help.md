@@ -8,15 +8,18 @@ keywords: github，markdown,writing,notes
 ## Github Markdown写作帮助
 
 #### **基本格式写作语法**
-	参考：[Basic Writing and formatting syntax](https://help.github.com/articles/basic-writing-and-formatting-syntax/)
-	注意：
-		支持emji表情,支持@某个github用户或者组织,
-		用法 ```:EMOJICODE:```,```@user```
-		\```@octocat :+1: This PR looks great - it's ready to merge! :shipit:\```
-		@utf7 :+1: This PR looks great-it's ready to merge!:shipit:
+	
+参考：[Basic Writing and formatting syntax](https://help.github.com/articles/basic-writing-and-formatting-syntax/)  
+注意：
+支持emji表情,支持@某个github用户或者组织,
+用法 `:EMOJICODE:`,`@user`
+
+@utf7 :+1: This PR looks great-it's ready to merge!:shipit:
 		 
 #### 设置配置
-	``` git config key value ```
+
+` git config key value `
+
 #### **下载源码**
    ``` git clone xx@xx:/xxx.git ```
     
@@ -38,11 +41,11 @@ keywords: github，markdown,writing,notes
 #### **查看提交内容的差异**
     git log -p -1(1是最新的一条)
 ### **放弃本地所有修改**
-	```
-	git reset --hard ORIGIN/BRANCH
-	比如：
-	git reset --hard origin/master
-    ```	
+```
+git reset --hard ORIGIN/BRANCH
+比如：
+git reset --hard origin/master
+```	
  
 ### **SVN相关**
 
