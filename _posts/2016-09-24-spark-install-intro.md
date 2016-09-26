@@ -3,6 +3,7 @@ layout: post
 title: Spark 2.0 安装部署
 description: Spark 2.0 安装部署
 keywords: spark，big data
+category: spark
 ---
 
 ## Spark 2.0 安装部署
@@ -13,13 +14,7 @@ keywords: spark，big data
 
 此处如下：
 
-![](/pictures/spark-install-intro/spark_download.png "选择页面")
-
-
-Here's our current build status:
-
- [![Build Status](https://api.travis-ci.org/github/linguist.svg?java=scala)](https://travis-ci.org/github/linguist)
-
+![](//resources/pictures/spark-install-intro/spark_download.png "选择页面")
 
 #### **上传解压包**
 	
