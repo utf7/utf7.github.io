@@ -14,7 +14,7 @@ category: spark
 
 此处如下：
 
-![](//resources/pictures/spark-install-intro/spark_download.png "选择页面")
+![](/resources/pictures/spark-install-intro/spark_download.png "选择页面")
 
 #### **上传解压包**
 	
