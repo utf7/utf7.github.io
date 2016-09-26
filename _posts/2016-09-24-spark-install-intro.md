@@ -109,7 +109,7 @@ res4: Long = 19
 **编写Spark程序：**
 使用maven管理包依赖：
 - pom.xml
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -384,11 +384,12 @@ echo "GUIDE:"
 echo "USE runRDD/runSQL"
 ```
 $ ./runSpark.sh runRDD
+```bash
 16/09/26 17:44:41 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 total length is :3729
-
+```
 $ ./runSpark.sh runSQL
-
+```bash
 16/09/26 17:39:31 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 16/09/26 17:39:32 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
 16/09/26 17:39:32 WARN SparkContext: Use an existing SparkContext, some configuration may not take effect.
@@ -471,7 +472,7 @@ show how read from mysql:
 | seven|  1|
 |  utf7| 28|
 +-------+---+
-
+```
 
 
 
