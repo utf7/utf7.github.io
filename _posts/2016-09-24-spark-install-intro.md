@@ -156,7 +156,7 @@ res4: Long = 19
 </project>
 ```
 - 使用Java RDD API
-```java
+~~~java
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -201,7 +201,7 @@ public class HelloSparkJavaRDD {
     }
 }
 
-```
+~~~
 更加请参考:[resilient-distributed-datasets-rdds](http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds)
 - 使用Java Spark SQL API
 ```java
