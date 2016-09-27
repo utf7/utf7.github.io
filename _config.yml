@@ -6,13 +6,13 @@ layouts:      ./_layouts
 paginate:     8
 
 # Handling Reading
-safe:         true
+safe:         false
 include:      [".htaccess"]
 exclude:      []
 keep_files:   [".git", ".svn"]
 encoding:     "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
-textile_ext:  "textile"
+#textile_ext:  "textile"
 
 # Filtering Content
 show_drafts:  null
@@ -26,7 +26,7 @@ highlighter:  rouge
 lsi:          false
 excerpt_separator: "\n\n"
 incremental: false
-github: [metadata]
+#github: [metadata]
 kramdown:
   input: GFM
   hard_wrap: false
@@ -34,9 +34,9 @@ kramdown:
 gist:
    noscript: false   
 #plugins   
-gems:
-  - jekyll-coffeescript
-  - jekyll-paginate
+#gems:
+#  - jekyll-coffeescript
+ # - jekyll-paginate
 
 # Serving
 detach:       false
