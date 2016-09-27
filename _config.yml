@@ -6,7 +6,7 @@ layouts:      ./_layouts
 paginate:     8
 
 # Handling Reading
-safe:         false
+safe:         true
 include:      [".htaccess"]
 exclude:      []
 keep_files:   [".git", ".svn"]
@@ -22,9 +22,21 @@ unpublished:  false
 
 # Conversion
 markdown:     kramdown
-highlighter:  pygments
+highlighter:  rouge
 lsi:          false
 excerpt_separator: "\n\n"
+incremental: false
+github: [metadata]
+kramdown:
+  input: GFM
+  hard_wrap: false
+  math_engine: mathjax
+gist:
+   noscript: false   
+#plugins   
+gems:
+  - jekyll-coffeescript
+  - jekyll-paginate
 
 # Serving
 detach:       false
