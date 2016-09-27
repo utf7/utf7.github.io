@@ -14,14 +14,14 @@ keywords: Markdown
 ### 超链接
 
 ```
-[博客](http://utf7.github.io/)
+[靠谱-ing](http://mazhuang.org)
 
-<http://utf7.github.io>
+<http://mazhuang.org>
 ```
 
-[博客](http://utf7.github.io/)  
+[靠谱-ing](http://mazhuang.org)  
 
-<http://utf7.github.io/>
+<http://mazhuang.org>
 
 ### 列表
 
