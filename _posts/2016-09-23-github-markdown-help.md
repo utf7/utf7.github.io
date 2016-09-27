@@ -2,6 +2,7 @@
 layout: post
 title: Github Markdown 写作帮助
 description: Github Markdown 写作帮助
+categories: Markdown
 keywords: github，markdown,writing,notes
 ---
 

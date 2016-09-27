@@ -2,8 +2,8 @@
 layout: post
 title: Spark 2.0 安装部署
 description: Spark 2.0 安装部署
+category: Spark
 keywords: spark，big data
-category: spark
 ---
 
 ## Spark 2.0 安装部署
