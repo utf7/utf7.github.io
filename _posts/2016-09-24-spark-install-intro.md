@@ -78,6 +78,12 @@ cd $SPARK_HOME/sbin
 - 查看spark管理页面：
 http://master:8090
 
+```ruby
+require 'redcarpet'
+markdown = Redcarpet.new("Hello World!")
+puts markdown.to_html
+```
+
 #### **访问Spark**
 - 使用spark-shell
 
