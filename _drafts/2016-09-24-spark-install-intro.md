@@ -2,8 +2,8 @@
 layout: post
 title: Spark 2.0 安装部署
 description: Spark 2.0 安装部署
-category: Spark
 keywords: spark，big data
+category: spark
 ---
 
 ## Spark 2.0 安装部署
@@ -20,11 +20,11 @@ keywords: spark，big data
 	
 将文件上传到各个节点，然后解压
 
-`tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz`
+` tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz `
 
 配置SPARK_HOME
 
-```bash
+```  
 export SPARK_HOME=/home/utf7/spark-2.0.0-bin-hadoop2.6	
 export PATH=$SPARK_HOME/bin:$PATH
 ```
@@ -33,11 +33,10 @@ export PATH=$SPARK_HOME/bin:$PATH
 进入spark 安装目录
 
 - spark-env.sh
-
-```bash
 cd conf
 cp spark-env.sh.template spark-env.sh
 vi spark
+```
 export SPARK_HOME=/home/utf7/spark-2.0.0-bin-hadoop2.6
 export HADOOP_CONF_DIR=/home/utf7/hadoop/etc/hadoop
 export SPARK_MASTER_IP=master
@@ -50,15 +49,13 @@ export SPARK_LOG_DIR=$SPARK_HOME/logs/spark
 export SPARK_PID_DIR=$SPARK_HOME/tmp/spark
 ```
 - slaves
-```bash
-cat slaves  
+cat slaves
+```
 yc3
 ```
 
 - log4j.properties  
-
-`cp log4j.properties.template log4j.properties`
-  
+`cp log4j.properties.template log4j.properties`  
 根据需要修改，此处没有修改
 
 - 引入hadoop配置
@@ -68,7 +65,7 @@ yc3
 
 #### **启动**
 
-```bash
+```
 cd $SPARK_HOME/sbin
 ./start-all.sh
 ```
@@ -81,16 +78,18 @@ cd $SPARK_HOME/sbin
 - 查看spark管理页面：
 http://master:8090
 
-
+```ruby
+require 'redcarpet'
+markdown = Redcarpet.new("Hello World!")
+puts markdown.to_html
+```
 
 #### **访问Spark**
 - 使用spark-shell
 
-首先，将spark的README.MD上传到hdfs上，后面我们需要用,上传文件：
-
+首先，将spark的README.MD上传到hdfs上，后面我们需要用
 `hdfs dfs -put /home/utf7/spark-2.0.0-bin-hadoop2.6/README.md /home/utf7/README.md`
-
-```bash
+```
 cd $SPARK_HOME/bin
 
 ./spark-shell
@@ -109,15 +108,13 @@ linesWithSpark: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[8] at filter
 
 scala>  textFile.filter(line => line.contains("Spark")).count()
 res4: Long = 19
+
 ```
 更多，请参考[quick-start](http://spark.apache.org/docs/latest/quick-start.html)
 
-#### **编写Spark程序**
-
+**编写Spark程序：**
 使用maven管理包依赖：
-
 - pom.xml
-
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -164,11 +161,7 @@ res4: Long = 19
     </dependencies>
 </project>
 ```
-
-
 - 使用Java RDD API
-
-
 ```java
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -214,14 +207,8 @@ public class HelloSparkJavaRDD {
     }
 }
 ```
-
-
 更加请参考:[resilient-distributed-datasets-rdds](http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds)
-
-
 - 使用Java Spark SQL API
-
-
 ```java
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Column;
@@ -364,18 +351,13 @@ public class HelloSparkJavaSQL {
     }
 }
 ```
-
-
 更多请参考：[sql-programming-guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 
-
-
 - 提交spark jar脚本
-
 将上面的程序打包，放到spark环境中执行，执行脚本为：
-
 ```bash
 #!/usr/bin/env bash
+
 # you can use this script to run spark app:
 # ./runSpark.sh runRDD : run RDD example
 # ./runSpark.sh runSQL : run SQL example
@@ -406,18 +388,12 @@ fi
 echo "GUIDE:"
 echo "USE runRDD/runSQL"
 ```
-
-
-$ ./runSpark.sh runRDD ,执行如上命令，spark rdd 示例输出如下：
-
-
+$ ./runSpark.sh runRDD
 ```bash
 16/09/26 17:44:41 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 total length is :3729
 ```
-
-$./runSpark.sh runSQL 执行如上命令，使用spark sql示例输出如下：
-
+$ ./runSpark.sh runSQL
 ```bash
 16/09/26 17:39:31 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 16/09/26 17:39:32 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
