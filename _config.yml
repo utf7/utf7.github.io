@@ -2,26 +2,26 @@
 #   Main Configs   #
 # ---------------- #
 baseurl:
-url: https://github.com/utf7/utf7.github.io
+url: http://mazhuang.org
 date_format: "ordinal"
-title: utf7
-subtitle: "做好人，做好事"
-description: "Seven的个人博客"
-keywords: utf7, seven
+title: 码志
+subtitle: "打码改变人生"
+description: "马壮的个人博客"
+keywords: 码志, Zhuang Ma, mzlogin, mazhuang
 favicon: /favicon.ico
 timezone: Asia/Shanghai
 encoding: "utf-8"
-source_code: https://github.com/utf7/utf7.github.io
+source_code: https://github.com/mzlogin/mzlogin.github.io
 side_bar_repo_limit: 5
 
 # ---------------- #
 #      Author      #
 # ---------------- #
-author: utf7
-organization: utf7, Inc.
-organization_url: http://utf7.github.io
-location: Suzhou, China
-email: chenyechao@gmail.com
+author: Zhuang Ma
+organization: Sogou, Inc.
+organization_url: https://www.sogou.com
+location: Beijing, China
+email: chumpma@gmail.com
 
 # ---------------- #
 #    Navigation    #
@@ -80,8 +80,12 @@ collections:
 # ---------------- #
 #      Socials     #
 # ---------------- #
-github_username: utf7
-weibo_username: chenyechao
+github_username: mzlogin
+douban_username: freedim
+facebook_username: mzlogin
+weibo_username: mzlogin
+zhihu_username: mzlogin
+twitter_username: mzlogin
 
 # ---------------- #
 #      Comments    #
@@ -90,8 +94,8 @@ weibo_username: chenyechao
 comments_provider: disqus
 # !!!重要!!! 请修改下面两个用户名为你自己申请的
 # !!!Important!!! Please modify usernames below to yours
-duoshuo_username: utf7
-disqus_username: utf7
+duoshuo_username: mazhuang
+disqus_username: mzlogin
 # 在使用 disqus 的时候可点击显示多说评论框
 lazy_load_duoshuo: true
 
@@ -104,5 +108,6 @@ google:
 # ---------------- #
 #      Datas       #
 # ---------------- #
-skill_programing_keywords: [Java, Java EE, Design Patterns]
-skill_big_data_keywords: [Hadoop,Yarn,Hive,Spark,Presto,HBase,MySQL]
+skill_software_keywords: [Java, C++, Python, Design Patterns]
+skill_mobile_app_keywords: [Android, Reverse Engineering]
+skill_windows_keywords: [Win32 SDK, DuiLib, WTL, COM, WinDbg]
