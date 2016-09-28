@@ -92,8 +92,9 @@ comments_provider: disqus
 # !!!Important!!! Please modify usernames below to yours
 duoshuo_username: utf7
 disqus_username: utf7
+disqus_shortname: http-utf7-github-io
 # 在使用 disqus 的时候可点击显示多说评论框
-lazy_load_duoshuo: true
+lazy_load_duoshuo: false
 
 # ---------------- #
 #    Analytics     #
