@@ -5,7 +5,7 @@
         {% assign load_disqus = true %}
         <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
         {% if site.disqus_username == 'utf7' %}
-          {% assign load_disqus = false %}
+          {% assign load_disqus = true %}
           {% if site.url contains 'utf7.github.io/' %}
             {% assign load_disqus = true %}
           {% endif %}
