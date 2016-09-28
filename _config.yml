@@ -2,7 +2,7 @@
 #   Main Configs   #
 # ---------------- #
 baseurl:
-url: https://github.com/utf7/utf7.github.io
+url: http://utf7.github.io
 date_format: "ordinal"
 title: utf7
 subtitle: "做好人，做好事"
