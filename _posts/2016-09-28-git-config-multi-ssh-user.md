@@ -6,13 +6,13 @@ category: Git
 keywords: git,github
 ---
 
-##摘要
+## 摘要
 
- 我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。
-     我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。下面我们来看看具体的操作：
+ 我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。下面我们来看看具体的操作：
 
 1. **生成一个公司用的SSH-Key**      
-  $ ssh-keygen -t rsa -C "xxx@xxx.com” -f ~/.ssh/id_rsa
+
+ `$ ssh-keygen -t rsa -C "xxx@xxx.com” -f ~/.ssh/id_rsa`
 
 在~/.ssh/目录会生成id_rsa和id_rsa.pub私钥和公钥。
 
@@ -109,7 +109,7 @@ user.name=utf7
 user.email=utf7@xxx.com
 core.editor=vim
 gitreview.username=xxx
-commit.template=D:/Users/seven/.gitcommit
+commit.template=D:/Users/utf7/.gitcommit
 push.default=simple
 gui.recentrepo=E:/git/Blog
 core.repositoryformatversion=0
