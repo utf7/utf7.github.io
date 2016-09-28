@@ -19,9 +19,9 @@ permalink: /about/
 
 ## 联系
 
-* GitHub：[@mzlogin](https://github.com/utf7)
+* GitHub：[@utf7](https://github.com/utf7)
 * 博客：[{{ site.title }}]({{ site.url }})
-* 微博: [@mzlogin](http://weibo.com/chenyechao)
+* 微博: [@敌粑咯](http://weibo.com/chenyechao)
 
 
 ## Skill Keywords
