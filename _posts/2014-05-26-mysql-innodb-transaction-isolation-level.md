@@ -99,14 +99,15 @@ INSERT INTO t (a) VALUES (1),(2),(3);
 ![测试READ-COMMITTED与REPEATABLE-READ](/images/posts/mysql/transaction/exp2.jpg)
 
 当然数据的可见性都是对不同事务来说的，同一个事务，都是可以读到此事务中最新数据的。
+
 ```sql
 mysql>start transaction;  
-mysql>insert into t(a) values (4);  
-mysql>select  * from t;  
-1,2,3,4;  
-mysql>insert into t(a) values (5);  
-mysql>select  * from t;  
-1,2,3,4,5; 
+mysql>insert into t(a) values (4);    
+mysql>select * from t;  
+1,2,3,4;    
+mysql>insert into t(a) values (5);	  
+mysql>select  * from t;  	
+1,2,3,4,5; 	
 ```
 
 - 实验三：测试SERIALIZABLE事务对其他的影响
