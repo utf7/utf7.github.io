@@ -52,7 +52,8 @@ mysql> show variables like '%tx_isolation%';
 +---------------+--------------+ 
 ```
 
-- 查看全局的事务隔离级别。
+- 查看全局的事务隔离级别
+
 ```sql
 mysql> show global variables like '%tx_isolation%';
 +---------------+-----------------+
@@ -69,6 +70,7 @@ mysql> show global variables like '%tx_isolation%';
 注意一点的设置global并不会对当前session生效。
   
 比如设置session事务隔离级别命令如下：
+
 ```sql
 set session transaction isolation level read uncommitted;      
 set session transaction isolation level read committed;      
@@ -79,6 +81,7 @@ set session transaction isolation level SERIALIZABL;
 上面的文字，读起来并不是那么容易让人理解，以下用几个实验对InnoDB的四个事务隔离级别做详细的解释，希望通过实验来加深大家对InnoDB的事务隔离级别理解。
 
 首先，我们来创建一张innodb表，插入几条数据
+
 ```sql
 CREATE TABLE `t` (  
     `a` INT (11) NOT NULL PRIMARY KEY  
