@@ -110,9 +110,12 @@ res4: Long = 19
 ```
 更多，请参考[quick-start](http://spark.apache.org/docs/latest/quick-start.html)
 
-**编写Spark程序：**
+#### **编写Spark程序**
+
 使用maven管理包依赖：
+
 - pom.xml
+
 ```html
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
