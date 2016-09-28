@@ -78,17 +78,14 @@ cd $SPARK_HOME/sbin
 - 查看spark管理页面：
 http://master:8090
 
-```ruby
-require 'redcarpet'
-markdown = Redcarpet.new("Hello World!")
-puts markdown.to_html
-```
+
 
 #### **访问Spark**
 - 使用spark-shell
 
 首先，将spark的README.MD上传到hdfs上，后面我们需要用
 `hdfs dfs -put /home/utf7/spark-2.0.0-bin-hadoop2.6/README.md /home/utf7/README.md`
+
 ```
 cd $SPARK_HOME/bin
 
@@ -162,7 +159,7 @@ res4: Long = 19
 </project>
 ```
 - 使用Java RDD API
-```java
+~~~java
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -206,10 +203,10 @@ public class HelloSparkJavaRDD {
 
     }
 }
-```
+~~~
 更加请参考:[resilient-distributed-datasets-rdds](http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds)
 - 使用Java Spark SQL API
-```java
+~~~java
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
@@ -350,12 +347,12 @@ public class HelloSparkJavaSQL {
         }
     }
 }
-```
+~~~
 更多请参考：[sql-programming-guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 
 - 提交spark jar脚本
 将上面的程序打包，放到spark环境中执行，执行脚本为：
-```bash
+~~~bash
 #!/usr/bin/env bash
 
 # you can use this script to run spark app:
@@ -387,14 +384,14 @@ fi
 
 echo "GUIDE:"
 echo "USE runRDD/runSQL"
-```
+~~~
 $ ./runSpark.sh runRDD
 ```bash
 16/09/26 17:44:41 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 total length is :3729
 ```
 $ ./runSpark.sh runSQL
-```bash
+~~~bash
 16/09/26 17:39:31 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 16/09/26 17:39:32 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
 16/09/26 17:39:32 WARN SparkContext: Use an existing SparkContext, some configuration may not take effect.
@@ -477,7 +474,7 @@ show how read from mysql:
 | seven|  1|
 |  utf7| 28|
 +-------+---+
-```
+~~~
 
 
 
