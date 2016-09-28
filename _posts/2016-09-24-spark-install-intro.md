@@ -158,7 +158,11 @@ res4: Long = 19
     </dependencies>
 </project>
 ```
+
+
 - 使用Java RDD API
+
+
 ~~~java
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -204,8 +208,14 @@ public class HelloSparkJavaRDD {
     }
 }
 ~~~
+
+
 更加请参考:[resilient-distributed-datasets-rdds](http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds)
+
+
 - 使用Java Spark SQL API
+
+
 ~~~java
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Column;
@@ -348,10 +358,17 @@ public class HelloSparkJavaSQL {
     }
 }
 ~~~
+
+
 更多请参考：[sql-programming-guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 
+
+
 - 提交spark jar脚本
+
 将上面的程序打包，放到spark环境中执行，执行脚本为：
+
+
 ~~~bash
 #!/usr/bin/env bash
 
@@ -385,12 +402,20 @@ fi
 echo "GUIDE:"
 echo "USE runRDD/runSQL"
 ~~~
+
+
 $ ./runSpark.sh runRDD
+
+
 ```bash
 16/09/26 17:44:41 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 total length is :3729
 ```
+
+
 $ ./runSpark.sh runSQL
+
+
 ~~~bash
 16/09/26 17:39:31 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 16/09/26 17:39:32 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
