@@ -15,13 +15,13 @@ Github Markdown 语法又称 GFM
 
 使用不同数目的 `#` 来表示不同级别的标题
 ```
-# 一级标题
-## 二级标题
-### 三级标题
+# 一级标题  
+## 二级标题  
+### 三级标题  
 ```
-# 一级标题
-## 二级标题
-### 三级标题
+# 一级标题  
+## 二级标题  
+### 三级标题  
 
 ### 链接
 可以使用`[`]`(`)来实现链接功能  
@@ -39,11 +39,9 @@ Github Markdown 语法又称 GFM
 可以使用\`\`
 
 \`\`\`  
-public void test(){ 
-
-	System.out.println("Syntax highlighting");
-	
-}
+public void test(){   
+	System.out.println("Syntax highlighting");  
+}  
 \`\`\`
 
 ```
@@ -54,10 +52,10 @@ public void test(){
 
 
 ### 代码高亮
-\`\`\`java
-public void test(){
-	System.out.println("Syntax highlighting");
-}
+\`\`\`java  
+public void test(){  
+	System.out.println("Syntax highlighting");  
+}  
 \`\`\`
 
 ```java
@@ -103,6 +101,7 @@ public void test(){
   * Mention all the members of my team  
     * Ask for feedback  
 ```	
+
 1. Make my changes  
   1. Fix bug  
   2. Improve formatting  
@@ -146,6 +145,7 @@ Let's rename \*our-new-project\* to \*our-old-project\*.
 
 		 
 参考：
+
 [Basic Writing and formatting syntax](https://help.github.com/articles/basic-writing-and-formatting-syntax/)  
 [Autolinked references and URLs](https://help.github.com/articles/autolinked-references-and-urls/)  
 [Working with advanced formatting](https://help.github.com/articles/working-with-advanced-formatting/)  
