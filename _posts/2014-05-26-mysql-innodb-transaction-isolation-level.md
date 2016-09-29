@@ -6,11 +6,12 @@ categories: MySQL
 keywords: mysql，innodb,transaction
 ---
 
-希望通过本文，可以加深读者对ySQL InnoDB的四个事务隔离级别，以及脏读、不重复读、幻读的理解。
 
 ## MySQL InnoDB事务隔离级别脏读、可重复读、幻读
 
-#### **InnoDB 事务隔离级别**
+希望通过本文，可以加深读者对ySQL InnoDB的四个事务隔离级别，以及脏读、不重复读、幻读的理解。
+
+### **InnoDB 事务隔离级别**
 	
 MySQL InnoDB事务的隔离级别有四级，默认是“可重复读”（REPEATABLE READ）。
 
@@ -77,6 +78,7 @@ set session transaction isolation level read committed;
 set session transaction isolation level REPEATABLE READ;   
 set session transaction isolation level SERIALIZABL;
 ```
+### 实验理解InnoDB事物隔离级别
 
 上面的文字，读起来并不是那么容易让人理解，以下用几个实验对InnoDB的四个事务隔离级别做详细的解释，希望通过实验来加深大家对InnoDB的事务隔离级别理解。
 
