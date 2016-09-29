@@ -7,11 +7,11 @@ keywords: git,github
 excerpt: 我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。
 ---
 
-## 摘要
 
  我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。下面我们来看看具体的操作：
 
- ### 详细步骤如下：
+### 详细步骤如下：
+
 1. **生成一个公司用的 SSH-Key **      
 
  `$ ssh-keygen -t rsa -C "xxx@xxx.com” -f ~/.ssh/id_rsa`
