@@ -1,15 +1,15 @@
 ---
 layout: post
-title: Git配置多个ssh账户
-description: Git配置多个ssh账户
+title: Git 配置多个 ssh 账户
+description: Git 配置多个 ssh 账户
 categories: Git
 keywords: git,github
-excerpt: 我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。
+excerpt: 我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。
 ---
 
 ## 摘要
 
- 我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。下面我们来看看具体的操作：
+ 我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。下面我们来看看具体的操作：
 
  ### 详细步骤如下：
 1. **生成一个公司用的 SSH-Key **      
@@ -84,7 +84,7 @@ $ ls -lh ~/.ssh/
 $ ssh -T git@github.com
 输出
 Hi utf7! You've successfully authenticated, but GitHub does not provide shell access.
-就表示成功的连上github了.也可以试试链接公司的git仓库中.
+就表示成功的连上 github 了.也可以试试链接公司的 git 仓库中.
 
 
 

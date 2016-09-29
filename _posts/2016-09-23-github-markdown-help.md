@@ -4,6 +4,7 @@ title: Github Markdown 写作帮助
 description: Github Markdown 写作帮助
 categories: Markdown
 keywords: github，markdown,writing,notes
+excerpt: Github Markdown 写作帮助
 ---
 
 ## Github Markdown写作帮助
@@ -12,7 +13,7 @@ keywords: github，markdown,writing,notes
 	
 参考：[Basic Writing and formatting syntax](https://help.github.com/articles/basic-writing-and-formatting-syntax/)  
 注意：
-支持emji表情,支持@某个github用户或者组织,
+支持 emji 表情,支持 @ 某个 github 用户或者组织,
 用法 `:EMOJICODE:`,`@user`
 
 @utf7 :+1: This PR looks great-it's ready to merge!:shipit:
@@ -67,7 +68,7 @@ git reset --hard origin/master
     svn unlock path
 
 #### **更新到某个版本**
-    svn update -r m path -- m是版本号，path为文件名
+    svn update -r m path -- m 是版本号，path 为文件名
     //简写 svn up
 
 #### **查看文件或者目录状态**

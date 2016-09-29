@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Git/SVN 常用命令笔记
-description: Git 和 SVN常见命令
+description: Git 和 SVN 常见命令
 categories: Git
 keywords: git, svn
 excerpt: Git 和 SVN 的常用命令

@@ -8,7 +8,7 @@ keywords: spark，big data
 
 ## Spark 2.0 安装部署
 
-本篇将简单部署Spark 2.0的环境，以及如何使用Spark RDD/SQL/SHELL访问数据
+本篇将简单部署 Spark 2.0 的环境，以及如何使用 Spark RDD/SQL/SHELL 访问数据
 
 ### **选择下载安装包**
 	
@@ -18,13 +18,13 @@ keywords: spark，big data
 
 ![](/images/posts/spark/spark-install-intro/spark_download.png "选择页面")
 
-### **配置Spark**
+### **配置 Spark **
 	
 将文件上传到各个节点，然后解压
 
 `tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz`
 
-配置SPARK_HOME
+配置 SPARK_HOME
 
 ```bash
 export SPARK_HOME=/home/utf7/spark-2.0.0-bin-hadoop2.6	
@@ -32,7 +32,7 @@ export PATH=$SPARK_HOME/bin:$PATH
 ```
 
 修改配置文件:
-进入spark 安装目录
+进入 spark 安装目录
 
 - spark-env.sh
 
@@ -63,8 +63,8 @@ yc3
   
 根据需要修改，此处没有修改
 
-- 引入hadoop配置
-  此处将core-site.xml和hdfs-site.xml 复制到了spark的conf目录下面。应该也可以通过其他方式去做
+- 引入 hadoop 配置
+  此处将 core-site.xml 和 hdfs-site.xml 复制到了 spark 的 conf 目录下面。应该也可以通过其他方式去做
 将修改的文件同步到所有的节点中
 
 
@@ -76,19 +76,19 @@ cd $SPARK_HOME/sbin
 ```
 
 ### **查看启动日志**
-日志记录在$SPARK_HOME/logs/spark目录下面
+日志记录在 $SPARK_HOME/logs/spark 目录下面
 
 ### **测试**
 
-- 查看spark管理页面：
+- 查看 spark 管理页面：
 http://master:8090
 
 
 
-### **访问Spark**
-- 使用spark-shell
+### **访问 Spark **
+- 使用 spark-shell
 
-首先，将spark的README.MD上传到hdfs上，后面我们需要用,上传文件：
+首先，将 spark 的 README.MD 上传到 hdfs 上，后面我们需要用,上传文件：
 
 `hdfs dfs -put /home/utf7/spark-2.0.0-bin-hadoop2.6/README.md /home/utf7/README.md`
 
@@ -114,7 +114,7 @@ res4: Long = 19
 ```
 更多，请参考[quick-start](http://spark.apache.org/docs/latest/quick-start.html)
 
-### **编写Spark程序**
+### **编写 Spark程序 **
 
 使用maven管理包依赖：
 
@@ -168,7 +168,7 @@ res4: Long = 19
 ```
 
 
-- 使用Java RDD API
+- 使用 Java RDD API
 
 
 ```java
@@ -221,7 +221,7 @@ public class HelloSparkJavaRDD {
 更加请参考:[resilient-distributed-datasets-rdds](http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds)
 
 
-- 使用Java Spark SQL API
+- 使用 Java Spark SQL API
 
 
 ```java
@@ -372,9 +372,9 @@ public class HelloSparkJavaSQL {
 
 
 
-- 提交spark jar脚本
+- 提交 spark jar脚本
 
-将上面的程序打包，放到spark环境中执行，执行脚本为：
+将上面的程序打包，放到 spark 环境中执行，执行脚本为：
 
 ```bash
 #!/usr/bin/env bash
@@ -418,7 +418,7 @@ $ ./runSpark.sh runRDD ,执行如上命令，spark rdd 示例输出如下：
 total length is :3729
 ```
 
-$./runSpark.sh runSQL 执行如上命令，使用spark sql示例输出如下：
+$./runSpark.sh runSQL 执行如上命令，使用 spark sql 示例输出如下：
 
 ```bash
 16/09/26 17:39:31 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
