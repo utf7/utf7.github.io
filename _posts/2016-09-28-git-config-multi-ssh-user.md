@@ -2,7 +2,7 @@
 layout: post
 title: Git配置多个ssh账户
 description: Git配置多个ssh账户
-category: Git
+categories: Git
 keywords: git,github
 ---
 
