@@ -8,7 +8,9 @@ keywords: spark，big data
 
 ## Spark 2.0 安装部署
 
-#### **选择下载安装包**
+本篇将简单部署Spark 2.0的环境，以及如何使用Spark RDD/SQL/SHELL访问数据
+
+### **选择下载安装包**
 	
 可以在[这里](http://spark.apache.org/downloads.html)下载相应版本的安装包。
 
@@ -16,7 +18,7 @@ keywords: spark，big data
 
 ![](/resources/pictures/spark-install-intro/spark_download.png "选择页面")
 
-#### **配置Spark**
+### **配置Spark**
 	
 将文件上传到各个节点，然后解压
 
@@ -66,24 +68,24 @@ yc3
 将修改的文件同步到所有的节点中
 
 
-#### **启动**
+### **启动**
 
 ```bash
 cd $SPARK_HOME/sbin
 ./start-all.sh
 ```
 
-#### **查看启动日志**
+### **查看启动日志**
 日志记录在$SPARK_HOME/logs/spark目录下面
 
-#### **测试**
+### **测试**
 
 - 查看spark管理页面：
 http://master:8090
 
 
 
-#### **访问Spark**
+### **访问Spark**
 - 使用spark-shell
 
 首先，将spark的README.MD上传到hdfs上，后面我们需要用,上传文件：
@@ -112,7 +114,7 @@ res4: Long = 19
 ```
 更多，请参考[quick-start](http://spark.apache.org/docs/latest/quick-start.html)
 
-#### **编写Spark程序**
+### **编写Spark程序**
 
 使用maven管理包依赖：
 
