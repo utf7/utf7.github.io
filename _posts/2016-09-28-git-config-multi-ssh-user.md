@@ -4,7 +4,7 @@ title: Git配置多个ssh账户
 description: Git配置多个ssh账户
 categories: Git
 keywords: git,github
-excerpt:  我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。
+excerpt: 我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。
 ---
 
 ## 摘要

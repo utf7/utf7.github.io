@@ -1,14 +1,15 @@
 ---
 layout: post
 title: Git/SVN 常用命令笔记
-description: Git和SVN常见命令
+description: Git 和 SVN常见命令
 categories: Git
 keywords: git, svn
+excerpt: Git 和 SVN 的常用命令
 ---
 
-## Git和SVN常用命令
+## Git 和 SVN 常用命令
 
-### **查看git配置**
+### **查看 git 配置**
 ```ssh
 git config -l
 ```
@@ -49,7 +50,7 @@ git config key value
 	git reset --hard origin/master
 ```
  
-### **SVN相关**
+### **SVN 相关**
 
 ### **将文件下载到本地**
     svn checkout path(服务器上的目录)
@@ -66,7 +67,7 @@ git config key value
     svn unlock path
 
 ### **更新到某个版本**
-    svn update -r m path -- m是版本号，path为文件名
+    svn update -r m path -- m是版本号，path 为文件名
     //简写 svn up
 
 ### **查看文件或者目录状态**
