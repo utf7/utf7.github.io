@@ -11,20 +11,20 @@ keywords: git,github
  我们在日常工作中会遇到公司有个git仓库，还有些自己的一些项目放在github上。这样就导致我们要配置不同的ssh-key对应不同的环境。下面我们来看看具体的操作：
 
  ### 详细步骤如下：
-1. **生成一个公司用的SSH-Key**      
+1. **生成一个公司用的 SSH-Key **      
 
  `$ ssh-keygen -t rsa -C "xxx@xxx.com” -f ~/.ssh/id_rsa`
 
-在~/.ssh/目录会生成id_rsa和id_rsa.pub私钥和公钥。
+在 ~/.ssh/ 目录会生成 id_rsa 和 id_rsa.pub 私钥和公钥。
 
-我们将id_rsa.pub中的内容粘帖到公司git服务器的SSH-key的配置中。
+我们将 id_rsa.pub 中的内容粘帖到公司git服务器的 SSH-key 的配置中。
 
 2. **生成一个github用的SSH-Key**
 
  $ ssh-keygen -t rsa -C "yyy@yyy.com” -f ~/.ssh/github-rsa
-在~/.ssh/目录会生成github_rsa和github_rsa.pub私钥和公钥。
+在 ~/.ssh/ 目录会生成 github_rsa 和 github_rsa.pub 私钥和公钥。
 
-我们将github_rsa.pub中的内容粘帖到github服务器的SSH-key的配置中。
+我们将 github_rsa.pub 中的内容粘帖到 github 服务器的 SSH-key 的配置中。
 
 3. **添加私钥**
 
@@ -32,11 +32,11 @@ keywords: git,github
 $ ssh-add ~/.ssh/id_rsa 
 $ ssh-add ~/.ssh/github_rsa
 ```
-如果执行ssh-add时提示"Could not open a connection to your authentication agent"，可以现执行命令：
+如果执行 ssh-add 时提示 "Could not open a connection to your authentication agent" ，可以现执行命令：
 
 $ **ssh-agent bash**
 
-然后再运行ssh-add命令。
+然后再运行 ssh-add 命令。
 ```bash
 $ ssh-add ~/.ssh/id_rsa 
 $ ssh-add ~/.ssh/github_rsa
@@ -49,8 +49,8 @@ $ ssh-add -D
 
 4. **修改配置文件**
 
-在 ~/.ssh 目录下新建一个config文件,添加内容：
-注意此步骤建议使用touch config生成配置文件（防止window记事本生成windows格式，ansi编码的文件）
+在 ~/.ssh 目录下新建一个 config 文件,添加内容：
+注意此步骤建议使用 touch config 生成配置文件（防止 window 记事本生成 windows 格式， ansi 编码的文件）
 ```
 #Default commpany user(xxx@xxx.com)
 Host gerrit.xxx.com 
@@ -88,7 +88,7 @@ Hi utf7! You've successfully authenticated, but GitHub does not provide shell ac
 
 
 
-注意此时默认的git用户还是默认的账户
+注意此时默认的 git 用户还是默认的账户
 
 查看默认配置:
 
