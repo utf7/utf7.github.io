@@ -5,6 +5,14 @@ description: MySQL InnoDB事务隔离级别脏读、可重复读、幻读
 categories: MySQL
 keywords: mysql，innodb,transaction
 ---
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url }}">{{ post.title }}</a>
+      <p>{{ post.excerpt }}</p>
+    </li>
+  {% endfor %}
+</ul>
 
 ## MySQL InnoDB事务隔离级别脏读、可重复读、幻读
 
