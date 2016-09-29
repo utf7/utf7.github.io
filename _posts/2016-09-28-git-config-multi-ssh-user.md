@@ -7,11 +7,10 @@ keywords: git,github
 excerpt: 我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。
 ---
 
-## Git 配置多个 ssh 账户
+### Git 配置多个 ssh 账户
 
  我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。详细步骤如下：
 
-### 准备 ssh-key 
   
 #### **生成一个公司用的 SSH-Key**      
 
