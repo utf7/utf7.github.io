@@ -16,7 +16,7 @@ keywords: spark，big data
 
 此处如下：
 
-![](/resources/pictures/spark-install-intro/spark_download.png "选择页面")
+![](/images/posts/spark/spark-install-intro/spark_download.png "选择页面")
 
 ### **配置Spark**
 	
