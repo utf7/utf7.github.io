@@ -2,7 +2,7 @@
 layout: post
 title: MySQL InnoDB事务隔离级别脏读、可重复读、幻读
 description: MySQL InnoDB事务隔离级别脏读、可重复读、幻读
-category: MySQL
+categories: MySQL
 keywords: mysql，innodb,transaction
 ---
 
