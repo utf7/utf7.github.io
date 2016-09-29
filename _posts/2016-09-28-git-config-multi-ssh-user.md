@@ -13,15 +13,15 @@ excerpt: 我们在日常工作中会遇到公司有个 git 仓库，还有些自
 
 ### 准备 ssh-key 
   
-#### **生成一个公司用的 SSH-Key **      
+#### **生成一个公司用的 SSH-Key**      
 
  `$ ssh-keygen -t rsa -C "xxx@xxx.com” -f ~/.ssh/id_rsa`
 
 在 ~/.ssh/ 目录会生成 id_rsa 和 id_rsa.pub 私钥和公钥。
 
 我们将 id_rsa.pub 中的内容粘帖到公司git服务器的 SSH-key 的配置中。
-
-#### **生成一个github用的SSH-Key**
+ 
+#### **生成一个 github 用的 SSH-Key**
 
 `$ ssh-keygen -t rsa -C "yyy@yyy.com” -f ~/.ssh/github-rsa`
 在 ~/.ssh/ 目录会生成 github_rsa 和 github_rsa.pub 私钥和公钥。
