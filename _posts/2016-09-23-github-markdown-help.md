@@ -124,9 +124,9 @@ Github 支持任务列表 `[]`， 使用 `[x]` 表示任务完成
 \- \[ \] Push my commits to GitHub  
 \- \[ \] Open a pull request  
 
-- [x] Finish my changes  
-- [ ] Push my commits to GitHub  
-- [ ] Open a pull request  
+1. [x] Finish my changes  
+2. [ ] Push my commits to GitHub  
+3. [ ] Open a pull request  
 	
 
 
