@@ -24,12 +24,12 @@ Github Markdown 语法又称 GFM
 ### 三级标题  
 
 ### 链接
-可以使用`[`]`(`)来实现链接功能  
+可以使用`[]()`来实现链接功能  
 该博客建立在 `[Github Pages](https://pages.github.com/)`  
 该博客建立在 [Github Pages](https://pages.github.com/)
 
 
-文本格式
+### 文本格式
 
 粗体，斜体，删除线
 
@@ -79,6 +79,7 @@ public void test(){
 - Markdown  
 
 有序列表
+
 1. Java  
 2. Scala  
 3. Markdown  
@@ -90,16 +91,27 @@ public void test(){
 嵌套列表
 
 可以在行与行之间使用两个空格实现
+
 ```
+
 1. Make my changes  
+
   1. Fix bug  
+  
   2. Improve formatting  
+  
     * Make the headings bigger  
+	
 2. Push my commits to GitHub  
+
 3. Open a pull request  
+
   * Describe my changes  
+  
   * Mention all the members of my team  
+  
     * Ask for feedback  
+	
 ```	
 
 1. Make my changes  
