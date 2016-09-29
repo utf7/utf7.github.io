@@ -7,12 +7,13 @@ keywords: git,github
 excerpt: 我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。
 ---
 
+## Git 配置多个 ssh 账户
 
- 我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。下面我们来看看具体的操作：
+ 我们在日常工作中会遇到公司有个 git 仓库，还有些自己的一些项目放在 github 上。这样就导致我们要配置不同的 ssh-key 对应不同的环境。详细步骤如下：
 
-### 详细步骤如下：
-
-1. **生成一个公司用的 SSH-Key **      
+### 准备 ssh-key 
+  
+#### **生成一个公司用的 SSH-Key **      
 
  `$ ssh-keygen -t rsa -C "xxx@xxx.com” -f ~/.ssh/id_rsa`
 
@@ -20,14 +21,14 @@ excerpt: 我们在日常工作中会遇到公司有个 git 仓库，还有些自
 
 我们将 id_rsa.pub 中的内容粘帖到公司git服务器的 SSH-key 的配置中。
 
-2. **生成一个github用的SSH-Key**
+#### **生成一个github用的SSH-Key**
 
- $ ssh-keygen -t rsa -C "yyy@yyy.com” -f ~/.ssh/github-rsa
+`$ ssh-keygen -t rsa -C "yyy@yyy.com” -f ~/.ssh/github-rsa`
 在 ~/.ssh/ 目录会生成 github_rsa 和 github_rsa.pub 私钥和公钥。
 
 我们将 github_rsa.pub 中的内容粘帖到 github 服务器的 SSH-key 的配置中。
 
-3. **添加私钥**
+#### **添加私钥**
 
 ```bash
 $ ssh-add ~/.ssh/id_rsa 
@@ -48,7 +49,7 @@ $ ssh-add -l
 $ ssh-add -D
 
 
-4. **修改配置文件**
+#### **修改配置文件**
 
 在 ~/.ssh 目录下新建一个 config 文件,添加内容：
 注意此步骤建议使用 touch config 生成配置文件（防止 window 记事本生成 windows 格式， ansi 编码的文件）
@@ -66,7 +67,7 @@ Host github.com
  PreferredAuthentications publickey
  IdentityFile ~/.ssh/github_rsa
 ```
-5，目录结构
+目录结构如下：
 
 ```bash
 $ ls -lh ~/.ssh/
@@ -79,14 +80,12 @@ $ ls -lh ~/.ssh/
 ```
 
  
-6，测试
+#### 测试验证
 
-$ ssh -T git@github.com
+`$ ssh -T git@github.com`
 输出
 Hi utf7! You've successfully authenticated, but GitHub does not provide shell access.
 就表示成功的连上 github 了.也可以试试链接公司的 git 仓库中.
-
-
 
 
 注意此时默认的 git 用户还是默认的账户
