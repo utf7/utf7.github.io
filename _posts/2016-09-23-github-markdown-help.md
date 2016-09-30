@@ -21,8 +21,10 @@ Github Markdown 语法又称 GFM
 ### 三级标题         
 ```
 
-# 一级标题		 
-## 二级标题		  
+# 一级标题
+		 
+## 二级标题	
+	  
 ### 三级标题		  
 
 ### 链接
@@ -70,7 +72,7 @@ public void test(){
 
 ### 列表
 
-可以使用 `-` 或 `*` 来实现列表功能
+可以使用 `-` 或 `*` 来实现列表功能。注意列表符与列表标题需要空格
 
 \- Java  
 \- Scala  
@@ -147,7 +149,7 @@ Let's rename \*our-new-project\* to \*our-old-project\*.
 @utf7 :+1: This PR looks great-it's ready to merge!:shipit:
 
 
-
+问题：换行？为什么不支持任务列表
 		 
 参考：
 
