@@ -122,7 +122,7 @@ Post-install message from html-pipeline:
 输入http://localhost:4000  
 
 
-![]((/images/posts/github/jekyll/jekyll_local_snapshot.png)
+![](/images/posts/github/jekyll/jekyll_local_snapshot.png)
     
 
 	
