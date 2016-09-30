@@ -10,7 +10,7 @@ excerpt: MySQL InnoDB 事务隔离级别脏读、可重复读、幻读
 
 希望通过本文，可以加深读者对 MySQL InnoDB 的四个事务隔离级别，以及脏读、不重复读、幻读的理解。
 
-### ** InnoDB 事务隔离级别**
+### **InnoDB 事务隔离级别**
 	
 MySQL InnoDB事务的隔离级别有四级，默认是“可重复读”（REPEATABLE READ）。
 
@@ -193,14 +193,14 @@ SELECT * FROM t_bitfly;
 
 http://dev.mysql.com/doc/refman/5.0/en/innodb-record-level-locks.html
 
-By default, InnoDB operatesin REPEATABLE READ transaction isolation level and with the innodb_locks_unsafe_for_binlogsystem variable disabled. In this case, InnoDB uses next-key locks for searchesand index scans, which prevents phantom rows (see Section 13.6.8.5, “Avoidingthe Phantom Problem Using Next-Key Locking”).
+>By default, InnoDB operatesin REPEATABLE READ transaction isolation level and with the innodb_locks_unsafe_for_binlogsystem variable disabled. In this case, InnoDB uses next-key locks for searchesand index scans, which prevents phantom rows (see Section 13.6.8.5, >“Avoidingthe Phantom Problem Using Next-Key Locking”).
 
 准备的理解是，当隔离级别是可重复读，且禁用 innodb_locks_unsafe_for_binlog 的情况下，在搜索和扫描 index 的时候使用的 next-keylocks 可以避免幻读。
 关键点在于，是 InnoDB 默认对一个普通的查询也会加next-key locks，还是说需要应用自己来加锁呢？如果单看这一句，可能会以为 InnoDB 对普通的查询也加了锁，如果是，那和序列化（SERIALIZABLE）的区别又在哪里呢？
 
 MySQL manual里还有一段：
 
-Avoiding the PhantomProblem Using Next-Key Locking (http://dev.mysql.com/doc/refman/5.0/en/innodb-next-key-locking.html)
+>Avoiding the PhantomProblem Using Next-Key Locking (http://dev.mysql.com/doc/refman/5.0/en/innodb-next-key-locking.html)
 Toprevent phantoms, InnoDB usesan algorithm called next-key locking that combinesindex-row locking with gap locking.
 Youcan use next-key locking to implement a uniqueness check in your application:If you read your data in share mode and do not see a duplicate for a row youare going to insert, then you can safely insert your row and know that thenext-key lock set on the successor of your row during the read prevents anyonemeanwhile inserting a duplicate for your row. Thus, the next-key lockingenables you to “lock” the nonexistence of something in your table.
 
@@ -268,7 +268,8 @@ MySQL manual 里对可重复读里的锁的详细解释：
 
 http://dev.mysql.com/doc/refman/5.0/en/set-transaction.html#isolevel_repeatable-read
 
-For locking reads (SELECT with FORUPDATE or LOCK IN SHARE MODE),UPDATE, and DELETE statements, lockingdepends on whether the statement uses a unique index with a unique searchcondition, or a range-type search condition. For a unique index with a uniquesearch condition, InnoDB locksonly the index record found, not the gap before it. For other searchconditions, InnoDB locksthe index range scanned, using gap locks or next-key (gap plus index-record)locks to block insertions by other sessions into the gaps covered by the range.
+
+>For locking reads (SELECT with FORUPDATE or LOCK IN SHARE MODE),UPDATE, and DELETE statements, lockingdepends on whether the statement uses a unique index with a unique searchcondition, or a range-type search condition. For a unique index with a uniquesearch condition, InnoDB locksonly the index record found, not the gap before it. For other searchconditions, InnoDB locksthe index range scanned, using gap locks or next-key (gap plus index-record)locks to block insertions by other sessions into the gaps covered by the range.
 
 
 一致性读和提交读，先看实验:
@@ -328,10 +329,10 @@ SELECT * FROM t_bitfly;
 
 http://dev.mysql.com/doc/refman/5.0/en/innodb-consistent-read.html
 
-If you want to see the “freshest” state of the database, you should use either theREAD COMMITTED isolation level or a locking read:
+>If you want to see the “freshest” state of the database, you should use either theREAD COMMITTED isolation level or a locking read  
 `SELECT * FROM t_bitfly LOCK IN SHARE MODE;`
 
 结论：MySQL InnoDB 的可重复读并不保证避免幻读，需要应用使用加锁读来保证。而这个加锁度使用到的机制就是 next-keylocks 。
  
 
-文章幻读部分直接转载了 bitfly 的文章： http://blog.bitfly.cn/post/mysql-innodb-phantom-read/ 
+文章幻读部分直接转载了 bitfly 的文章： <http://blog.bitfly.cn/post/mysql-innodb-phantom-read/> 

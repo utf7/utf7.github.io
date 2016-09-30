@@ -51,22 +51,32 @@ export SPARK_WORKER_PORT=8091
 export SPARK_LOG_DIR=$SPARK_HOME/logs/spark
 export SPARK_PID_DIR=$SPARK_HOME/tmp/spark
 ```
-- slaves
+***
+
+- slaves  
+
 ```bash
-cat slaves  
-yc3
-```
+cat slaves
+```  
+
+>yc3
+
+***
 
 - log4j.properties  
 
-`cp log4j.properties.template log4j.properties`
+  `cp log4j.properties.template log4j.properties`
   
 根据需要修改，此处没有修改
 
-- 引入 hadoop 配置
-  此处将 core-site.xml 和 hdfs-site.xml 复制到了 spark 的 conf 目录下面。应该也可以通过其他方式去做
+***
+
+- 引入 hadoop 配置  
+
+此处将 core-site.xml 和 hdfs-site.xml 复制到了 spark 的 conf 目录下面。应该也可以通过其他方式去做
 将修改的文件同步到所有的节点中
 
+***
 
 ### **启动**
 
@@ -74,6 +84,8 @@ yc3
 cd $SPARK_HOME/sbin
 ./start-all.sh
 ```
+
+***
 
 ### **查看启动日志**
 日志记录在 $SPARK_HOME/logs/spark 目录下面
@@ -83,9 +95,10 @@ cd $SPARK_HOME/sbin
 - 查看 spark 管理页面：
 http://master:8090
 
-
+***
 
 ### **访问 Spark **
+
 - 使用 spark-shell
 
 首先，将 spark 的 README.MD 上传到 hdfs 上，后面我们需要用,上传文件：
@@ -94,25 +107,28 @@ http://master:8090
 
 ```bash
 cd $SPARK_HOME/bin
-
 ./spark-shell
+```
 
-scala>var textFile = sc.textFile("/user/utf7/README.md")
+>scala>var textFile = sc.textFile("/user/utf7/README.md")
 textFile: org.apache.spark.rdd.RDD[String] = /user/utf7/README.md MapPartitionsRDD[7] at textFile at <console>:24
 
-scala>textFile.count()
+>scala>textFile.count()
 res2: Long = 99
 
-scala> textFile.first()
+>scala> textFile.first()
 res3: String = # Apache Spark
 
-scala> val linesWithSpark = textFile.filter(line => line.contains("Spark"))
+>scala> val linesWithSpark = textFile.filter(line => line.contains("Spark"))
 linesWithSpark: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[8] at filter at <console>:26
 
-scala>  textFile.filter(line => line.contains("Spark")).count()
+>scala>  textFile.filter(line => line.contains("Spark")).count()
 res4: Long = 19
-```
+
+
 更多，请参考[quick-start](http://spark.apache.org/docs/latest/quick-start.html)
+
+***
 
 ### **编写 Spark程序 **
 
@@ -167,9 +183,9 @@ res4: Long = 19
 </project>
 ```
 
+***
 
 - 使用 Java RDD API
-
 
 ```java
 import org.apache.spark.SparkConf;
@@ -219,6 +235,8 @@ public class HelloSparkJavaRDD {
 
 
 更加请参考:[resilient-distributed-datasets-rdds](http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds)
+
+***
 
 
 - 使用 Java Spark SQL API
@@ -370,7 +388,7 @@ public class HelloSparkJavaSQL {
 
 更多请参考：[sql-programming-guide](http://spark.apache.org/docs/latest/sql-programming-guide.html)
 
-
+***
 
 - 提交 spark jar脚本
 
@@ -409,6 +427,7 @@ echo "GUIDE:"
 echo "USE runRDD/runSQL"
 ```
 
+***
 
 $ ./runSpark.sh runRDD ,执行如上命令，spark rdd 示例输出如下：
 

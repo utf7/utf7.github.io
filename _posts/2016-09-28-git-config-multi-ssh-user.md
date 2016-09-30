@@ -38,52 +38,56 @@ $ ssh-add ~/.ssh/github_rsa
 $ **ssh-agent bash**
 
 然后再运行 ssh-add 命令。
+
 ```bash
 $ ssh-add ~/.ssh/id_rsa 
 $ ssh-add ~/.ssh/github_rsa
 ```
-# 可以通过 ssh-add -l 来确私钥列表
-$ ssh-add -l
-# 可以通过 ssh-add -D 来清空私钥列表
-$ ssh-add -D
+
+可以通过 ssh-add -l 来确私钥列表  
+`$ ssh-add -l`  
+可以通过 ssh-add -D 来清空私钥列表  
+`$ ssh-add -D`
 
 
 #### **修改配置文件**
 
 在 ~/.ssh 目录下新建一个 config 文件,添加内容：
 注意此步骤建议使用 touch config 生成配置文件（防止 window 记事本生成 windows 格式， ansi 编码的文件）
-```
-#Default commpany user(xxx@xxx.com)
-Host gerrit.xxx.com 
- HostName gerrit.xxx.com
- User utf7
- PreferredAuthentications publickey
- IdentityFile ~/.ssh/id_rsa
-# second user(yyy@yyy.com)
-Host github.com
- HostName github.com
- User utf7
- PreferredAuthentications publickey
- IdentityFile ~/.ssh/github_rsa
-```
+
+>#Default commpany user(xxx@xxx.com)  
+Host gerrit.xxx.com  
+HostName gerrit.xxx.com  
+User utf7  
+PreferredAuthentications publickey  
+IdentityFile ~/.ssh/id_rsa  
+#second user(yyy@yyy.com)  
+Host github.com  
+HostName github.com  
+User utf7  
+PreferredAuthentications publickey  
+IdentityFile ~/.ssh/github_rsa
+
 目录结构如下：
 
 ```bash
 $ ls -lh ~/.ssh/
--rw-r--r-- 1 utf7 197121  344 九月 22 07:42 config
--rw-r--r-- 1 utf7 197121 1.7K 九月 22 07:28 github_rsa
--rw-r--r-- 1 utf7 197121  402 九月 22 07:28 github_rsa.pub
--rw-r--r-- 1 utf7 197121 1.7K 五月 30 06:30 id_rsa
--rw-r--r-- 1 utf7 197121  413 五月 30 06:30 id_rsa.pub
--rw-r--r-- 1 utf7 197121 1.3K 九月 22 06:39 known_hosts
 ```
+>-rw-r--r-- 1 utf7 197121  344 九月 22 07:42 config  
+-rw-r--r-- 1 utf7 197121 1.7K 九月 22 07:28 github_rsa  
+-rw-r--r-- 1 utf7 197121  402 九月 22 07:28 github_rsa.pub  
+-rw-r--r-- 1 utf7 197121 1.7K 五月 30 06:30 id_rsa  
+-rw-r--r-- 1 utf7 197121  413 五月 30 06:30 id_rsa.pub  
+-rw-r--r-- 1 utf7 197121 1.3K 九月 22 06:39 known_hosts
 
  
 #### 测试验证
 
 `$ ssh -T git@github.com`
-输出
-Hi utf7! You've successfully authenticated, but GitHub does not provide shell access.
+输出  
+
+>Hi utf7! You've successfully authenticated, but GitHub does not provide shell access.
+
 就表示成功的连上 github 了.也可以试试链接公司的 git 仓库中.
 
 
@@ -93,34 +97,35 @@ Hi utf7! You've successfully authenticated, but GitHub does not provide shell ac
 
 ```bash
 $ git config -l
-core.symlinks=false
-core.autocrlf=input
-core.fscache=true
-color.diff=auto
-color.status=auto
-color.branch=auto
-color.interactive=true
-help.format=html
-http.sslcainfo=D:/Program Files/Git/mingw64/ssl/certs/ca-bundle.crt
-diff.astextplain.textconv=astextplain
-rebase.autosquash=true
-core.longpaths=true
-user.name=utf7
-user.email=utf7@xxx.com
-core.editor=vim
-gitreview.username=xxx
-commit.template=D:/Users/utf7/.gitcommit
-push.default=simple
-gui.recentrepo=E:/git/Blog
-core.repositoryformatversion=0
-core.filemode=false
-core.bare=false
-core.logallrefupdates=true
-core.symlinks=false
-core.ignorecase=true
-core.hidedotfiles=dotGitOnly
-remote.origin.url=git@github.com:utf7/utf7.github.io.git
-remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
-branch.master.remote=origin
-branch.master.merge=refs/heads/master
 ```
+
+>core.symlinks=false  
+core.autocrlf=input  
+core.fscache=true  
+color.diff=auto  
+color.status=auto  
+color.branch=auto  
+color.interactive=true  
+help.format=html  
+http.sslcainfo=D:/Program Files/Git/mingw64/ssl/certs/ca-bundle.crt  
+diff.astextplain.textconv=astextplain  
+rebase.autosquash=true  
+core.longpaths=true
+>user.name=utf7  
+user.email=utf7@xxx.com  
+core.editor=vim  
+gitreview.username=xxx  
+commit.template=D:/Users/utf7/.gitcommit  
+push.default=simple  
+gui.recentrepo=E:/git/Blog  
+core.repositoryformatversion=0  
+core.filemode=false  
+core.bare=false  
+core.logallrefupdates=true  
+core.symlinks=false  
+core.ignorecase=true  
+core.hidedotfiles=dotGitOnly  
+remote.origin.url=git@github.com:utf7/utf7.github.io.git  
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*  
+branch.master.remote=origin  
+>branch.master.merge=refs/heads/master

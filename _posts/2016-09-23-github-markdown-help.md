@@ -11,6 +11,13 @@ excerpt: Github Markdown 写作帮助
 
 Github Markdown 语法又称 GFM 
 
+
+### 换行  
+换行，两个空格+回车  
+换行并且留一个空行，则可以两个回车  
+如果需要使用标题，代码块，引用，等等标记，则需要前面有两个回车  
+
+
 ### 标题
 
 使用不同数目的 `#` 来表示不同级别的标题
@@ -149,10 +156,11 @@ Let's rename \*our-new-project\* to \*our-old-project\*.
 @utf7 :+1: This PR looks great-it's ready to merge!:shipit:
 
 
-问题：换行？为什么不支持任务列表
+
+
 		 
 参考：
 
-[Basic Writing and formatting syntax](https://help.github.com/articles/basic-writing-and-formatting-syntax/)  
+[Writing on GitHub](https://help.github.com/categories/writing-on-github/)  
 [Autolinked references and URLs](https://help.github.com/articles/autolinked-references-and-urls/)  
 [Working with advanced formatting](https://help.github.com/articles/working-with-advanced-formatting/)  
