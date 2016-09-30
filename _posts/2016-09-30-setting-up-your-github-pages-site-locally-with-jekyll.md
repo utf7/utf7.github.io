@@ -116,9 +116,16 @@ Post-install message from html-pipeline:
 `netstat -ano` 找到 4000 端口的服务进程号，比如2034，task /svc /FI "PID eq 2034"找到服务的名称。    
 关闭此服务，然后重新启动 Jekyll 即可。福昕阅读器可能会占用 4000 端口
     
-    
+#### 本地浏览博客
+
+启动好 Jekyll 以后就可以本地浏览博客了。  
+输入http://localhost:4000  
+
+
+![]((/images/posts/github/jekyll/jekyll_local_snapshot.png)
     
 
+	
 参考：    
 [setting-up-your-github-pages-site-locally-with-jekyll](https://help.github.com/articles/setting-up-your-github-pages-site-locally-with-jekyll/)  
 [rubyinstaller](http://rubyinstaller.org/downloads/)  
