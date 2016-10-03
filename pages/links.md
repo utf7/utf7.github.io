@@ -10,8 +10,9 @@ permalink: /links/
 
 > 常用的一些链接
 
-* [微博](http://weibo.com/chenyechao)
-* [CSDN](http://blog.csdn.net/seven_3306)
-* [Blog](http://utf7.github.io)
-* [GitHub](https://github.com/utf7)
-* [SlideShare](www.slideshare.net)
+* [微博](http://weibo.com/chenyechao "我的微博，欢迎关注")
+* [CSDN](http://blog.csdn.net/seven_3306 "原 CSDN 博客")
+* [Blog](http://utf7.github.io "我的博客地址，欢迎阅读")
+* [GitHub](https://github.com/utf7 "最大的同性交友网站")
+* [SlideShare](www.slideshare.net "PPT 分享网站")
+* [程序猿DD](http://blog.didispace.com/ "Spring Boot/Cloud 相关内容")
