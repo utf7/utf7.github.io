@@ -126,8 +126,8 @@ public void test(){
 	* Mention all the members of my team  
 		* Ask for feedback  	 
 
-### 任务列表
-Github 支持任务列表 `[]`， 使用 `[x]` 表示任务完成
+### ~~任务列表~~
+~~Github 支持任务列表 `[]`， 使用 `[x]` 表示任务完成~~
 
 \- \[x\] Finish my changes  
 \- \[ \] Push my commits to GitHub  
@@ -137,8 +137,7 @@ Github 支持任务列表 `[]`， 使用 `[x]` 表示任务完成
 2. [ ] Push my commits to GitHub  
 3. [ ] Open a pull request  
 	
-
-
+	
 
 ### 忽略 Markdown 格式
 可以使用`\` 忽略 Markdown 的格式
