@@ -115,7 +115,7 @@ Post-install message from html-pipeline:
    编译启动 Jekyll ,如果出现 "jekyll 3.2.1 | Error:  Permission denied - bind(2) for 127.0.0.1:4000" 错误，这个问题可能是4000端口被占用导致。福昕阅读器可能会占用 4000 端口。    
 `netstat -ano` 找到 4000 端口的服务进程号，比如2034，task /svc /FI "PID eq 2034"找到服务的名称。    
 关闭此服务，然后重新启动 Jekyll 即可。  
-当然也可以启动 Jekyll 时候指定端口。`bundle exec jekyll serve -P 4001`，请参加`bundle exec jekyll serve --help`
+当然也可以启动 Jekyll 时候指定端口。`bundle exec jekyll serve -P 4001`，更多启动参数，可以查看帮助`bundle exec jekyll serve --help`
     
 #### 本地浏览博客
 
