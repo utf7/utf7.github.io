@@ -16,3 +16,4 @@ permalink: /links/
 * [GitHub](https://github.com/utf7 "最大的同性交友网站")
 * [SlideShare](www.slideshare.net "PPT 分享网站")
 * [程序猿DD](http://blog.didispace.com/ "Spring Boot/Cloud 相关内容")
+* [HBase Blog by Lars Hofhansl](http://hadoop-hbase.blogspot.jp/ "关于HBase的博客，作者是 Salesforce 首席架构师和 VP，HBase 和 Phoenix 贡献者以及 PMC 成员")
