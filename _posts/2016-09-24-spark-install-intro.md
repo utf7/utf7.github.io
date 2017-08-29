@@ -18,7 +18,7 @@ keywords: spark，big data
 
 ![](/images/posts/spark/spark-install-intro/spark_download.png "选择页面")
 
-### **配置 Spark **
+### **配置 Spark**
 	
 将文件上传到各个节点，然后解压
 
@@ -97,7 +97,7 @@ http://master:8090
 
 ***
 
-### **访问 Spark **
+### **访问 Spark**
 
 - 使用 spark-shell
 
@@ -130,7 +130,7 @@ res4: Long = 19
 
 ***
 
-### **编写 Spark程序 **
+### **编写 Spark程序**
 
 使用maven管理包依赖：
 
