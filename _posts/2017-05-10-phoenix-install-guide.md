@@ -1,3 +1,13 @@
+---
+layout: post
+title: 安装 Phoenix 
+description: Phoenix 
+categories: Phoenix
+keywords: Phoenix,big data,hbase
+excerpt: Phoenix 安装
+---
+
+
 ## **一、安装配置 Phoenix**
 
 下载tar后解压phoenix
