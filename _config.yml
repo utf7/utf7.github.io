@@ -7,7 +7,7 @@ date_format: "ordinal"
 title: utf7
 subtitle: "做好人，做好事"
 description: "Seven的个人博客"
-keywords: utf7, seven
+keywords: utf7, seven,HBase
 favicon: /favicon.ico
 timezone: Asia/Shanghai
 encoding: "utf-8"
@@ -107,4 +107,4 @@ google:
 #      Datas       #
 # ---------------- #
 skill_programing_keywords: [Java, Java EE, Design Patterns]
-skill_big_data_keywords: [Hadoop,Yarn,Hive,Spark,Presto,HBase,MySQL]
+skill_big_data_keywords: [HBase,Hadoop,Hive,Spark,Presto,MySQL]
