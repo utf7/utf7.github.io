@@ -2,7 +2,7 @@
 layout: page
 title: About
 description: 做好人，做好事
-keywords: Seven,utf7
+keywords: Seven,utf7,HMaster
 comments: true
 menu: 关于
 permalink: /about/
@@ -22,6 +22,7 @@ permalink: /about/
 * GitHub：[@utf7](https://github.com/utf7)
 * 博客：[{{ site.title }}]({{ site.url }})
 * 微博: [@敌粑咯](http://weibo.com/chenyechao)
+* HBase 技术社区: [@hmaster](http://hbase-help.com/?/people/hmaster)
 
 
 ## Skill Keywords
