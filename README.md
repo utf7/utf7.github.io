@@ -1,6 +1,6 @@
 # utf7
 
-我的个人博客：<http://utf7.github.io>，欢迎 Star 和 Fork。
+我的个人博客：<https://utf7.github.io>，欢迎 Star 和 Fork。
 
 ## 概览
 
@@ -12,9 +12,9 @@
 
 ## 效果预览
 
-### [在线预览 &rarr;](http://utf7.github.io)
+### [在线预览 &rarr;](https://utf7.github.io)
 
-![screenshot home](http://utf7.github.io/assets/images/screenshots/home.png)
+![screenshot home](https://utf7.github.io/assets/images/screenshots/home.png)
 
 ## Fork 指南
 
