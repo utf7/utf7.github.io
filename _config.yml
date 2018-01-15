@@ -77,6 +77,9 @@ collections:
     wiki:
         output: true
         permalink: /wiki/:path/
+        
+repository: utf7/utf7.github.io
+
 
 # ---------------- #
 #      Socials     #
