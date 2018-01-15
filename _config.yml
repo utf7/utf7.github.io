@@ -2,7 +2,7 @@
 #   Main Configs   #
 # ---------------- #
 baseurl:
-url: http://utf7.github.io
+url: https://utf7.github.io
 date_format: "ordinal"
 title: utf7
 subtitle: "做好人，做好事"
@@ -13,13 +13,14 @@ timezone: Asia/Shanghai
 encoding: "utf-8"
 source_code: https://github.com/utf7/utf7.github.io
 side_bar_repo_limit: 5
+repository: utf7/utf7.github.io
 
 # ---------------- #
 #      Author      #
 # ---------------- #
 author: utf7
 organization: utf7, Inc.
-organization_url: http://utf7.github.io
+organization_url: https://utf7.github.io
 location: Suzhou, China
 email: chenyechao@gmail.com
 
@@ -64,7 +65,7 @@ lsi: false
 quiet: false
 excerpt_separator: "\n\n"
 permalink: /:year/:month/:day/:title/
-gems:
+plugins:
     - rouge
 #     - jekyll-html-pipeline
     - jekyll-paginate
