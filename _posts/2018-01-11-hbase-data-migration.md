@@ -269,29 +269,21 @@ export HADOOP_HOME=/usr/lib/hadoop;export HBASE_HOME=/usr/lib/hbase;export HADOO
 ```
 
 
-
-
-
 ----------
-
 
 
 注意线上环境执行distcp或者snapshot 需要限制带宽。可通过设置map数以及限制每个map的带宽来实现。
 
 限制带宽方法请执行如下命令查看帮助
+
 ```bash
 hadoop distcp
 ```
 >-bandwidth <arg>              Specify bandwidth per map in MB  
-  
->-m <arg>                      Max number of concurrent maps to use for copy
+>-m <arg>                      Max number of concurrent maps to use for copy  
 
-
-
-                              
 ```bash 
 hbase org.apache.hadoop.hbase.snapshot.ExportSnapshot
 ```
->-mappers                Number of mappers to use during the copy   (mapreduce.job.maps).
- 
+>-mappers                Number of mappers to use during the copy   (mapreduce.job.maps).  
 >-bandwidth              Limit bandwidth to this value in MB/second.
