@@ -279,8 +279,8 @@ export HADOOP_HOME=/usr/lib/hadoop;export HBASE_HOME=/usr/lib/hbase;export HADOO
 ```bash
 hadoop distcp
 ```
->-bandwidth <arg>              Specify bandwidth per map in MB  
->-m <arg>                      Max number of concurrent maps to use for copy  
+>-bandwidth <arg>              Specify bandwidth per map in MB  <br/>
+>-m <arg>                      Max number of concurrent maps to use for copy
 
 ```bash 
 hbase org.apache.hadoop.hbase.snapshot.ExportSnapshot
