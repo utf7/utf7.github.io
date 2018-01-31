@@ -12,9 +12,9 @@ excerpt: Phoenix 安装
 
 下载tar后解压phoenix
 
-tar -zxvf phoenix-4.10.0-HBase-1.1-{bch_version}.tar.gz
+tar -zxvf phoenix-4.10.0-HBase-1.1.tar.gz
 
-在解压目录找到如下文件 phoenix-4.10.0-HBase-1.1-{bch_version}-server.jar
+在解压目录找到如下文件 phoenix-4.10.0-HBase-1.1-server.jar
 
 将上面 jar 文件 放到 HBase 所有节点的HBase_HOME的lib目录下。
 

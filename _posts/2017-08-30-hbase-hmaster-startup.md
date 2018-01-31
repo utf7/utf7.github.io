@@ -147,8 +147,10 @@ ByteBufferIOEngine 堆内和堆外内存分配
 1)判断集群启动模式
 2）根据不同的默认启动
 
-HBase 集群分为 local 和 distributed 两种模式，根据 hbase.cluster.distributed 是否为 true，如果不是，则为 local模式，
-local 通常也不会使用，这里我们不关心，我们来看一下集群模式的启动代码
+HBase 集群分为 local 和 distributed 两种模式，
+根据 hbase.cluster.distributed 是否为 true，
+如果不是，则为 local模式，local 通常也不会使用，这里我们不关心，
+我们来看一下集群模式的启动代码
 startHMaster()的核心代码如下
 ```java
         CoordinatedStateManager csm =
@@ -163,21 +165,17 @@ startHMaster()的核心代码如下
         if(master.isAborted())
           throw new RuntimeException("HMaster Aborted");
 ```
-首先实例化 CoordinatedStateManager 这个类，这个类目前是通过 zookeeper 来实现的，用于协调管理状态相关的东西。然后实例化 HMaster，这里很重要，HMaster 继承了HRegionServer ，所以可以理解成 HMaster 也是一个特殊的RegionServer
+首先实例化 CoordinatedStateManager 这个类，这个类目前是通过 Zookeeper 来实现的，
+用于协调管理状态相关的东西。然后实例化 HMaster，这里很重要，
+HMaster 继承了 HRegionServer ，所以可以理解成 HMaster 也是一个特殊的RegionServer
 
 实例化 HMaster 代码如下 
 
 
 ```java
-  public HMaster(final Configuration conf, CoordinatedStateManager csm)
-      throws IOException, KeeperException, InterruptedException {
+  public HMaster(final Configuration conf, CoordinatedStateManager csm) {
     super(conf, csm);
-    this.rsFatals = new MemoryBoundedLogMessageBuffer(
-      conf.getLong("hbase.master.buffer.for.rs.fatals", 1*1024*1024));
-
-    LOG.info("hbase.rootdir=" + FSUtils.getRootDir(this.conf) +
-      ", hbase.cluster.distributed=" + this.conf.getBoolean(HConstants.CLUSTER_DISTRIBUTED, false));
-
+    //初始化一些参数
     // Disable usage of meta replicas in the master
     this.conf.setBoolean(HConstants.USE_META_REPLICAS, false);
 
@@ -247,6 +245,8 @@ startHMaster()的核心代码如下
 ```
 
 
+
+
 1）首先构建执行父类的构造方法，也就是HRegionServer的构造方法
   HRegionServer 构造方法完成如下几个事情
   ```java
@@ -254,17 +254,18 @@ startHMaster()的核心代码如下
       throws IOException, InterruptedException {
     this.fsOk = true;
     this.conf = conf;
-    checkCodecs(this.conf);//1、检查压缩，执行压缩格式支持测试
+	//1、检查压缩，执行压缩格式支持测试
+    checkCodecs(this.conf);
     this.userProvider = UserProvider.instantiate(conf);
-    Superusers.initialize(conf);
     //2、初始化超级用户信息
-    FSUtils.setupShortCircuitRead(this.conf);//3、初始化设置短路读dfs.client.read.shortcircuit.skip.checksum,hbase.regionserver.checksum.verify
-    这两个属性不能同时设置为true，设置dfs.client.read.shortcircuit.buffer.size默认值为BLOCK_SIZE*2=128K
-
-    // Disable usage of meta replicas in the regionserver
+    Superusers.initialize(conf);
+	//3、初始化设置短路读,这两个属性不能同时设置为true，
+    //设置dfs.client.read.shortcircuit.buffer.size默认值为BLOCK_SIZE*2=128K
+    FSUtils.setupShortCircuitRead(this.conf);dfs.client.read.shortcircuit.skip.checksum,hbase.regionserver.checksum.verify
+  
     //3、设置hbase.meta.replicas.use 为false
+    // Disable usage of meta replicas in the regionserver
     this.conf.setBoolean(HConstants.USE_META_REPLICAS, false);
-
 
     // Config'ed params
     //4、设置参数，1、默认重试次数，2、线程唤醒频率 3、Sleeper 线程检查频率
@@ -273,18 +274,24 @@ startHMaster()的核心代码如下
     this.threadWakeFrequency = conf.getInt(HConstants.THREAD_WAKE_FREQUENCY, 10 * 1000);
     this.msgInterval = conf.getInt("hbase.regionserver.msginterval", 3 * 1000);
 
-    //5、实例化Sleeper 线程，该线程用于检测进程停顿
+    //5、实例化Sleeper 线程，该线程用于检测进程停顿,
     this.sleeper = new Sleeper(this.msgInterval, this);
 
     //6、实例化NonceManager
     //nonceManager 用于处理append/increment 被客户端多次重试发送的情况
-    //HBase Client RPC提交后，如果因为服务端响应超时，则会重新发起请求直到重试或者达到重试次数失败。
-    //多次RPC 发起append/increment可能会导致被多次操作的情况。HBase的NonceManager用于处理这种情况。 
-    //这个特性默认是开启的。简单来讲，ClientProtos中有两个参数nonceGroup和nonce 会携带到RPC请求中，
-    //这两个参数构成一个NonceKey，可以标记某个重复的请求，处理increment和append的时候，会拿到
-    //这个NonceKey从ServerNonceManager的nonces(ConcurrentHashMap)中判断是否存在，
-    //如果存在则判断该Operation的状态：DONT_PROCEED：已经被成功处理，不需要操作，直接忽略即可,
-    //PROCEED：已经被处理，但失败,此时需要重新执行。WAIT：还在处理，继续等待，根据处理结果来决定下一步操作。 有兴趣可以看ServerNonceManager的代码，比较简单易懂
+    //HBase Client RPC提交后，如果因为服务端响应超时，
+    //则会重新发起请求直到重试或者达到重试次数失败。
+    //多次RPC 发起append/increment可能会导致被多次操作的情况。
+    //HBase的NonceManager用于处理这种情况。这个特性默认是开启的。
+    //简单来讲，ClientProtos中有两个参数nonceGroup和nonce 会携带到RPC请求中，
+    //这两个参数构成一个NonceKey，可以标记某个重复的请求。
+    //处理increment和append的时候，会拿到这个NonceKey
+    //从ServerNonceManager的nonces(ConcurrentHashMap)中判断是否存在，
+    //如果存在则判断该Operation的状态：
+     //DONT_PROCEED：已经被成功处理，不需要操作，直接忽略即可；
+    //PROCEED：已经被处理，但失败,此时需要重新执行；
+    //WAIT：还在处理，继续等待，根据处理结果来决定下一步操作；
+    // 有兴趣可以看ServerNonceManager的代码，比较简单易懂
     boolean isNoncesEnabled = conf.getBoolean(HConstants.HBASE_RS_NONCES_ENABLED, true);
     this.nonceManager = isNoncesEnabled ? new ServerNonceManager(this.conf) : null;
 
@@ -345,35 +352,47 @@ startHMaster()的核心代码如下
     // Get fs instance used by this RS.  Do we use checksum verification in the hbase? If hbase
     // checksum verification enabled, then automatically switch off hdfs checksum verification.
     boolean useHBaseChecksum = conf.getBoolean(HConstants.HBASE_CHECKSUM_VERIFICATION, true);
-    //实例化 HFileSystem,这个是操作 HFILE 文件系统的类，继续自 HDFS 的 FileSystem，用于读写 HDFS
+    //实例化 HFileSystem,这个是操作 HFILE 文件系统的类，
+    //继续自 HDFS 的 FileSystem，用于读写 HDFS
     this.fs = new HFileSystem(this.conf, useHBaseChecksum);
     this.rootDir = FSUtils.getRootDir(this.conf);
-    //实例化 FSTableDescriptors，这个是类是用用来操作读写 HDFS中表路径的定义，临时文件目录的，如读写表的定义。如启动时，将HDFS中的 ，tablePath/.tabledesc/.tableinfo.0000000001 加载到内存中，这里RegionServer 对象的参数是 readonly,HMaster 是可写的
+    //实例化 FSTableDescriptors，这个是类是用用来操作读写 HDFS中表路径的定义，
+    //临时文件目录的，如读写表的定义。
+    //如启动时，将HDFS中的 ，tablePath/.tabledesc/.tableinfo.0000000001 
+    //加载到内存中，这里RegionServer 对象的参数是 readonly,HMaster 是可写的
     this.tableDescriptors = new FSTableDescriptors(
       this.conf, this.fs, this.rootDir, !canUpdateTableDescriptor(), false);
-    //实例化 ExecutorService ，该类用于承载多个线程池，主要对象就是 Executor 的 map
+    //实例化 ExecutorService，该类用于承载多个线程池，主要对象就是 Executor 的 map
     service = new ExecutorService(getServerName().toShortString());
     spanReceiverHost = SpanReceiverHost.getInstance(getConfiguration());
 
 
-     //初始化 Zookeeper  Coordination 相关内容
+     //初始化 Zookeeper Coordination 相关内容
     // Some unit tests don't need a cluster, so no zookeeper at all
     if (!conf.getBoolean("hbase.testing.nocluster", false)) {
         //实例化zookeeperWatcher，canCreateBaseZNode只有Hmaster 才可以创建baseZNode
       // Open connection to zookeeper and set primary watcher
       zooKeeper = new ZooKeeperWatcher(conf, getProcessName() + ":" +
         rpcServices.isa.getPort(), this, canCreateBaseZNode());
-      //实例化 ZkCoordinatedStateManager，这个类主要包括，ZooKeeperWatcher，以及各种Coordination，包括splitLogWorkerCoordination，splitTransactionCoordination，splitLogManagerCoordination，closeRegionCoordination，openRegionCoordination，regionMergeCoordination,通过ZooKeeperWatcher 监听zookeeper 相应的znode节点信息，如果一旦发生变化，则做相应的操作,如修改znode状态等
+      //实例化 ZkCoordinatedStateManager，这个类主要包括:
+      //ZooKeeperWatcher，以及各种Coordination，包
+     //splitLogWorkerCoordination，splitTransactionCoordination，
+     //splitLogManagerCoordination，closeRegionCoordination，
+	//openRegionCoordination，regionMergeCoordination,
+	//通过ZooKeeperWatcher 监听zookeeper 相应的znode节点信息，
+	//如果一旦发生变化，则做相应的操作,如修改znode状态等
       this.csm = (BaseCoordinatedStateManager) csm;
       this.csm.initialize(this);
       this.csm.start();
 
       
-      //创建 TableLockManager，该类实现了一个分布式的表锁（通过zookeeper），默认是开启的，表锁如修改schema的时候，需要锁表
+      //创建 TableLockManager，该类实现了一个分布式的表锁（通过zookeeper），
+      //默认是开启的，表锁如修改schema的时候，需要锁表
       tableLockManager = TableLockManager.createTableLockManager(
         conf, zooKeeper, serverName);
 
-      //实例化 MasterAddressTracker，用于跟踪 HMaster 的地址 ，zonde 为${zookeeper.znode.parent}/master
+      //实例化 MasterAddressTracker，用于跟踪 HMaster 的地址 ，
+      //zonde 为${zookeeper.znode.parent}/master
       masterAddressTracker = new MasterAddressTracker(getZooKeeper(), this);
       //启动 MasterAddressTracker 
       masterAddressTracker.start();
@@ -384,24 +403,56 @@ startHMaster()的核心代码如下
       clusterStatusTracker.start();
     }
 
-    // 实例化 ConfigurationManager，该类用来实现动态加载配置，目前 HBase 支持部分配置动态加载，如 compaction 一些参数等；未来会支持更多动态配置加载
+    // 实例化 ConfigurationManager，该类用来实现动态加载配置，
+    //目前 HBase 支持部分配置动态加载，如 Compaction 一些参数等；
+    //未来会支持更多动态配置加载
     this.configurationManager = new ConfigurationManager();
 
     //启动RPCService, 最终调用RpcServer的start 方法启动，
-    //此步骤主要是启动 responder.start();listener.start();scheduler.start();
-    //1、Responder 用于向客户端发送 RPC 调用结果，通过 JAVA NIO Selector+ loop 实现。
-    //2、Listener 用于监听 RPC 端口，处理请求，ServerSocketChannel+Selector+ ThreadPool（Reader)实现
+    //此步骤主要是启动 responder、listener、scheduler 的 start()方法;
+    //1)、Responder 用于向客户端发送 RPC 调用结果，
+    //通过 JAVA NIO Selector+ loop 实现。
+    //2、Listener 用于监听 RPC 端口，处理请求，
+    // ServerSocketChannel+Selector+ ThreadPool（Reader)实现
     //3、scheduler 是一个 rpc 处理调度器，用于构建 hanlders,用于调度 处理CallRunner。
-    //目前有两种实现， SimpleRpcScheduler 和 FifoRpcScheduler，默认为SimpleRpcScheduler
+    //目前有两种实现， SimpleRpcScheduler 和 FifoRpcScheduler，
+    //默认为SimpleRpcScheduler
     rpcServices.start();
-    //启动 info web ui， 基于jetty 的 HttpServer，如果是RegionServer 则启用RegionServer WebUI，如果是 HMaster 则启动 HMaster WEBUI
+    //启动 info web ui， 基于jetty 的 HttpServer，
+    //如果是RegionServer 则启用RegionServer WebUI
+    //如果是 HMaster 则启动 HMaster WEBUI
     putUpWebUI();
     this.walRoller = new LogRoller(this, this);
     this.choreService = new ChoreService(getServerName().toString());
   }
   ```
 
+```java
+初始化参数部分
+//用于打印FATAL错误
+ this.rsFatals = new MemoryBoundedLogMessageBuffer(
+      conf.getLong("hbase.master.buffer.for.rs.fatals", 1*1024*1024));
+	//meta replicas 设置为 false 
+    // Disable usage of meta replicas in the master
+    this.conf.setBoolean(HConstants.USE_META_REPLICAS, false);
+    //初始化修改一些 replication 相关的参数，目前是hbase.master.logcleaner.plugins ，master 清理 WAL 的插件
+    Replication.decorateMasterConfiguration(this.conf);
 
+     //不知道什么意思。。。
+    // Hack! Maps DFSClient => Master for logs.  HDFS made this
+    // config param for task trackers, but we can piggyback off of it.
+    if (this.conf.get("mapreduce.task.attempt.id") == null) {
+      this.conf.set("mapreduce.task.attempt.id", "hb_m_" + this.serverName.toString());
+    }
+     //配置是否检查压缩支持
+    // should we check the compression codec type at master side, default true, HBASE-6370
+    this.masterCheckCompression = conf.getBoolean("hbase.master.check.compression", true);
+    //配置是否检查加密支持
+    // should we check encryption settings at master side, default true
+    this.masterCheckEncryption = conf.getBoolean("hbase.master.check.encryption", true);
+
+
+```
 
 
 
