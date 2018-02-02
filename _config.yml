@@ -79,6 +79,7 @@ collections:
         permalink: /wiki/:path/
         
 repository: utf7/utf7.github.io
+github: [metadata]
 
 
 # ---------------- #
