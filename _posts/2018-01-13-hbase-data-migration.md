@@ -41,17 +41,17 @@ DISTCP的思路是，直接通过DISTCP拷贝HBase 的目录文件到目标集�
      hbase org.apache.hadoop.hbase.mapreduce.RowCounter 'testTable' 
 
 1-5 步骤使用hdfs 用户执行命令：
-
+```bash
 hadoop distcp   hftp://original_namenode1:port/hbase/test hdfs://new_namenode:8020/apps/hbase/data/data/default/
 hdfs dfs -mkdir /apps/hbase/data/data/default/test/.tabledesc
 hdfs dfs -mv /apps/hbase/data/data/default/test/.tableinfo.0000000001 /apps/hbase/data/data/default/test/.tabledesc/
 hdfs dfs -chmod -R 755 /apps/hbase/data/data/default/test
 hdfs dfs -chown -R hbase:hdfs /apps/hbase/data/data/default/test
-
+```
 6-7 切换到hbase 用户执行：
-
+```bash
 hbase hbck -fixMeta  -fixAssignments test
-
+```
 
 ## **SNAPSHOT快照迁移**
 
