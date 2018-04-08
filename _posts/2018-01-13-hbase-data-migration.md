@@ -23,7 +23,7 @@ DISTCP的思路是，直接通过DISTCP拷贝HBase 的目录文件到目标集�
 案例：
 0.94.11 版本迁移到1.1.3，0.94.11 版本是2013年的版本，是非常老的一个版本。
 社区从0.96版本开始 HBase 序列化协议和目录结构发生了变化
-其它版本的迁移，理论上也都可以按照此步骤来，只不过步骤2，3可能不需要
+0.96后的版本不需要步骤2、3
 
 解决步骤：
 确保网络互通，两个集群的 /etc/hosts 配置主机名映射
@@ -31,8 +31,8 @@ DISTCP的思路是，直接通过DISTCP拷贝HBase 的目录文件到目标集�
 如下所在步骤在新集群操作
  
 1、首先distcp 拷贝表目录
-2、创建表描述文件目录
-3、移动表描述文件到如上目录
+2、创建表描述文件目录（0.96之前版本）
+3、移动表描述文件到如上目录(0.96之前版本）
 4、修改权限
 5、修改所属用户
 6、修复表 执行hbase hbck -fixMeta -fixAssignments
@@ -70,8 +70,9 @@ HBase 支持快照功能以及快照导出功能，组合利用此功能可以�
 新集群：
 
 1）检查新老集群配置snappy压缩支持(可选，因为有些新老集群压缩不一定支持）
-在HC的hbase-env.sh中添加如下属性：
-```bash export JAVA_LIBRARY_PATH=/usr/lib/hadoop/lib/native/Linux-amd64-64:/usr/lib/hadoop/lib/native
+在HC的hbase-env.sh中添加如下属性：  
+```bash
+export JAVA_LIBRARY_PATH=/usr/lib/hadoop/lib/native/Linux-amd64-64:/usr/lib/hadoop/lib/native
 ```
 默认加载hadoop的native类库。
 2）检查是否启用快照
@@ -81,8 +82,7 @@ hbase.snapshot.enabled为true
 （注意本步骤必不可少，即使知道快照和压缩已经可用，因为需要此步骤来自动生成 /apps/hbase/data/.hbase-snapshot 目录）
 ```bash
 su - hbase
-hbase>create 'test_tmp_2017', {NAME => 'c1', DATA_BLOCK_ENCODING => 'NONE', BLOOMFILTER => 'ROW', REPLICATION_SCOPE => '0', VERSIONS => '1', COMPRESSION => 'SNAPPY', MIN_VERSIONS => '0',
-TTL => '2147483647', KEEP_DELETED_CELLS => 'false', BLOCKSIZE => '65536', IN_MEMORY => 'false', BLOCKCACHE => 'true'}
+hbase>create 'test_tmp_2017', {NAME => 'F', DATA_BLOCK_ENCODING => 'NONE', BLOOMFILTER => 'ROW',COMPRESSION => 'SNAPPY'}
 hbase>flush ’test_tmp_2017'
 hbase>snapshot ’test_tmp_2017', ’test_tmp_2017_sp'
 hbase>list_snapshots
