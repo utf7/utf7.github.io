@@ -1,11 +1,12 @@
 ---
 layout: post
 title: HBase Compaction 参数调优
-description:HBase Compaction 重要的参数说明以及调优
-catagories:HBase
-keywords:HBase,Compaction
-excerpt: HBase Compaction 参数调优
+description: HBase Compaction 重要的参数说明以及调优
+categories: HBase
+keywords: HBase,Compaction
+excerpt: HBase Compaction 重要参数调优
 ---
+
 
 ## **HBase compaction 调优**
 
