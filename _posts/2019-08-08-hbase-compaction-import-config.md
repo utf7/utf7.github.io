@@ -1,6 +1,6 @@
 ---
-layout:post
-tile: HBase Compaction 参数调优
+layout: post
+title: HBase Compaction 参数调优
 description:HBase Compaction 重要的参数说明以及调优
 catagories:HBase
 keywords:HBase,Compaction
