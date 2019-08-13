@@ -10,13 +10,14 @@ excerpt: HBase Compaction 重要参数调优
 
 ## **HBase compaction 调优**
 
-Compaction的主要目的：
-1、将多个HFile 合并为较大HFile，从而提高查询性能
-2、减少HFile 数量，减少小文件对HDFS 影响
-3、提高Region初始化速度
+Compaction的主要目的： 
+
+1、将多个HFile 合并为较大HFile，从而提高查询性能  
+2、减少HFile 数量，减少小文件对HDFS 影响  
+3、提高Region初始化速度  
 
 
-hbase.hstore.compaction.min
+### hbase.hstore.compaction.min
 
 当某个列族下的HFile 文件数量超过这个值，则会触发 minor compaction操作
 默认是3，比较小，建议设置10-15
@@ -36,35 +37,37 @@ hbase.hstore.compaction.min
 此时合并文件，对查询效率的提升影响不大。则可以将该值设置的大一些，减少合并对系统的影响。
 
 
-hbase.hstore.compaction.max
+### hbase.hstore.compaction.max
 
 一次最多可以合并多少个HFile，默认为 10
 限制某个列族下面选择最多可选择多少个文件来进行合并
 注意需要满足条件hbase.hstore.compaction.max > hbase.hstore.compaction.min
 
 
-hbase.hstore.compaction.max.size
+### hbase.hstore.compaction.max.size
 
 默认Long最大值，minor_compact 时 HFile 大小超过这个值则不会被选中合并
 用来限制防止过大的HFile被选中合并，减少写放大以及提高合并速度
 
-hbase.hstore.compaction.min.size
+### hbase.hstore.compaction.min.size
 
 默认 memstore 大小，minor_compact 时 HFile 小于这个值，则一定会被选中
 可用来优化尽量多的选择合并小的文件
 
-hbase.regionserver.thread.compaction.small
+### hbase.regionserver.thread.compaction.small
+
 默认1，每个RS的  minor compaction线程数，其实不是很准确，这个线程主要是看参与合并的HFile数据量
 有可能minor compaction数据量较大会使用compaction.large
 提高线程可提高HFile 合并效率
 
 
-hbase.regionserver.thread.compaction.large
+### hbase.regionserver.thread.compaction.large
+
 默认1，每个RS的 major compaction线程数，其实不是很准确，这个线程主要是看参与合并的HFile数据量
 有可能minor compaction数据量较大会使用compaction.large
 提高线程可提高 HFile 合并效率
 
-Hbase.hregion.majorcompaction
+### Hbase.hregion.majorcompaction
 
 默认：86400000
 
