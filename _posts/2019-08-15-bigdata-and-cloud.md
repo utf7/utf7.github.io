@@ -7,11 +7,15 @@ keywords: EMR,Cloud,Hadoop、HBase
 excerpt:  EMR,Cloud,Hadoop、HBase
 ---
 
+EMR 与HBase 可以使用2种形态，  
+第一种是包含在EMR 中作为一个产品提供  
+第二种是作为单独的服务提供  
+以下是做的几个主要云计算厂商的调研  
+
 
 ## EMR 主要厂家以及组件
 
-
-|云厂商 | 产品 | 组件 | 链接|
+| 云厂商 | 产品 | 组件 | 链接 |
 | :-: | :-: | :-: | :-: |
 
 | 亚马逊 | EMR | Hadoop、Flink、HBase、Hive、Phoenix、Zookeeper、Presto、Spark、Tez、Pig、Zeppelin、Tensorflow、Sqoop、Hue、Livy、Mahout、MXNet、Oozie| https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-release-5x.html |
