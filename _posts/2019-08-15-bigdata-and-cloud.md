@@ -9,13 +9,21 @@ excerpt:  EMR,Cloud,Hadoop、HBase
 
 
 ## EMR 主要厂家以及组件
+
+
 |云厂商 | 产品 | 组件 | 链接|
 | :-: | :-: | :-: | :-: |
+
 | 亚马逊 | EMR | Hadoop、Flink、HBase、Hive、Phoenix、Zookeeper、Presto、Spark、Tez、Pig、Zeppelin、Tensorflow、Sqoop、Hue、Livy、Mahout、MXNet、Oozie| https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-release-5x.html |
+
 | 阿里云 | E-MapReduce | Hadoop、Spark、Hive、YARN、HDFS、HBase、Phoenix、Flink、Zoookeeper、Tez、Druid、Presto、Storm、Impala、Flume、Ranger、TF、Kafka、Pig、Sqoop、 | https://help.aliyun.com/document_detail/28073.html?spm=a2c4g.11186623.6.546.be7d2068xWi6GP |
+
 | 华为云 | MapReduce服务 | Hadoop、Spark、HBase、Opentsdb、Hive、Tez、Hue、Flink、Kafka、Storm、KafkaManager、Flume | https://support.huaweicloud.com/productdesc-mrs/mrs_08_0005.html |
+
 | 腾讯云 | 弹性MapReduce |Haoop、HBase、Flink、Hive、Hue、Ooize、Presto、Ranger、Spark、Sqoop、Storm、Tez、Zookeeper、Flume、Alluxio、Knox | https://cloud.tencent.com/document/product/589/20279 |
+
 | 天翼云 | MapReduce服务 |Hadoop、Spark、HBase、Kafka、Storm | https://www.ctyun.cn/product/MapReduce https://www.ctyun.cn/help/qslist/1411 |
+
 
 
 ## EMR 与 HBase 产品形态
