@@ -7,6 +7,8 @@ keywords: EMR,Cloud,Hadoop、HBase
 excerpt:  EMR,Cloud,Hadoop、HBase
 ---
 
+# EMR 与 HBase
+
 ## EMR 与 HBase 产品形态
 
 EMR 与 HBase 主要有2种形态：
