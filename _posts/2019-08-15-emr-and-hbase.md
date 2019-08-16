@@ -2,7 +2,7 @@
 layout: post
 title: EMR 与 HBase
 description:  EMR 与 HBase
-categories: EMR,Cloud,HBase
+categories: EMR
 keywords: EMR,Cloud,HBase
 excerpt:  EMR,Cloud,HBase
 ---
@@ -21,17 +21,86 @@ EMR 与 HBase 主要有2种形态：
 
 比如 Bulkload/Spark 分析等 是EMR 一套集群，HBase 是一套集群
 
-## EMR 主要厂家以及组件
 
 
-| 云厂商 | 产品 | 组件 | 链接 |
-| :---  | :---: | :---: | ---: |
-| 亚马逊 | EMR | Hadoop、Flink、HBase、Hive、Phoenix、Zookeeper、Presto、Spark、Tez、Pig、Zeppelin、Tensorflow、Sqoop、Hue、Livy、Mahout、MXNet、Oozie| https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-release-5x.html |
-| 阿里云 | E-MapReduce | Hadoop、Spark、Hive、YARN、HDFS、HBase、Phoenix、Flink、Zoookeeper、Tez、Druid、Presto、Storm、Impala、Flume、Ranger、TF、Kafka、Pig、Sqoop、 | https://help.aliyun.com/document_detail/28073.html?spm=a2c4g.11186623.6.546.be7d2068xWi6GP |
-| 华为云 | MapReduce服务 | Hadoop、Spark、HBase、Opentsdb、Hive、Tez、Hue、Flink、Kafka、Storm、KafkaManager、Flume | https://support.huaweicloud.com/productdesc-mrs/mrs_08_0005.html |
-| 腾讯云 | 弹性MapReduce | Haoop、HBase、Flink、Hive、Hue、Ooize、Presto、Ranger、Spark、Sqoop、Storm、Tez、Zookeeper、Flume、Alluxio、Knox | https://cloud.tencent.com/document/product/589/20279 |
-| 天翼云 | MapReduce服务 | Hadoop、Spark、HBase、Kafka、Storm | https://www.ctyun.cn/product/MapReduce https://www.ctyun.cn/help/qslist/1411 |
+## 云商家 EMR 与开源的关系说明：
 
+
+#### 亚马逊：
+
+基于开源,是否修改代码未知，推测可能会修改支持S3相关的内容。
+
+#### 阿里云：
+
+> 我们基于开源 Hadoop 的版本，在完全不改变原有接口的基础上，加入了我们的 emr-core 组件，深度支持阿里云的 OSS。这个组件的版本会跟在 Hadoop 版本后。
+
+#### 腾讯云：
+
+> 弹性 MapReduce 结合云技术和 Hadoop、Hive、Spark、Storm 等社区开源技术，为您提供安全、低成本、高可靠、> 可弹性伸缩的云端 Hadoop 服务。
+
+应该是基于开源。
+
+#### 华为云：
+
+> MRS服务拥有强大的Hadoop内核团队，基于华为FusionInsight大数据企业级平台构筑。
+
+#### 天翼云：
+
+> MRS 基于开源软件 Hadoop 进行功能增强、Spark 内存计算引擎、HBase 分布式存储数据
+库以及 Hive 数据仓库框架，提供海量数据的分析计算与存储能力。
+
+
+## 云厂商 EMR 组件版本信息
+
+| **组件** | **亚马逊**  | **阿里云**  | **腾讯云** | **华为云**  | **天翼云** |
+| :------------  |:---------------:|:---------------:|:---------------:|:---------------:| -----:|
+| 产品 | EMR  | E-MapReduce  |  弹性 MapReduce | MapReduce 服务  | MapReduce 服务 |
+| 版本 |  emr-5.25.0  | EMR-3.20.0  |  EMR-V2.1.0 |  MRS 2.0.1  | 版本未知 |
+| 发布时间 | 2019.5  | 2019.7  |  2019.5 | 2019.6  | 未知 |
+| 迭代周期 | 每月  | 每月  |  1-2月 | 2月左右  | 未知 |
+| Hadoop  | 2.8.5 | 2.8.5 | 2.8.4 | 3.1.1 | 2.7.2 |
+| HBase   | 1.4.9 | 1.4.9 | 1.3.1 | 2.1.1 | 1.0.2 |
+| Hive    | 2.3.5 | 3.1.1 | 2.3.3 | 3.1.0 | 1.2.1 |
+| Spark   | 2.4.3 | 2.4.2 | 2.3.2 | 2.3.2 | 2.1.0 |
+| Presto  | 0.220 | 0.213 | 0.215 | 308 | N/A |
+| Tez   | 0.9.2 | 0.9.1 | 0.8.5 | 0.9.1 | N/A |
+| Zookeeper | 3.4.14 | 3.4.13 | 3.4.9 |  N/A | N/A |
+| Flink   | 1.8.0 | 1.7.2 | 1.4.2 | N/A | N/A |
+| Kafka   | N/A | 2.11 | N/A | 1.1.0 | 版本未知 |
+| Storm   | N/A | 1.2.2 | 1.1.0 | 1.2.1 | 版本未知 |
+| Flume | N/A | 1.8.0 | 1.8.0 | 1.6.0 | 版本未知 |
+| Hue    | 4.4.0 | 4.1.0 | 4.4.0 | 3.11.0 | 版0本未知 |
+| Phoenix | 4.14.1 |  4.14.1 | N/A | N/A | N/A |
+| Sqoop | 1.4.7 | 1.4.7 | 1.4.7 |  N/A | N/A |
+| Oozie | 5.1.0 | 5.1.0 | 4.3.1 | N/A | N/A |
+| Ranger |  N/A | 1.2.0 | 0.7.1 | N/A | N/A |
+|Tensorflow | 1.13.1 | 1.8.0 |  N/A |  N/A | N/A |
+| MXNet | 1.4.0 | N/A |  N/A |  N/A | N/A |
+| Mahout | 0.13.0 | N/A | N/A | 0.7.1| N/A |
+| Impala  | N/A | 2.12.2 | N/A | N/A | N/A |
+| Druid   | N/A | 0.13.0 | N/A | N/A | N/A |
+| Pig | 0.17.0 | 0.14.0 |  N/A |  N/A |N/A |
+| Alluxio | N/A | N/A | 1.8.1 | N/A  | N/A |
+| Loader | N/A | N/A |  N/A | 2.0.0 | 版本未知 |
+| Livy | 0.6.0 | 0.6.0 | N/A | N/A | N/A |
+| Zeppelin |0.8.1 | 0.8.1 | N/A | N/A | N/A |
+| Ganglia  | 3.7.2 | 3.7.2 | 3.7.2 | N/A | N/A |
+| JupyterHub | 0.9.6 | N/A | N/A| N/A  | N/A |
+| Jupyter | N/A | 4.4.0 | N/A | N/A | N/A |
+| Knox    | N/A | 1.1.0 | N/A | N/A | N/A |
+| Apache DS  | N/A  | 2.0.0 | N/A | N/A | N/A |
+| Analytics Zoo | N/A  | 0.2.0 | N/A | N/A | N/A |
+| Superset | N/A  | 0.28.1 | N/A | N/A | N/A |
+| OS | *版本未知* | CentOS 7.4 | *版本未知* | *版本未知* | *版本未知* |
+| **组件** | **亚马逊**  | **阿里云**  | **腾讯云** | **华为云**  | **天翼云** |
+
+
+
+**注意**
+
+*N/A 表示无；版本未知表示有此组件，但不清楚具体版本*
+
+*统计时间为2019.8.16，有些云厂商有多个版本分支同时进行，这里只列出的最新主干分支*
 
 
 ## EMR 与 HBase 产品形态
@@ -43,17 +112,6 @@ EMR 与 HBase 主要有2种形态：
 阿里云提供[云数据库HBase版](https://cn.aliyun.com/product/hbase),放在了云计算基础 NOSQL 数据库
 
 华为云提供[CloudTable](https://www.huaweicloud.com/product/cloudtable.html)其实就是HBase,放在EI企业智能，为什么放在这块主要是组织架构原因，MapReduce 服务也是放在这边。
-
-## 版本链接
-
-[亚马逊 EMR 版本](https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-release-5x.html)
-
-[阿里云 E-MapReduce 版本](https://help.aliyun.com/document_detail/28073.html?spm=a2c4g.11186623.6.546.be7d2068xWi6GP#title-b9j-f3m-75x)
-
-[华为云 MapReduce服务 版本](https://support.huaweicloud.com/productdesc-mrs/mrs_08_0005.html)   
-[腾讯云 弹性MapReduce 版本](https://cloud.tencent.com/document/product/589/20279)   
-[天翼云 MapReduce服务 版本](https://www.ctyun.cn/help/qslist/1411)  版本未知，有[手册](http://oos.ctyunapi.cn/downfile/%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8C2018/MapReduce%E7%94%A8%E6%88%B7%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.pdf
-)，也许可以看到版本
 
 
 ## HBase 是否适合提供云服务
@@ -85,4 +143,17 @@ HBase 生态：与Phoenix 结合提供SQL、二级索引；与 OpenTSDB 结合�
 5、稳定性：HBase 稳定性这块相比其他数据库差距还是很明显的。
 
 
+
+## ***链接***
+
+
+AWS EMR ：<https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-release-5x.html>
+
+阿里云  E-MapReduce ：<https://help.aliyun.com/product/28066.html?spm=a2c4g.11174283.6.540.722b3d79Tt6gVH>
+
+华为云 MapReduce服务 ：<https://support.huaweicloud.com/productdesc-mrs/mrs_08_0005.html>
+
+腾讯云 弹性MapReduce ：< https://cloud.tencent.com/document/product/589/20279>
+
+天翼云 MapReduce服务 ：<https://www.ctyun.cn/help/list/1407>
 
