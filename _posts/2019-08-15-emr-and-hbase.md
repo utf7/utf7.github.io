@@ -2,9 +2,9 @@
 layout: post
 title: EMR 与 HBase
 description:  EMR 与 HBase
-categories: EMR,Cloud,Hadoop、HBase
-keywords: EMR,Cloud,Hadoop、HBase
-excerpt:  EMR,Cloud,Hadoop、HBase
+categories: EMR,Cloud,HBase
+keywords: EMR,Cloud,HBase
+excerpt:  EMR,Cloud,HBase
 ---
 
 # EMR 与 HBase
