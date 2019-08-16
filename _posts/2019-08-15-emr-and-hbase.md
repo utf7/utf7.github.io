@@ -123,10 +123,23 @@ HBase 是否单独作为产品？
 
 ## HBase 是否适合提供云服务
 
-HBase 功能方面：提供分布式 NOSQL 存储，高性能的写吞吐，还不错的读能力。业务场景也是比较丰富的，需求应该是一直在的。
-HBase 架构方面：HBase 是分布式的、计算存储分离的，本身是比较适合提供云服务的。
-HBase 应用场景： 物联网、明细记录、消息日志类、用户画像标签、金融风控、社交消息feed流、监控、小对象存储（视频、图片）、时序时空、海量实时分布式存储。 曾经的一个场景，最大存储单表近2PB（单副本GZIP压缩后）
-HBase 生态：与Phoenix 结合提供SQL、二级索引；与 OpenTSDB 结合提供时序；GeoMesa 结合提供时空数据库功能；与 HGraphDB 结合提供图数据库功能；与 Kylin 结合提供 MOLAP；Spark 结合提供分析功能；Hive 其实也可以映射HBase 表来使用；还可与 Solr 结合提供全文索引功能。更多生态可以参考：[awesome-hbase](https://github.com/rayokota/awesome-hbase)
+#### HBase 功能方面
+
+提供分布式 NOSQL 存储，高性能的写吞吐，还不错的读能力。业务场景也是比较丰富的，需求应该是一直在的。
+
+#### HBase 架构方面
+
+HBase 是分布式的、计算存储分离的，本身是比较适合提供云服务的。
+
+#### HBase 应用场景
+
+物联网、明细记录、消息日志类、用户画像标签、金融风控、社交消息feed流、监控、小对象存储（视频、图片）、时序时空、海量实时分布式存储。 
+
+如笔者公司使用HBase 存储手机详单数据，最大存储单表近2PB（单副本GZIP压缩后）。
+
+#### HBase 生态
+
+与Phoenix 结合提供SQL、二级索引；与 OpenTSDB 结合提供时序；GeoMesa 结合提供时空数据库功能；与 HGraphDB 结合提供图数据库功能；与 Kylin 结合提供 MOLAP；Spark 结合提供分析功能；Hive 其实也可以映射HBase 表来使用；还可与 Solr 结合提供全文索引功能。更多生态可以参考：[awesome-hbase](https://github.com/rayokota/awesome-hbase)
 
 ## 问题：
 
