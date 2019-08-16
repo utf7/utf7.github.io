@@ -186,7 +186,7 @@ Microsfot Azure HDInsight 版本: <https://docs.microsoft.com/zh-cn/azure/hdinsi
 
 华为云 MapReduce服务 ：<https://support.huaweicloud.com/productdesc-mrs/mrs_08_0005.html>
 
-腾讯云 弹性MapReduce ：< https://cloud.tencent.com/document/product/589/20279>
+腾讯云 弹性MapReduce ：<https://cloud.tencent.com/document/product/589/20279>
 
 天翼云 MapReduce服务 ：<https://www.ctyun.cn/help/list/1407>
 
