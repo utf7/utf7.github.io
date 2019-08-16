@@ -96,6 +96,13 @@ EMR 与 HBase 主要有2种形态：
 
 
 
+HBase 是否单独作为产品？
+
+| **组件** | **阿里云**  |**华为云**  |  **腾讯云** | **天翼云** | **亚马逊**  |
+| :------------  |:---------------:|:---------------:|:---------------:|:---------------:| -----:|
+| 产品 |  云数据库 HBase 版 | 表格存储服务 CloudTable | N/A | N/A | N/A |
+ 
+ 
 **注意**
 
 *N/A 表示无；版本未知表示有此组件，但不清楚具体版本*
@@ -156,4 +163,8 @@ AWS EMR ：<https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-releas
 腾讯云 弹性MapReduce ：< https://cloud.tencent.com/document/product/589/20279>
 
 天翼云 MapReduce服务 ：<https://www.ctyun.cn/help/list/1407>
+
+华为云 表格存储服务 CloudTable  <https://www.huaweicloud.com/product/cloudtable.html>
+
+阿里云 云数据库 HBase 版 <https://cn.aliyun.com/product/hbase?spm=a2c4g.11186623.cwnn_jpze.64.125b40acDBGNlH>
 
