@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title: CentOS 安装 Docker
