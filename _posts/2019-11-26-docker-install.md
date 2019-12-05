@@ -11,6 +11,7 @@ excerpt:  Docker,CentOS
 
 
 ## 1、安装依赖
+
 yum install -y yum-utils device-mapper-persistent-data lvm2
 
 ## 2、配置yum 仓库
@@ -24,6 +25,7 @@ yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-c
 docker-ce : The Docker Engine - Community
 
 yum install docker-ce
+
 
 ## 4、启动docker
 
@@ -55,6 +57,7 @@ vim /etc/docker/daemon.json
 
 }
 ```
+
 
 
 
