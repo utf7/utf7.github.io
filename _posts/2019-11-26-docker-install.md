@@ -38,19 +38,27 @@ systemctl status docker
 
  sudo docker run hello-world
 
+
 ## 6、修改docker 镜像地址
+
 
 默认docker image 镜像网络访问不了（或者慢），这里配置阿里云的镜像地址
 
+
 vim /etc/docker/daemon.json
 
+
+```json
 {
-     "registry-mirrors": ["https://aekshq8n.mirror.aliyuncs.com"]
+
+     "registry-mirrors":  ["https://aekshq8n.mirror.aliyuncs.com"]
+
 }
+```
 
 
 
-##7、卸载docker:
+##  7、卸载docker:
 
 sudo yum remove docker-ce
 
