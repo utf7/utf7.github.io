@@ -110,5 +110,5 @@ google:
 # ---------------- #
 #      Datas       #
 # ---------------- #
-skill_programing_keywords: [Java, Java EE, Design Patterns]
+skill_programing_keywords: [Java, Design Patterns]
 skill_big_data_keywords: [HBase,Hadoop,Hive,Spark,Presto,MySQL]
