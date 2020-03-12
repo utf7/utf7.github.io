@@ -245,3 +245,11 @@ git fetch --unshallow
 ```
 git pull --unshallow
 ```
+
+#### ***unstaged changes
+
+```
+git stash
+git pull –rebase
+git stash pop
+```
