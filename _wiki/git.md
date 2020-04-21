@@ -10,13 +10,10 @@ keywords: Git, 版本控制
 
 | 功能                      | 命令                                  | 举例                                  |
 |:--------------------------|:--------------------------------------|:--------------------------------------|
-| 添加https代理     | git add filename                      | git config --global https.proxy http://127.0.0.1:1080
-                      |
-| 添加http代理     | git add filename                      | git config --global https.proxy https://127.0.0.1:1080
-                     |
-| 取消https代理     | git add filename                      | git config --global --unset http.proxy                     |
-| 取消https代理     | git add filename                      | git config --global --unset https.proxy
-                     |
+| 添加https代理     | git add filename                      | git config --global https.proxy http://127.0.0.1:1080 |
+| 添加http代理     | git add filename                       | git config --global https.proxy https://127.0.0.1:1080 |
+| 取消https代理     | git add filename                      | git config --global --unset http.proxy       |
+| 取消https代理     | git add filename                      | git config --global --unset https.proxy      |
 | 添加文件/更改到暂存区     | git add filename                      | git add filename                      |
 | 添加所有文件/更改到暂存区 | git add .                             | git add ./-A (new,modified,deleted)   |
 | 提交                      | git commit -m msg                     | git commit -m "update blog"           |
