@@ -13,10 +13,8 @@ excerpt: HBase,LSM,Compaction,Bulkload
 
 在 HBaseConAsia 2019 的分享：
 
+https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf
 
 
-![](/docs/hbaseconasia2019track31430-190819225905.pdf "HBase Practice in China Mobile")
-
-​	  
-
+<a href="docs/hbaseconasia2019track31430-190819225905.pdf" class="image fit"><img src="images/hbase_s3.png" alt=""></a>
 
