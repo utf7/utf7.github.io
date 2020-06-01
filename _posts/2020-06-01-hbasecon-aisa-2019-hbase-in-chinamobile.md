@@ -16,5 +16,5 @@ excerpt: HBase,LSM,Compaction,Bulkload
 https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf
 
 
-<a href="docs/hbaseconasia2019track31430-190819225905.pdf" class="image fit"><img src="images/hbase_s3.png" alt=""></a>
+<a href="https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf" class="image fit"><img src="images/hbase_s3.png" alt=""></a>
 
