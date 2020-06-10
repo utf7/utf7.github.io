@@ -9,13 +9,11 @@ excerpt: HBase,Bulkload,LSM,HFile
 
 #  HBase Bulkload failed and improve case-1
 
-某天某业务找我，说线上 `bulkload` 导入数据到 `HBase` 失败：
+某天某应用找到我，说线上 `bulkload` 导入数据到 `HBase` 失败
 
-`check` 了一下 `MR` 日志，报错如下：
+`check` 了一下 `MR` 日志，报错如下
 
-
-
-``` org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:591)|||IOException during splitting
+```  org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:591)|||IOException during splitting
 java.util.concurrent.ExecutionException: org.apache.hadoop.hbase.io.hfile.CorruptHFileException: Problem reading HFile Trailer from file hdfs://******/*****/f1/2adb6a82818642aca73daf999063f655
        org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:584)
         at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.doBulkLoad(LoadIncrementalHFiles.java:440)
@@ -54,7 +52,8 @@ Caused by: java.lang.UnsatisfiedLinkError: org.apache.hadoop.util.NativeCodeLoad
         at org.apache.hadoop.hbase.io.hfile.HFileReaderV2.<init>(HFileReaderV2.java:150)
         at org.apache.hadoop.hbase.io.hfile.HFile.pickReaderVersion(HFile.java:483)
        
-       ```
+      
+      ```
 
 
 
