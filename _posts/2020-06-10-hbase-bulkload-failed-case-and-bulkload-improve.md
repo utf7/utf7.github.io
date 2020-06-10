@@ -15,7 +15,7 @@ excerpt: HBase,Bulkload,LSM,HFile
 
 
 
-` org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:591)|||IOException during splitting
+``` org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:591)|||IOException during splitting
 java.util.concurrent.ExecutionException: org.apache.hadoop.hbase.io.hfile.CorruptHFileException: Problem reading HFile Trailer from file hdfs://******/*****/f1/2adb6a82818642aca73daf999063f655
        org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:584)
         at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.doBulkLoad(LoadIncrementalHFiles.java:440)
@@ -53,12 +53,12 @@ Caused by: java.lang.UnsatisfiedLinkError: org.apache.hadoop.util.NativeCodeLoad
         at org.apache.hadoop.hbase.io.hfile.HFileBlock$AbstractFSReader$1.nextBlockWithBlockType(HFileBlock.java:1386)
         at org.apache.hadoop.hbase.io.hfile.HFileReaderV2.<init>(HFileReaderV2.java:150)
         at org.apache.hadoop.hbase.io.hfile.HFile.pickReaderVersion(HFile.java:483)
-       `
+       
+       ```
 
 
 
-上面的报错很明显，是 执行 `Bulkload `导入的最后一步，执行 `doBulkload` 的时候，将生成的 `HFile` 导入到`HBase` 中出现问题，原因是执行 ` doBulkload` 的客户端 没有 `snappy` 本地库。所以只需要添加 `snappy` 本地库即可。
-
+上面的报错很明显，`Bulkload ` 导入最后一步，执行 `doBulkload` 的时候，将生成的 `HFile` 导入到 `HBase` 中出现问题，原因是执行 `doBulkload` 的客户端 没有 `snappy` 本地库。所以只需要添加 `snappy` 本地库即可。
 
 
 但是这样处理是否有问题呢：
@@ -69,19 +69,20 @@ Caused by: java.lang.UnsatisfiedLinkError: org.apache.hadoop.util.NativeCodeLoad
 
 
 
-`bulkload` 原理就是通过 `MR/Spark` 程序根据 `HBase` 表的 `region` 范围 `(startkey/endkey)` 来做 `partition` 直接生成 `HFile` ，然后通过 `doBulkload` 命令将 `HFile` `move` 到 `HBase RegionServer` 的 `Region` 对应的列族目录下， `StoreFileManager` 更新维护的 `HFile` 列表对象即可。`bulkload` 和 `doBulkload` 详细原理，由于涉及的内容比较多，后面计划单独写个博客来介绍。这里就不展开了。
+`bulkload` 原理就是通过 `MR/Spark` 程序根据 `HBase` 表的 `region` 范围 `(startkey/endkey)` 来做 `partition` 直接生成 `HFile` ，然后通过 `doBulkload` 命令将 `HFile` `move` 到 `HBase RegionServer` 的 `Region` 对应的列族目录下， `StoreFileManager` 更新维护的 `HFile` 列表对象即可。`bulkload` 和 `doBulkload` 详细原理，由于涉及的内容比较多，后面有时间的话单独写个博客来介绍。这里就不展开了。
 
-所以这里面会使用到压缩的地方应该有三处：
+所以这里面会使用到压缩的地方应该有三处：  
 
-1、`MR`  生成 `HFile` 的时候 
+1、`MR`  生成 `HFile` 的时候   
 
-2、`doBulkload`  的时候
+2、`doBulkload`  的时候  
 
-3、导入到HBase ，然后HBase 自身读取/写入/compaction的时候
+3、导入到 `HBase` ，然后 `HBase` 自身读取/写入/`compaction` 的时候
 
-` 集群是我们自己开发维护的 `HBase` 分支， 虽然默认已经集成了一些 `native` 的库，比如 `snappy`，`zstd` ，但通常 执行 `bulkload` 的的 `MR` 程序或者 `doBulkload` 的客户端与`HBase` 不在一个集群，例如这个本例就是。这会导致往压缩的 `HBase` 表中导入数据失败 。
 
-基于以上的问题，对 `HBase Bulkload` 做了一个简单的改进：
+集群是我们自己开发维护的 `HBase` 分支， 虽然默认已经集成了常用的 `native` 的库，比如 `snappy`，`zstd` ，但通常执行 `bulkload` 的 `MR` 程序或者 `doBulkload` 的客户端与 `HBase` 不在一个集群，例如这个本例就是。这会导致往压缩的 `HBase` 表中导入数据失败 。
+
+基于以上的原因和问题，对 `HBase Bulkload` 做了一个简单的改进：
 
 思路很简单：就是 `bulkload` 的时候，支持在客户端设置压缩格式，而不是直接使用原始表的压缩格式。
 
