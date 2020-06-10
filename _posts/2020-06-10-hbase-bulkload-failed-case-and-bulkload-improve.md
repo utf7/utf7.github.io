@@ -13,7 +13,7 @@ excerpt: HBase,Bulkload,LSM,HFile
 
 `check` 了一下 `MR` 日志，报错如下
 
-```  org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:591)|||IOException during splitting
+```yaml
 java.util.concurrent.ExecutionException: org.apache.hadoop.hbase.io.hfile.CorruptHFileException: Problem reading HFile Trailer from file hdfs://******/*****/f1/2adb6a82818642aca73daf999063f655
        org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:584)
         at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.doBulkLoad(LoadIncrementalHFiles.java:440)
@@ -28,34 +28,10 @@ java.util.concurrent.ExecutionException: org.apache.hadoop.hbase.io.hfile.Corrup
         at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
         at java.lang.reflect.Method.invoke(Method.java:606)
         at sun.reflect.misc.MethodUtil.invoke(MethodUtil.java:279)
-       
-Caused by: org.apache.hadoop.hbase.io.hfile.CorruptHFileException: Problem reading HFile Trailer from file
- hdfs://******/*****/f1/2adb6a82818642aca73daf999063f655
-        at org.apache.hadoop.hbase.io.hfile.HFile.pickReaderVersion(HFile.java:495)
-        at org.apache.hadoop.hbase.io.hfile.HFile.createReader(HFile.java:538)
-        at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplit(LoadIncrementalHFiles.java:661)
-        at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles$3.call(LoadIncrementalHFiles.java:574)
-        at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles$3.call(LoadIncrementalHFiles.java:571)
-        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
-        ... 3 more
-Caused by: java.lang.UnsatisfiedLinkError: org.apache.hadoop.util.NativeCodeLoader.buildSupportsSnappy()Z
-        at org.apache.hadoop.util.NativeCodeLoader.buildSupportsSnappy(Native Method)
-        at org.apache.hadoop.io.compress.SnappyCodec.checkNativeCodeLoaded(SnappyCodec.java:63)
-        at org.apache.hadoop.io.compress.SnappyCodec.getDecompressorType(SnappyCodec.java:195)
-        at org.apache.hadoop.io.compress.CodecPool.getDecompressor(CodecPool.java:181)
-        at org.apache.hadoop.hbase.io.compress.Compression$Algorithm.getDecompressor(Compression.java:328)
-        at org.apache.hadoop.hbase.io.compress.Compression.decompress(Compression.java:423)
-        at org.apache.hadoop.hbase.io.encoding.HFileBlockDefaultDecodingContext.prepareDecoding(HFileBlockDefaultDecodingContext.java:90)
-        at org.apache.hadoop.hbase.io.hfile.HFileBlock.unpack(HFileBlock.java:549)
-        at org.apache.hadoop.hbase.io.hfile.HFileBlock$AbstractFSReader$1.nextBlock(HFileBlock.java:1380)
-        at org.apache.hadoop.hbase.io.hfile.HFileBlock$AbstractFSReader$1.nextBlockWithBlockType(HFileBlock.java:1386)
-        at org.apache.hadoop.hbase.io.hfile.HFileReaderV2.<init>(HFileReaderV2.java:150)
-        at org.apache.hadoop.hbase.io.hfile.HFile.pickReaderVersion(HFile.java:483)
-       
-      
-      ```
 
+```
 
+  
 
 上面的报错很明显，`Bulkload ` 导入最后一步，执行 `doBulkload` 的时候，将生成的 `HFile` 导入到 `HBase` 中出现问题，原因是执行 `doBulkload` 的客户端 没有 `snappy` 本地库。所以只需要添加 `snappy` 本地库即可。
 
