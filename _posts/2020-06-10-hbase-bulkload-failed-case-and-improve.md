@@ -1,13 +1,13 @@
 ---
 layout: post
-title: HBase Bulkload 失败问题以及改进
-description: 对 HBase Bulkload 失败问题的处理以及改进
+title: HBase Bulkload 失败问题处理以及改进
+description: HBase Bulkload 失败问题处理以及改进
 categories: [HBase]
 keywords: HBase,Bulkload,LSM,HFile
 excerpt: HBase,Bulkload,LSM,HFile
 ---
 
-#  HBase Bulkload failed and improve case-1
+#  HBase Bulkload 失败问题处理以及改进
 
 某天某应用找到我，说线上 `bulkload` 导入数据到 `HBase` 失败
 
