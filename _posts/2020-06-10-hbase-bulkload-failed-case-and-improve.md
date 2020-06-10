@@ -81,3 +81,5 @@ java.util.concurrent.ExecutionException: org.apache.hadoop.hbase.io.hfile.Corrup
 
 https://issues.apache.org/jira/browse/HBASE-21810
 
+https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf
+
