@@ -73,7 +73,9 @@ ROW                                 COLUMN+CELL
 
 `get` 出来的结果是：
 
- ```5914200010001                          column=f:c2, timestamp=1595252559734, value=2-1```
+ ```shell
+ 5914200010001                          column=f:c2, timestamp=1595252559734, value=2-1
+ ```
 
 
 **详细了解以及现象：**
@@ -105,6 +107,7 @@ Region 重叠，英文叫做 region overlap，意思是region 范围发生了交
 20~30
 30~40
 40~
+
 如上 10~20,15~25,20~30 就发生了重叠
 
  `region` 还有一个常见的问题，叫做 `region` 空洞 `hole`
@@ -153,16 +156,12 @@ Region 重叠，英文叫做 region overlap，意思是region 范围发生了交
 
 **处理思路：**
 
-尽快恢复业务！
-
+恢复业务为先！
 
 
 下线错误 `region` -> 修复 `hbase:meta` -> `move` 走有问题的 `region` 目录 -> `check` 有问题的 `region` 目录数据是否需要恢复 ->将 出问题的 `reigon` 需要恢复的 `HFile` 导入进来
 
-
-
 这个问题非常考验对 `HBase` 的理解以及工具的使用。
-
 
 1、`unassign region` ：下线` region`
 
@@ -185,6 +184,7 @@ Region 重叠，英文叫做 region overlap，意思是region 范围发生了交
 可能会使用到如下命令：
 
 ```shell
+
 查看某个hfile 基本信息，比如startkey/endkey/midkey，又多少key，最大，最小，平均长度，时间戳等等
 
 $ hbase hfile -f hfile_path -s
@@ -193,6 +193,7 @@ $ hbase hfile -f hfile_path -s
 $ hbase hfile -f hfile_path -p
 打印key
 $ hbase hfile -f hfile_path -e
+
 ```
 
 本案例中从这些 `hfile` 中打印出来的信息，可以发现 `hfile` 中的数据都是后写入的，根据 `rowkey` 信息（内含时间戳）以及 `KV` 的 `timestamp` 字段来判断。
@@ -217,7 +218,9 @@ $ hbase hfile -f hfile_path -e
 
 1) 首先创建一个表
 
-```create 'test','f', SPLITS => ['05', '15', '25'] ```
+```
+create 'test','f', SPLITS => ['05', '15', '25']
+```
 
 
 2) 然后将这个表目录拷贝出来
@@ -232,19 +235,22 @@ $ hbase hfile -f hfile_path -e
 
  4)重新创建表（不同splitkeys)
 
-```create 'test', 'f', SPLITS => ['10', '20', '30']```
+```create 'test', 'f', SPLITS => ['10', '20', '30']
+```
 
  5)然后选取上一次建表的region目录拷贝到新表目录中
 
 比如：
 
-``` hdfs dfs -cp /tmp/xxx/test/4f3cab0063decfac00755c88337da380 /apps/hbase/data/data/default/test/```
+``` hdfs dfs -cp /tmp/xxx/test/4f3cab0063decfac00755c88337da380 /apps/hbase/data/data/default/test
+```
 
  6)上线有问题的 `region`
 
  执行命令
 
-``` hbase hbck -j $hbase_home/hbase-operator-tools/hbase-hbck***.jar addFsRegionsMissingInMeta default:test``
+``` hbase hbck -j $hbase_home/hbase-operator-tools/hbase-hbck***.jar addFsRegionsMissingInMeta default:test
+``
 
 如上命令的意思是根据 `hdfs` 中的 `region` 目录等信息加载到 `hbase:meta` 表中
 
@@ -255,7 +261,8 @@ $ hbase hfile -f hfile_path -e
 
 8)上线这个有问题的 reigon
 
-``` hbase hbck -j  $hbase_home/hbase-operator-tools//hbase-hbck***.jar assigns 4f3cab0063decfac00755c88337da380 ```
+``` hbase hbck -j  $hbase_home/hbase-operator-tools//hbase-hbck***.jar assigns 4f3cab0063decfac00755c88337da380
+```
 
 
 
