@@ -136,16 +136,23 @@ Region 重叠，英文叫做 region overlap，意思是region 范围发生了交
 
 刚开始的时候，时间点T1 插入数据到了正常的 `region` 中，
 
-时间点 `T2`，插入数据，正好到`5192-5294` 这个 `region` 中去了。
+时间点 `T2`，插入数据，正好到`5192-5294` 这个异常的 `region` 中去了。
 
 所以导致 `scan` 和 `get` 结果不一致。 
 
-另外如果你仔细观察的话，会发现这个有问题的 `region` 的 `startkey/endkey` 和其它的都不一样，
+这个异常的 `Region` 怎么来的？应用怀疑是 `HBase split` 出现了异常，导致的，那么真的是 `HBase` 自己 `split` 出来的吗？
 
-这个表的正常的 `region` 的 `startkey/endkey` 是 `7 `位数，而异常的只有 `4` 位数，看了一下正常的 `startkey/endkey` 应该是预先分区指定的，而不像是 `split` 出来的，
+这个表是预先分区的 `splitkeys` 为 7位数(比如4750000,4800000)，
 
-，出问题 `region` 的 `startkey` 和 `endkey`  只有4位，看起来既不是 `split` 出来的 `key` 也不像是 `split` 出来的 `key`，非常诡异，那么有人可能会想会不会可能是 `region split`出现异常导致的，分析这个异常的 `region`，基本上是排除这种情况，为什么？首先这个表的 `rowkey` 都是`13`位长度，`region` 如果是 `split` 出来的话，则会取`Region` 下面列族下面的最大 `HFile` 的 `midkey`（某个`rowkey`), 同时这个 `region` 的 `startkey/endkey` 要不就是`HFile`的 `midkey`，要不就是预先分区的 `7` 位数的 `key`，
-不可能是 `4` 位数的 `key`。当时有个大胆的推测，会不会是这个 `region` 是谁一顿操作猛如虎拷贝了一个其它表或者之前的表的 `region` 目录，放在表目录下，然后一顿操作猛如虎，把这个给上线了。。。后来 `check `了 `NameNode` 的审计日志，果然发现是被人拷贝过来的。。。通过观察这个 `region` 的 `.regioninfo` 信息，发现这个region 是数个月之前的，后来被认为拷贝过来的， 具体为啥拷贝就不细说了。。。
+而异常的 `region` 的 `startkey/endkey` 只有 `4` 位数, 基本上可以排除 `split` 出来的可能性.
+
+因为region的startkey 要不是预先分区指定的值，要不是 `split` 时候取的 `splitPonit` 值（也就是 `region`下面列族中最大的 `hfile midkey`) ，所以几乎不可能是 `split` 异常导致的
+
+当时有个大胆的推测，会不会是这个 `region` 是谁一顿操作猛如虎拷贝了一个其它表或者之前的表的 `region` 目录，放在表目录下，然后一顿操作猛如虎，把这个给上线了。。。
+
+后来 `check `了 `NameNode` 的审计日志，果然发现是被人拷贝过来的。。。
+
+通过观察这个 `region` 的 `.regioninfo` 信息，发现这个region 是数个月之前的，后来被人为拷贝过来的， 具体为啥拷贝就不细说了。。。
 
 
 这个 `case` 非常有意思, 会涉及到 `HBase` 的 `hbck`工具，`hfile`工具，如何查看 `master` 页面，`hbase:meta` 元数据信息，`hbase` 表的目录结构等等信息
