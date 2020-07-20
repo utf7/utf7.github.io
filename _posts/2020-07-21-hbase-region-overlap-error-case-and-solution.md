@@ -13,8 +13,6 @@ excerpt: HBase,Region,Overlap,HFile
 
 最近某应用反馈 `HBase` 数据插入数据后、查询出现错误数据
 
-这个 `case` 非常有意思, 会涉及到 `HBase` 的 `hbck`工具，`hfile`工具，如何查看 `master` 页面，`hbase:meta` 元数据信息，`hbase` 表的目录结构等等信息
-
 现象如下：
 
 有一行数据：
@@ -27,7 +25,8 @@ excerpt: HBase,Region,Overlap,HFile
 
 `get` 操作只能看到时间点 `T2` 的 `1` 列最新数据
 
-具体例子：
+
+**具体例子：**
 
 有一行数据数据 `rowkey` 是 `591420001`（还有一些时间戳字段省略），有3列，分别是
 
@@ -43,8 +42,6 @@ ROW                                 COLUMN+CELL
  5914200010001                          column=f:c2, timestamp=1595252551656, value=2
  5914200010001                          column=f:c3, timestamp=1595252551656, value=3
 ```
-
-
 
 时间点T2  插入**c2值为 2-1**:
 
@@ -66,7 +63,6 @@ ROW                                 COLUMN+CELL
  5914200010001                          column=f:c3, timestamp=1595252551656, value=3
 ```
 
-
  但实际情况是, scan 出来的结果是：
 
 ```shell
@@ -80,15 +76,51 @@ ROW                                 COLUMN+CELL
  ```5914200010001                          column=f:c2, timestamp=1595252559734, value=2-1```
 
 
-看到这种情况，刚开始怀疑会不会是使用问题，是不是应用查询的时候，指定了版本，
+**详细了解以及现象：**
+
+刚听到这个描述，刚开始怀疑会不会是使用问题，是不是应用查询的时候，指定了版本，
 
 后来询问了是否设置了多版本之类的情况，答案是没有。
 
-又经过沟通询问，发现有些 `rowkey` 的数据是有问题，有些又是正常的，得到这个信息以后，
 
-在想怀疑是不是和 `rowkey` 分布的 `Region` 有关系，根据对` HBase` 的了解和直觉，大概猜测出了 `Region` 很可能发生了重叠的情况，
+又经过沟通询问，发现有些 `rowkey` 的数据是有问题，有些又是正常的，这是一个非常重要的信息，也就是只会发生在某些行数据中。
 
-导致时间点 `T1` 的数据插入 `regionA`，时间点 `T2` 的 `Region` 插入了` regionB`。
+由此信息怀疑问题是否和 `rowkey` 分布的 `Region` 有关系，
+
+根据对` HBase` 的了解和直觉，大概猜测出了 `Region` 很可能发生了重叠的情况，
+
+Region 重叠，英文叫做 region overlap，意思是region 范围发生了交叉，
+
+正常`region` 
+~10
+10~20
+20~30
+30~40
+40~
+
+重叠`region`
+~10
+10~20
+15~25
+20~30
+30~40
+40~
+如上 10~20,15~25,20~30 就发生了重叠
+
+ `region` 还有一个常见的问题，叫做 `region` 空洞 `hole`
+
+空洞 `region`
+~10
+10~20
+30~40
+40~
+
+如上 20~30 就区间没有了，也就是所谓的 `hole`, `region` 空洞通常是 `region` 没有 `assign` 成功导致
+
+
+时间点 `T1` 的数据插入的数据从hbase:meta表中找到 `regionA`，
+
+时间点 `T2` 的数据插入的数据从hbase:meta表中找到 `regionB`，
 
 然后 `5914200010001` 这个 `rowkey` 同时属于 regionA 和 RegionB （正常情况 region 是不会重叠的）
 
@@ -98,12 +130,6 @@ ROW                                 COLUMN+CELL
 
 根据上图，可以看到使用红线框起来的这个 region 是有问题的，
 
-正常的 `region` 的 `startkey` 和 `endkey` 是与前后 `region` 相连的
-
-
-它的 `startkey` 不是前一个 `region` 的 `endkey`，`endkey` 也不是后一个 `region` 的 `startkey`。
-
-并且这个 `region` 与其它的 region 都不连续，所以这应该有问题的region，
 
 刚开始的时候，时间点T1 插入数据到了正常的 `region` 中，
 
@@ -111,18 +137,23 @@ ROW                                 COLUMN+CELL
 
 所以导致 `scan` 和 `get` 结果不一致。 
 
+另外如果你仔细观察的话，会发现这个有问题的 `region` 的 `startkey/endkey` 和其它的都不一样，
 
-另外如果你仔细分析的话，会发现这个 `region` 的 `startkey/endkey` 和其它的都不一样，
+这个表的正常的 `region` 的 `startkey/endkey` 是 `7 `位数，而异常的只有 `4` 位数，看了一下正常的 `startkey/endkey` 应该是预先分区指定的，而不像是 `split` 出来的，
 
-正常的 `region` 的 `startkey/endkey` 是 `7 `位数，而异常的只有 `4` 位数，看了一下正常的 `startkey/endkey` 应该是预先分区指定的，而不像是 `split` 出来的，
-
-，出问题 `region` 的 `startkey` 和 `endkey`  只有4位，看起来既不是 `split` 出来的 `key` 也不像是 `split` 出来的 `key`，非常诡异，那么有人可能会想会不会可能是region split出现异常导致的异常 `region`，我分析了一下这个异常的 `region`，基本上是排除这种情况，为什么？首先这个表的 `rowkey` 都是`13`位长度，`region` 如果是 `split` 出来的话，则会取`Region` 下面列族下面的最大 `HFile` 的 `midkey`（某个`rowkey`), 同时这个 `region` 的 `startkey/endkey` 不要就是`HFile`的 `midkey`，要不就是预先分区的 `7` 位数的 `key`，不可能是 `4` 位数的 `key`。当时有个大胆的推测，会不会是这个 `region`，是谁一顿操作猛如虎拷贝了一个 `region` 目录，放在表目录下，然后一顿操作猛如虎，把这个给上线了。。。后来 `check `了 `NameNode` 的审计日志，果然发现是被人拷贝过来的。。。具体为啥拷贝就不细说了。。。
-
+，出问题 `region` 的 `startkey` 和 `endkey`  只有4位，看起来既不是 `split` 出来的 `key` 也不像是 `split` 出来的 `key`，非常诡异，那么有人可能会想会不会可能是 `region split`出现异常导致的，分析这个异常的 `region`，基本上是排除这种情况，为什么？首先这个表的 `rowkey` 都是`13`位长度，`region` 如果是 `split` 出来的话，则会取`Region` 下面列族下面的最大 `HFile` 的 `midkey`（某个`rowkey`), 同时这个 `region` 的 `startkey/endkey` 要不就是`HFile`的 `midkey`，要不就是预先分区的 `7` 位数的 `key`，
+不可能是 `4` 位数的 `key`。当时有个大胆的推测，会不会是这个 `region` 是谁一顿操作猛如虎拷贝了一个其它表或者之前的表的 `region` 目录，放在表目录下，然后一顿操作猛如虎，把这个给上线了。。。后来 `check `了 `NameNode` 的审计日志，果然发现是被人拷贝过来的。。。通过观察这个 `region` 的 `.regioninfo` 信息，发现这个region 是数个月之前的，后来被认为拷贝过来的， 具体为啥拷贝就不细说了。。。
 
 
-那么问题来了，我们如何处理这个问题呢？
+这个 `case` 非常有意思, 会涉及到 `HBase` 的 `hbck`工具，`hfile`工具，如何查看 `master` 页面，`hbase:meta` 元数据信息，`hbase` 表的目录结构等等信息
+
+
+明白了问题的现象，和原因以后，我们如何处理这个问题呢？
+
 
 **处理思路：**
+
+尽快恢复业务！
 
 
 
@@ -131,7 +162,6 @@ ROW                                 COLUMN+CELL
 
 
 这个问题非常考验对 `HBase` 的理解以及工具的使用。
-
 
 
 1、`unassign region` ：下线` region`
@@ -144,7 +174,9 @@ ROW                                 COLUMN+CELL
 
 这一步其实有一个前提，因为错误的region 是被拷贝过来的，那么我们就需要研究一下
 
-这个错误的 `region` 当时拷贝过来的时候，是否含有 `hfile`，也就是旧的数据，一般来说旧数据按理说我们是不需要，我们需要的是拷贝过来的 `region` 后面又写入的这部分数据，这部分数据虽然写道了错误的 `region`，但确实是需要的数据。
+这个错误的 `region` 当时拷贝过来的时候，是否含有 `hfile`，也就是旧的数据；一般来说旧数据按理说我们是不需要，我们需要的是拷贝过来的错误的 `region` 上线后面又写入的这部分数据，
+
+这部分数据虽然写到了错误的 `region`，但确实是需要的数据。
 
 这块的处理逻辑是需要推断，稍微判断失误，就可能会丢数据，或者导入不该导入的数据进来，
 
@@ -166,7 +198,6 @@ $ hbase hfile -f hfile_path -e
 本案例中从这些 `hfile` 中打印出来的信息，可以发现 `hfile` 中的数据都是后写入的，根据 `rowkey` 信息（内含时间戳）以及 `KV` 的 `timestamp` 字段来判断。
 
 
-
 到此 `HBase` 其实已经可以正常读写了。
 
 不过 此时 `hbase` 的 `hmaster` 中还有脏数据，比如页面中还会显示这个错误的 `region`
@@ -181,15 +212,13 @@ $ hbase hfile -f hfile_path -e
 
 **制造 Region overlap/ 复现问题**
 
-首先我们来"制造"一个类似的问题，也就是生成一个错误的`region`，制造`region overlap`（我们使用的是2.0.x，`hbck2` 还不完善），复现问题：
-
+首先我们来"制造"一个类似的问题，也就是生成一个错误的`region`，制造`region overlap`（当时环境使用的是2.x 的某个早期版本，`hbck2` 还不完善），复现问题：
 
 
 1) 首先创建一个表
 
 ```create 'test','f', SPLITS => ['05', '15', '25'] ```
 
- 
 
 2) 然后将这个表目录拷贝出来
 
@@ -217,13 +246,14 @@ $ hbase hfile -f hfile_path -e
 
 ``` hbase hbck -j $hbase_home/hbase-operator-tools/hbase-hbck***.jar addFsRegionsMissingInMeta default:test``
 
-如上命令的意思是将 `hdfs` 中的 `region` 加载到 `hbase:meta` 表中
+如上命令的意思是根据 `hdfs` 中的 `region` 目录等信息加载到 `hbase:meta` 表中
 
- 重启 `hmaster`
+
+7)重启 `hmaster`
 
  
 
-上线这个有问题的 reigon
+8)上线这个有问题的 reigon
 
 ``` hbase hbck -j  $hbase_home/hbase-operator-tools//hbase-hbck***.jar assigns 4f3cab0063decfac00755c88337da380 ```
 
@@ -231,9 +261,12 @@ $ hbase hfile -f hfile_path -e
 
 查看 `hmaster` 界面，就可以成功看到 ` region overlap` 重叠的情况了
 
+然后 `scan hbase:meta` 就可以成功看到 这个错误的 `region` 信息也存在 `hbase:meta` 中了，此时就成功复现了 `region overlap`
 
 
-解决办法：
+
+
+ **解决流程 **
 
 
 
@@ -285,5 +318,14 @@ hfile: 为 hfile 文件
 
 示例命令： `hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles " /tmp/hbase-loaddata/*****6bdd9b41aefefd0f89c " "test" `
 
-6、重启 `hmaster`，
+6、重启 `hmaster
+
+
+最后问题得以解决。
+
+这个问题，需要对 `unassign`、`hbck`、`region` 如何上下线，`hbase` 表目录结构,`hfile` 工具,`dobulkload` 工具，`.regioninfo`、`hbase:meta` 等工具链
+
+HBase 元数据原理和上下线、读写流程等都需要有一定的了解。
+
+
 
