@@ -72,7 +72,7 @@ int readLimit = 20*1024*1024*1024;//错误，溢出
 long readLimit = 20 * 1024 * 1024 * 1024 * 1024L
 ```
 
-说实话我就没有想到这块会整型溢出，误以为会自动类型推导的，因为后面特意写了 ```*1024L``` 来表示这个一个` long `类型。
+没有想到这块会整型溢出，误以为会自动类型推导的，因为后面特意写了 ```*1024L``` 来表示这个一个` long `类型。
 
 这块也是我的一个思维定势，比如 `HBase` [源代码](https://github.com/apache/hbase/blob/rel/2.3.1/hbase-common/src/main/java/org/apache/hadoop/hbase/HConstants.java#L420) 中，默认的 ```Region Size``` 最大值的代码 :
 
