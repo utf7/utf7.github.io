@@ -9,9 +9,7 @@ excerpt: hadoop,native
 
 #  编译 hadoop3 并绑定 native 库
   
-
- 最近由于工作需要，需要编译hadoop3，hadoop 3本身编译比较简单；但是由于涉及到 native 库，比如压缩算法的zstd、snappy 以及纠删码的ISA-L，所以会比较麻烦。
- 记录一下，或许会对其他人有些帮助。
+最近由于工作需要，需要编译hadoop3，hadoop 3本身编译比较简单；但是由于涉及到 native 库，社区提供的安装包中不包括 native 库，比如压缩算法的zstd、snappy 以及纠删码的ISA-L，所以会比较麻烦。 本文将介绍如何编译并绑定native库，记录一下，或许会对其他人有些帮助。
 
 
 
@@ -94,7 +92,7 @@ make && make install
 注意`zstd`与`isal` 和`snappy` 目录
 
 ```shell
-mvn clean install -DskipTests -Pdist,native  -Dtar  -Phbase2  -Dhbase.profile=2.0  -Dbundle.snappy=true -Drequire.snappy=true  -Dsnappy.prefix=/usr/lib64  -Dsnappy.lib=/usr/lib64  -Drequire.zstd=true -Dbundle.zstd=true -Dzstd.lib=/usr/local/lib -Dbundle.isal=true -Drequire.isal=true -Disal.prefix=/usr/lib64 -Disal.lib=/usr/lib64  
+mvn clean install -DskipTests -Pdist,native  -Dtar -Dbundle.snappy=true -Drequire.snappy=true  -Dsnappy.prefix=/usr/lib64  -Dsnappy.lib=/usr/lib64  -Drequire.zstd=true -Dbundle.zstd=true -Dzstd.lib=/usr/local/lib -Dbundle.isal=true -Drequire.isal=true -Disal.prefix=/usr/lib64 -Disal.lib=/usr/lib64  
 ```
 
 编译完成后，会在 hadoop-dist/target 目录下产生 hadoop-${version}.tar.gz 的包，如下图
