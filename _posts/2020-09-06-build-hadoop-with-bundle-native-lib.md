@@ -23,16 +23,12 @@ excerpt: hadoop,native
 
 2、snappy
 
-谷歌出品的snappy 压缩，hadoop生态很常用的压缩
+谷歌出品的 snappy 压缩算法，hadoop生态很常用的压缩算法。​
 
 3、zstd
+Facebook 出品的 zstd 压缩算法，也是近年来 Hadoop 生态常用压缩库，强烈推荐。
 
-Facebook 出品的zstd 压缩算法，也是近年来Hadoop神态常用压缩库，强烈推荐。
-
-
-
-当然也可以根据需要添加一些其他的，比如lzo等等。
-
+当然也可以根据需要添加一些其他的，比如 lzo 等等。
 
 
 ###  编译isa-l
