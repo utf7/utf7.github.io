@@ -1,13 +1,13 @@
 ---
 layout: post
 title: Linux at 使用方法
-description: Linux at 一次性计划任务调度命令
+description: Linux 一次性任务调度 at 命令
 categories: [linux]
 keywords: linux,at
 excerpt: linux
 ---
 
-# Linux 一次性调度命令 at 
+# Linux 一次性任务调度 at 命令
 
 ##  背景描述
   
