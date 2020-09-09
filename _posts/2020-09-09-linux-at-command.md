@@ -4,7 +4,7 @@ title: Linux 一次性任务调度 at 命令简介
 description: Linux 一次性任务调度 at 命令
 categories: [linux]
 keywords: linux,at
-excerpt: linux
+excerpt: 本文介绍 Linux 一次性任务调度 at 命令的常规使用
 ---
 
 # Linux 一次性任务调度 at 命令
