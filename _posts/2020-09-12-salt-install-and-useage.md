@@ -11,11 +11,11 @@ excerpt: 本文介绍自动化运维工具 salt 安装以及使用
 
 ## 介绍
 
-`salt` 与 `ansible`  类似，是常用的 linux 自动化运维工具，典型的应用场景为：多个节点执行命令、批量执行命令、分发文件、同步配置等，号称可以轻松管理成千上万台节点，速度较快。
+`salt` 与 `ansible`  类似，是常用的 `linux` 自动化运维工具，典型的应用场景为：多个节点执行命令、批量执行命令、分发文件、同步配置等，号称可以轻松管理成千上万台节点，速度较快。
 
-salt 使用 python 编写，代码在 https://github.com/saltstack/salt ，采用 Apache License 2.0 协议。
+`salt` 使用 `python` 编写，代码在 https://github.com/saltstack/salt ，采用 `Apache License 2.0` 协议。
 
-salt 采用主从架构，主节点为 `master`，从节点叫做 `minion` 相当于angent,本文将介绍如何安装以及使用 salt。
+`salt` 采用主从架构，主节点为 `master`，从节点叫做 `minion` 相当于 `agent`,本文将介绍如何安装以及使用 `salt`。
 
 
 
@@ -31,7 +31,7 @@ salt 采用主从架构，主节点为 `master`，从节点叫做 `minion` 相�
 
 ### 安装
 
-下载安装包，本地安装包放在/utf7/salt_pkgs/ 目录
+下载安装包，本地安装包放在 `/utf7/salt_pkgs/` 目录
 
 ```shell
 test1 节点执行
@@ -95,7 +95,7 @@ $ mkdir -p /srv/pillar/prod
 
 由于我的  `master` 节点同时也是 `minion` 功能，所以这里也需要配置 `minion`
 
-vim /etc/salt/minion
+`vim /etc/salt/minion`
 
 ```yaml
 master:
@@ -106,11 +106,11 @@ master_port: 4506
 
 
 
-其他minion 配置，除了id，其他都一样
+其他 `minion` 配置，除了 `id` ，其他都一样
 
 #### test2 节点
 
-vim /etc/salt/minion
+`vim /etc/salt/minion`
 
 ```yaml
 master:
@@ -121,7 +121,7 @@ master_port: 4506
 
 #### test3 节点
 
-vim /etc/salt/minion
+`vim /etc/salt/minion`
 
 ```yaml
 master:
@@ -136,7 +136,7 @@ master_port: 4506
 
 ### 启动命令
 
-启动 `master`  （在test1上执行）
+启动 `master`  （在 `test1` 上执行）
 
 ```shell
 $ /bin/systemctl enable salt-master;
@@ -153,7 +153,7 @@ $ /bin/systemctl enable salt-minion;/bin/systemctl restart salt-minion > /dev/nu
 
 ### 测试是否可用
 
-在 master 即 test1 节点执行如下命令
+在 `master` 即 `test1` 节点执行如下命令
 
 ```shell
 /所有节点执行命令
@@ -212,7 +212,7 @@ $ salt "test" cmd.run "cat /tmp/getfile.txt"
 
 `Salt`文件服务器可以用于从 `master` 到 `minions` 的文件传输。
 
-salt 自带的一个简单的 `ftp` 服务器功能，参考上面的 `master` 配置。
+`salt` 自带的一个简单的 `ftp` 服务器功能，参考上面的 `master` 配置。
 
 
 
@@ -271,7 +271,7 @@ $ salt '*' cp.get_dir salt://package  /tmp/utf7/  makedirs=True gzip=5
 
 到 `minoin `节点查看日志
 
-vim  /var/log/salt/minion
+`vim  /var/log/salt/minion`
 
 ```log
 2020-09-12 14:48:18,182 [salt.crypt       :1081][ERROR ][19925] The master key has changed, the salt master could have been subverted, verify salt master's public key
