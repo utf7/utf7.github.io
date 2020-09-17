@@ -2,8 +2,8 @@
 layout: post
 title: Mac 上从源代码编译 JDk
 description: Mac 上从源代码编译 **JDk**
-categories: [Java,mac]
-keywords: JDK,JVM,mac
+categories: [Java,Mac]
+keywords: JDK,JVM,Mac
 excerpt: Mac 上从源代码编译 JDk
 ---
 
