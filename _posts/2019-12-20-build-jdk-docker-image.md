@@ -2,7 +2,7 @@
 layout: post
 title: 制作 JDK docker 镜像
 description:  制作 JDK docker 镜像
-categories: Docker,K8S
+categories: [docker,K8S]
 keywords: Docker,CentOS,K8S
 excerpt:  Docker,CentOS,K8S
 ---
