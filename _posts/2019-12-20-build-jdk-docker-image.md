@@ -1,13 +1,13 @@
 ---
 layout: post
-title: 制作 JDK docker 镜像
-description:  制作 JDK docker 镜像
-categories: [docker,K8S]
-keywords: Docker,CentOS,K8S
-excerpt:  Docker,CentOS,K8S
+title: 制作 JDK Docker 镜像
+description:  制作 JDK Docker 镜像
+categories: [Docker]
+keywords: Docker
+excerpt:  制作 JDK docker 镜像
 ---
 
-# 制作 JDK docker 镜像
+# 制作 JDK Docker 镜像
 
 ## 1、下载 JDK 包
 
