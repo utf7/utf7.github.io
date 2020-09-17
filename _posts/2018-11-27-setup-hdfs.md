@@ -10,11 +10,7 @@ keywords: HDFS,STARTUP
 # HDFS HA 启动步骤
 
 
-:: warn
-
-注意该步骤是首次安装部署 hadoop 的操作，涉及到元数据格式化，请慎重
-
-::
+:warning: 注意该步骤是首次安装部署 hadoop 的操作，涉及到元数据格式化，请慎重
 
 假设安装目录为 `/opt/apps` , 每步都需要 check 服务是否正常启动
 
