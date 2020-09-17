@@ -1,10 +1,10 @@
 ---
 layout: post
 title: NodeManager 启动失败问题处理
-description: NodeManager 找不到 org.apache.spark.network.yarn.YarnShuffleService 
+description: NodeManager 启动失败问题处理
 categories: [Hadoop]
 keywords: hadoop,yarn,spark
-excerpt: NodeManager 找不到 org.apache.spark.network.yarn.YarnShuffleService 问题处理
+excerpt: NodeManager 启动失败问题处理
 ---
 
 
@@ -57,7 +57,8 @@ Caused by: java.lang.ClassNotFoundException: Class org.apache.spark.network.yarn
 
 :: warn
 
- 注意是  **yarn/lib/**  而不是直接 **yarn/** 目录下 
+ 注意是  **yarn/lib/**  而不是直接 **yarn/** 目录下
+ 
 :: 
 
 
