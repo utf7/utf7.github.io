@@ -2,7 +2,7 @@
 layout: post
 title: 编译 hadoop3 并绑定 native 库
 description: 编译 hadoop3 并绑定 native 库,snappy,zstd,isal
-categories: [hadoop]
+categories: [Hadoop]
 keywords: hadoop,zstd,snappy,isal,ISA-L,编译hadoop,native
 excerpt: hadoop,native
 ---
