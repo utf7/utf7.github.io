@@ -2,8 +2,8 @@
 layout: post
 title: 自动化运维工具 salt 安装使用
 description: 自动化运维工具 salt 安装使用
-categories: [linux,salt]
-keywords: linux,salt
+categories: [Linux,Salt]
+keywords: Linux,Salt
 excerpt: 本文介绍自动化运维工具 salt 安装以及使用
 ---
 
