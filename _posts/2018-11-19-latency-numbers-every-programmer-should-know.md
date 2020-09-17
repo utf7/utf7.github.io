@@ -2,7 +2,7 @@
 layout: post
 title: latency numbers every programmer should know
 description: latency,iops,sas,sata,ssd,pcie,nvme,memory,cpu,network
-categories: PCIe，SAS,SATA
+categories: [Hardware]
 keywords: latency,iops,sas,sata,ssd,pcie,nvme,memory,cpu,network
 ---
 
