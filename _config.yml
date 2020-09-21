@@ -5,8 +5,8 @@ baseurl:
 url: https://utf7.github.io
 date_format: "ordinal"
 title: utf7
-subtitle: "做好人，做好事"
-description: "Seven的个人博客"
+subtitle: "做好人,做好事"
+description: "utf7 的个人博客/欢迎关注公众号yechaotalk"
 keywords: utf7, seven,HBase
 favicon: /favicon.ico
 timezone: Asia/Shanghai
@@ -18,10 +18,10 @@ repository: utf7/utf7.github.io
 # ---------------- #
 #      Author      #
 # ---------------- #
-author: utf7
+author: utf7/Yechao Chen
 organization: utf7, Inc.
 organization_url: https://utf7.github.io
-location: Suzhou, China
+location: Shanghai, China
 email: chenyechao@gmail.com
 
 # ---------------- #
