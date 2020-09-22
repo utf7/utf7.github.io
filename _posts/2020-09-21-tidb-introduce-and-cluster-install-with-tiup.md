@@ -34,9 +34,7 @@ TiDB 整体架构拆分成了多个模块，各模块之间互相通信，组成
   - TiKV Server：负责存储数据，从外部看 TiKV 是一个分布式的提供事务的 Key-Value 存储引擎。存储数据的基本单位是 Region，每个 Region 负责存储一个 Key Range（从 StartKey 到 EndKey 的左闭右开区间）的数据，每个 TiKV 节点会负责多个 Region。TiKV 的 API 在 KV 键值对层面提供对分布式事务的原生支持，默认提供了 SI (Snapshot Isolation) 的隔离级别，这也是 TiDB 在 SQL 层面支持分布式事务的核心。TiDB 的 SQL 层做完 SQL 解析后，会将 SQL 的执行计划转换为对 TiKV API 的实际调用。所以，数据都存储在 TiKV 中。另外，TiKV 中的数据都会自动维护多副本（默认为三副本），天然支持高可用和自动故障转移。
   - TiFlash：TiFlash 是一类特殊的存储节点。和普通 TiKV 节点不一样的是，在 TiFlash 内部，数据是以列式的形式进行存储，主要的功能是为分析型的场景加速。
 
-  TiKV Server 是使用 RocksDB 作为本地的 LSM 存储引擎，利用 Raft 协议来做数据复制，避免单机失效。数据写入走Raft 接口写入，而不是直接写入 RocksDB,通过将表数据按照 Key 拆分成很多 Region ，每个Region 的数据之宝保存在一个节点中。使用 PD 来将 
-
-  Region 尽可能均匀的散布在集群的所有节点中，从而实现水平扩展以及负载均衡。TiKV 以 Region 为单位做数据的复制，也就是一个 Region 的数据会保存多个副本，TiKV 将每一个副本叫做一个 Replica。Replica 之间是通过 Raft 来保持数据的一致，一个 Region 的多个 Replica 会保存在不同的节点上，构成一个 Raft Group。其中一个 Replica 会作为这个 Group 的 Leader，其他的 Replica 作为 Follower。默认情况下，所有的读和写都是通过 Leader 进行，读操作在 Leader 上即可完成，而写操作再由 Leader 复制给 Follower。 大家理解了 Region 之后，应该可以理解下面这张图：
+   **关于 TiKV 存储架构**: TiKV Server 是使用 RocksDB 作为本地的 LSM 存储引擎，利用 Raft 协议来做数据复制，避免单机失效。数据写入走 Raft 接口写入，而不是直接写入 RocksDB,通过将表数据按照 Key 拆分成很多 Region ，Region 被分配到TiKVServer 中。使用 PD 来将 Region 尽可能均匀的散布在集群的所有节点中，从而实现水平扩展以及负载均衡。TiKV 以 Region 为单位做数据的复制，也就是一个 Region 的数据会保存多个副本，TiKV 将每一个副本叫做一个 Replica。Replica 之间是通过 Raft 来保持数据的一致，一个 Region 的多个 Replica 会保存在不同的节点上，构成一个 Raft Group。其中一个 Replica 会作为这个 Group 的 Leader，其他的 Replica 作为 Follower。默认情况下，所有的读和写都是通过 Leader 进行，读操作在 Leader 上即可完成，而写操作再由 Leader 复制给 Follower。 大家理解了 Region 之后，应该可以理解下面这张图：
 
   ![tidb-storage-3.png](/images/posts/tidb/install/tidb-storage-3.png)
 
