@@ -170,3 +170,4 @@ FROM
 ## 参考文档
 
 1. https://spark.apache.org/docs/3.0.1/sql-ref-syntax-qry-select-hints.html
+2. https://medium.com/@mrpowers/managing-spark-partitions-with-coalesce-and-repartition-4050c57ad5c4#.36o8a7b5j
