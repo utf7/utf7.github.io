@@ -111,12 +111,6 @@ FROM
 
 
 
-查看 `Spark` 作业 参数，发现
-
-```sql
-spark.sql.shuffle.partitions=400
-```
-
 应该是每个SELECT 有 400 个 partition 导致 2 个表 UNION ALL  加起来一共 800 个文件。
 
 我们理想的文件大小是保持在100-200M（建议略小于等于BLOCK 大小），比如HDFS BLOCK为128MB，则可以按照100M左右去算。
@@ -133,7 +127,7 @@ spark.sql.shuffle.partitions=400
 
 Spark SQL 支持 使用 ` /*+ REPARTITION(N) */ ` hint 来重新 `repartition` 数据,
 
-我们设置  `40/20个PARTITION` 
+按照每个分区1-6 G 的数据量，设置  `40/20个PARTITION` 
 
 
 
@@ -159,7 +153,7 @@ FROM
 
 
 
-有一个奇怪的点，优化以后数据量会比以前大一些，大概会多`5%-10%`  ，数据表格式是`ORC`， 按常理来说，ORC 合并的话，应该会稍微小一点，或者基本上没有变化，因为 `ORC` 里面有很多统计信息或者如果更多相同的数据，可以编码压缩掉，后来经过研究，发现应该是 `repartition` 是会重新做一次全量的`shuffle`，这样的话，会分到不同的文件中的数据大概率会比较随机，不利于 `ORC` 编码和压缩,除了 REPARTITION，Spark 的 Partition 还支持 `COALESCE` ，我们可以使用`COALESCE` 来替代`REPARTITION`.
+有一个奇怪的点，优化以后数据量会比以前大一些，大概会多`5%-10%`  ，数据表格式是`ORC`， 按常理来说，ORC 合并的话，应该会稍微小一点，或者基本上没有变化，因为 `ORC` 里面有很多统计信息或者如果更多相同的数据，可以编码压缩掉，经过研究，发现应该是 `repartition` 是会重新做一次全量的`shuffle`，这样的话，不利于 `ORC` 编码和压缩,除了 REPARTITION，Spark 的 Partition 还支持 `COALESCE` ，我们可以使用`COALESCE` 来替代`REPARTITION`.
 
 >#### Partitioning Hints Types
 >
@@ -281,11 +275,10 @@ FROM
 
 **思考：**
 
-1. 是否通过设置如下参数  `spark.sql.shuffle.partitions=40`  解决这个问题，区别是什么？
-
-2. repartition 与 coalesce 区别是什么？
-
-3. Spark 有几种 repartition 方法
+1. 为什么之前会有 800 ( 400+400 ) 个 `partition` ？
+2. 是否通过设置如下参数  `spark.sql.shuffle.partitions=40`  解决这个问题，区别是什么？
+3. repartition 与 coalesce 区别是什么？
+4. Spark 有几种 repartition 方法
 
 
 
