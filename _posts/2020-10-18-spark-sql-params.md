@@ -1,12 +1,24 @@
+---
+layout: post
+title: Spark SQL 正确的传递 Hive 参数
+description: Spark SQL 传递 Hive 参数
+categories: [Spark]
+keywords: Spark SQL
+excerpt: Spark SQL 正确的传递 Hive 参数
+---
 
-spark-sql 
+使用 `spark-sql` 导入动态分区时，出现来错误 
+```log
+Error in query: org.apache.hadoop.hive.ql.metadata.HiveException: Number of dynamic partitions created is 1793, which is more than 1000. To solve this try to set hive.exec.max.dynamic.partitions to at least 1793.;
+```
+提示增加 `hive.exec.max.dynamic.partitions` 的值，
+可是我明明通过 `--conf  hive.exec.max.dynamic.partitions=1000000` 为什么还是报错了？难道是参数没有传递进去？？？
+执行 `spark-sql --help` ，通过查看 `spark-sql` 的帮助
 
-使用spark-sql 导入动态分区时，出现来错误 提示增加  hive.exec.max.dynamic.partitions=1000000 的值，
-可是我明明通过 --conf  hive.exec.max.dynamic.partitions=1000000 为什么还是报错了？
-原来 hive的参数是通过 --hiveconf 来传递的
+原来 hive的参数是通过 `--hiveconf` 来传递的而不是 `--conf`
 
-使用 --conf 来传递 `spark` 参数
-使用 --hiveconf 来传递 `hive` 参数
+使用 `--conf` 来传递 `spark` 参数
+使用 `--hiveconf` 来传递 `hive` 参数
 修改后为：
 
 ```shell
