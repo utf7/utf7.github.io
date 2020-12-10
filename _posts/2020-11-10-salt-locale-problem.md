@@ -60,17 +60,17 @@ spark-submit client 模式则没有问题，cluster 模式则会有问题。
 
 此时赶快将节点回滚到之前的版本，然后慢慢重启 `NodeManager`，发现确实问题渐渐修复了。
 
-还有另外一个现象是并不是所有内容都是乱码的，这个猜测和Map/Reduce/以及 Spark Executor 跑在不同的 NodeManager 节点有关系。
+还有另外一个现象是并不是所有内容都是乱码的，这个猜测和 `Map/Reduce` 以及 `Spark Executor` 跑在不同的 `NodeManager` 节点有关系。
 
-这时候根据多年的经验直觉，赶快保存的异常的节点 NodeManager 保留的 lsof 信息，
+这时候根据多年的经验直觉，赶快保存的异常的节点 `NodeManager` 保留的 `lsof` 句柄信息，
 
- diff 一下进程加载的 fd，是不是少加载了什么导致的，比较2个进程加载的fd 发现有一个
+ diff 一下进程加载的 fd，是不是少加载了什么导致的，比较2个进程加载的fd 发现有一个  
 
-` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n > lsof_before `
+` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n > lsof_before `  
 
-` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n  > lsof_after` 
+` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n  > lsof_after`   
 
-diff lsof_before lsof_after
+`diff lsof_before lsof_after`  
 
 然后发现少了
 
@@ -120,15 +120,15 @@ salt "*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodema
 ```
 发现 `locale` 很多输出都是`C`，这个与我之前在机器上面执行的结果是不一致的。
 
-所以应该是salt 导致的，问了一下同事是如何重启的，他是kill 掉 `NodeManager`,并没有启动，而是让监控脚本自动拉起的。
+所以应该是 `salt` 导致的，问了一下同事是如何重启的，他是kill 掉 `NodeManager`,并没有启动，而是让监控脚本自动拉起的。
 
-而我当时为了启动快一些，是直接使用salt 批量stop然后start 的。
+而我当时为了启动快一些，是直接使用 `salt` 批量 `stop` 然后 `start` 的。
 
-至此原因排查出来的，原来是salt的锅。
+至此原因排查出来的，原来是 `salt` 的锅。
 
 后来去github 把salt 代码拉了下来，看了一下。问题出在这边：
 
-salt 默认会reset_system_locale,代码截图如下：
+`salt` 默认会 `reset_system_locale`,代码截图如下：
 
 
 
@@ -144,9 +144,9 @@ salt 默认会reset_system_locale,代码截图如下：
 
 很坑！！！
 
-看了一下代码，可以执行`salt` 命令的时候，添加reset_system_locale=False 配置解决：
+看了一下代码，可以执行`salt` 命令的时候，添加参数 `reset_system_locale=False` 解决：
 
-修改 `NodeManger` 启动脚本,Hive/Spark 乱码问题解决
+修改 `NodeManger` 启动脚本,`Hive/Spark` 乱码问题解决
 
 `salt 'nm-*' cmd.run reset_system_locale=False 'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'`
 
@@ -161,7 +161,7 @@ salt 默认会reset_system_locale,代码截图如下：
 `salt 'nm-*' cmd.run  'locale'`
 
 PS：
-关于 locale ： 可参考如下几个链接：
+关于 `locale` ： 可参考如下几个链接：
 
 1.https://wiki.archlinux.org/index.php/locale  
 2.https://man7.org/linux/man-pages/man1/localedef.1.html  
