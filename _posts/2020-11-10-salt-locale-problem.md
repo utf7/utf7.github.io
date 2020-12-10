@@ -8,6 +8,8 @@ excerpt: salt 中关于locale的问题
 ---
 
 
+## 记录一次诡异的 Hive/Spark 乱码问题
+
 最近遇到一个诡异的事情，Hive/Spark 写入汉字乱码。
 
 检查 Hive/Spark 的各种参数也没有发现有什么变动，客户端配置也是一样的。
@@ -157,4 +159,11 @@ salt 默认会reset_system_locale,代码截图如下：
 `salt 'nm-*' cmd.run reset_system_locale=False 'locale'`
 
 `salt 'nm-*' cmd.run  'locale'`
+
+PS：
+关于 locale ： 可参考如下几个链接：
+1.https://wiki.archlinux.org/index.php/locale  
+2.https://man7.org/linux/man-pages/man1/localedef.1.html  
+3.https://linuxhint.com/locales_debian/
+
 
