@@ -162,6 +162,7 @@ salt 默认会reset_system_locale,代码截图如下：
 
 PS：
 关于 locale ： 可参考如下几个链接：
+
 1.https://wiki.archlinux.org/index.php/locale  
 2.https://man7.org/linux/man-pages/man1/localedef.1.html  
 3.https://linuxhint.com/locales_debian/
