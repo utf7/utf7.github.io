@@ -24,9 +24,9 @@ spark-submit client 模式则没有问题，cluster 模式则会有问题。
 
 所以这块感觉和 NodeManager 有关系，因为 on YARN 的进程都是 NodeManager fork 出来的。
 
-因为最近在做 Zstandard 修改了代码，所以同事怀疑是否代码引起的。我反复check了代码，并没有设计到编码相关的内容。不应该出现此类问题。
+因为最近在做 Zstandard 修改了代码，所以同事怀疑是否代码引起的。我反复check了代码，并没有涉及到字符编码相关的内容。不应该出现此类问题。
 
-不过由于修改了Hadoop 代码，所以最近变动就是重启了 `NodeManager`以及添加了 Zstandard 的支持。
+不过由于修改了Hadoop 代码，需要重启 NodeManager ，最近变动就是重启了 `NodeManager`以及添加了 Zstandard 的支持。
 
 百思不得其解：
 
@@ -50,44 +50,65 @@ spark-submit client 模式则没有问题，cluster 模式则会有问题。
 
 貌似也没啥问题。
 
-还有另外一个
 
-这时候根据直觉突发奇想，要diff 一下进程加载的fd，是不是少加载了什么导致的：
+此时赶快将节点回滚到之前的版本，然后慢慢重启NodeManager，发现确实问题渐渐修复了。
 
-比较2个进程加载的fd 发现有一个
+还有另外一个现象是并不是所有内容都是乱码的，这个猜测和Map/Reduce/以及 Spark Executor 跑在不同的 NodeManager 节点有关系。
 
-ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n > lsof1
+这时候根据多年的经验直觉，我赶快保存的异常的节点 NodeManager 保留的lsof 信息，
 
-ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n  > lsof2
+要 diff 一下进程加载的 fd，是不是少加载了什么导致的，比较2个进程加载的fd 发现有一个
 
-diff lsof1 lsof2
+` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n > lsof_before `
+
+` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n  > lsof_after` 
+
+diff lsof_before lsof_after
 
 然后发现少了
+
 /usr/lib/locale/locale-archive
 
+咦，什么鬼。。。为啥没有这个，分明我登陆节点执行，`locale` 输出是正常的。
 
-NodeManager 启动命令如下：
+所以就把问题定位点放在 `/usr/lib/locale/locale-archive` 为什么少了这个地方。
+
+
+
+出问题的 NodeManager 启动命令如下：
 
 salt 'nm-*' cmd.run 'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'
 
+我在一个节点测试了一下，使用
 
-很奇怪相同的命令，为什么会少不一样呢？
+`sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"`
 
+启动一个 NM 测试，发现并没有什么异常。。。。太诡异了。。。
 
-
-
-
-
-
-```
-salt "nm-*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print \$2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"
-
-```
-
-会发现执行失败
-$2 前面需要加转义符号
+乘着节点还没有重启完，我赶快把所有的节点检查了一下，是否都丢失 `/usr/lib/locale/locale-archive`
 
 ```
 salt "*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print \$2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"
 
 ```
+
+发现我之前启动的节点都是没有 locale-archive ，而同事新启动的则是没有问题的。莫不是启动方式有问题？？？诡异。
+执行：
+salt -E "nm-*" cmd.run "locale"
+
+>>  LANG=en_US.UTF-8
+    LC_CTYPE=C
+    LC_NUMERIC=C
+    LC_TIME=C
+    LC_COLLATE=C
+    LC_MONETARY=C
+    LC_MESSAGES=C
+    LC_PAPER=C
+    LC_NAME=C
+    LC_ADDRESS=C
+    LC_TELEPHONE=C
+    LC_MEASUREMENT=C
+    LC_IDENTIFICATION=C
+    LC_ALL=
+
+发现locale很多输出都是C，这个与我之前在机器上面是
