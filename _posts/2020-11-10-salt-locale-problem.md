@@ -16,23 +16,22 @@ excerpt: salt 中关于locale的问题
 
 有一个诡异的地方是 
 
-spark-sql -f xxx.sql,xxx.sql 如果xxx.sql 中如果有汉字，则也会有问题。
+`spark-sql -f xxx.sql,xxx.sql` 如果 `xxx.sql` 中如果有汉字，则也会有问题。
 
-spark-submit client 模式则没有问题，cluster 模式则会有问题。
+`spark-submit client` 模式则没有问题，`cluster` 模式则会有问题。
 
-这里面唯一区别是 client 的 driver 在 本地，cluster 在 yarn（NodeManager） 节点。
+这里面唯一区别是 `client` 的 `Driver` 在 本地，`cluster` 在 `YARN（NodeManager）` 节点。
 
-另外Spark/MR 读写数据也有问题，不过 hive cli 不启动 MR的话，则没有问题。。。比如 select * from t limit 10 这种不回启动mr，则是本地运行的。
+另外 `Spark/MR` 读写数据也有问题，不过 `hive cli` 不启动 `MR` 的话，则没有问题。。。比如 `select * from t limit 10`  这种不会启动 `MR`，则是本地运行的。
 
-分析来看，不管是 Hive/Spark 只要任务跑在 YARN 上面则会有问题。
+分析来看，不管是 `Hive/Spark` 只要任务跑在 YARN 上面则会有问题。
 
-所以这块感觉和 NodeManager 有关系，因为 on YARN 的进程都是 NodeManager fork 出来的。
+所以这块感觉和 `NodeManager` 有关系，因为 `on YARN` 的进程都是 `NodeManager fork` 出来的。
 
-因为最近在做 Zstandard 修改了代码，所以同事怀疑是否代码引起的。我反复check了代码，并没有涉及到字符编码相关的内容。不应该出现此类问题。
+因为最近在做 `Zstandard` 修改了代码，所以同事怀疑是否代码引起的。我反复check了代码，并没有涉及到字符编码相关的内容。不应该出现此类问题。
 
-不过由于修改了Hadoop 代码，需要重启 NodeManager ，最近变动就是重启了 `NodeManager`以及添加了 Zstandard 的支持。
+由于修改了 `Hadoop` 代码，需要重启 `NodeManager` ，最近变动就是重启了 `NodeManager`以及添加了 `Zstandard` 的支持。
 
-百思不得其解：
 
 登陆出现问题的主机
 
@@ -55,7 +54,7 @@ spark-submit client 模式则没有问题，cluster 模式则会有问题。
     LC_ALL=
 ```    
 
-貌似也没啥问题。
+貌似也没啥问题。百思不得其解：
 
 
 此时赶快将节点回滚到之前的版本，然后慢慢重启 `NodeManager`，发现确实问题渐渐修复了。
@@ -154,7 +153,7 @@ salt "*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodema
 
 `salt "nm-*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print \$2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"`
 
-如果有使用salt的同学，具体可以使用如下命令来测试 测试这个问题：
+如果有使用 `salt` 的同学，具体可以使用如下命令来测试 测试这个问题：
 
 `salt 'nm-*' cmd.run reset_system_locale=False 'locale'`
 
