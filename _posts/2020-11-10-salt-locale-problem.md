@@ -97,9 +97,9 @@ salt "*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodema
 
 ```
 
-发现我之前启动的节点都是没有 locale-archive ，而同事新启动的则是没有问题的。莫不是启动方式有问题？？？诡异。
-执行：
-`salt -E "nm-*" cmd.run "locale"`
+发现我之前启动的节点都是没有 `locale-archive` ，而同事新启动的则是没有问题的。莫不是启动方式有问题？？？诡异。  
+执行： `salt -E "nm-*" cmd.run "locale"`   
+
 
 ```  LANG=en_US.UTF-8
     LC_CTYPE=C
