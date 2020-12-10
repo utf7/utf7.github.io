@@ -35,8 +35,10 @@ spark-submit client 模式则没有问题，cluster 模式则会有问题。
 登陆出现问题的主机
 
 执行 `locale`
->>  LANG=en_US.UTF-8
-    LC_CTYPE="en_US.UTF-8"
+
+```shell
+    LANG=en_US.UTF-8
+    LCCTYPE="en_US.UTF-8"
     LC_NUMERIC="en_US.UTF-8"
     LC_TIME="en_US.UTF-8"
     LC_COLLATE="en_US.UTF-8"
@@ -49,6 +51,7 @@ spark-submit client 模式则没有问题，cluster 模式则会有问题。
     LC_MEASUREMENT="en_US.UTF-8"
     LC_IDENTIFICATION="en_US.UTF-8"
     LC_ALL=
+```    
 
 貌似也没啥问题。
 
@@ -96,9 +99,9 @@ salt "*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodema
 
 发现我之前启动的节点都是没有 locale-archive ，而同事新启动的则是没有问题的。莫不是启动方式有问题？？？诡异。
 执行：
-salt -E "nm-*" cmd.run "locale"
+`salt -E "nm-*" cmd.run "locale"`
 
->>  LANG=en_US.UTF-8
+```  LANG=en_US.UTF-8
     LC_CTYPE=C
     LC_NUMERIC=C
     LC_TIME=C
@@ -112,7 +115,7 @@ salt -E "nm-*" cmd.run "locale"
     LC_MEASUREMENT=C
     LC_IDENTIFICATION=C
     LC_ALL=
-
+```
 发现 `locale` 很多输出都是`C`，这个与我之前在机器上面执行的结果是不一致的。
 
 所以应该是salt 导致的，问了一下同事是如何重启的，他是kill 掉 `NodeManager`,并没有启动，而是让监控脚本自动拉起的。
