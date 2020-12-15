@@ -65,11 +65,17 @@ excerpt: salt 中关于locale的问题
 
  diff 一下进程加载的 fd，是不是少加载了什么导致的，比较2个进程加载的fd 发现有一个  
 
-` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n > lsof_before `  
+```shell
+ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n > lsof_before   
+```  
 
-` ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n  > lsof_after`   
+```shell
+ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p |sort -n  > lsof_after. 
+```   
 
-`diff lsof_before lsof_after`  
+```shell 
+diff lsof_before lsof_after
+```  
 
 然后发现少了
 
@@ -83,17 +89,21 @@ excerpt: salt 中关于locale的问题
 
 出问题的 NodeManager 启动命令如下：
 
-`salt 'nm-*' cmd.run 'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'`
+```shell 
+salt 'nm-*' cmd.run 'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'
+```
 
 我在一个节点测试了一下，使用
 
-`sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"`
+```shell 
+sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"
+```
 
 启动一个 NM 测试，发现并没有什么异常。。。。太诡异了。。。
 
 节点还没有重启完，我赶快把所有的节点检查了一下，是否都丢失 `/usr/lib/locale/locale-archive`
 
-```
+```shell
 salt "*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print \$2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"
 
 ```
@@ -147,17 +157,25 @@ salt "*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodema
 
 修改 `NodeManger` 启动脚本,`Hive/Spark` 乱码问题解决
 
-`salt 'nm-*' cmd.run reset_system_locale=False 'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'`
+```shell 
+salt 'nm-*' cmd.run reset_system_locale=False 'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'
+```
 
 验证：
 
-`salt "nm-*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print \$2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"`
+```shell 
+salt "nm-*" cmd.run " ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print \$2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"
+```
 
 如果有使用 `salt` 的同学，具体可以使用如下命令来测试 测试这个问题：
 
-`salt 'nm-*' cmd.run reset_system_locale=False 'locale'`
+```shell
+salt 'nm-*' cmd.run reset_system_locale=False 'locale'
+```
 
-`salt 'nm-*' cmd.run  'locale'`
+```
+ salt 'nm-*' cmd.run  'locale'
+```
 
 PS：
 关于 `locale` ： 可参考如下几个链接：
