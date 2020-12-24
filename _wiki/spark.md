@@ -257,3 +257,8 @@ git stash
 git pull –rebase
 git stash pop
 ```
+
+cat /sys/kernel/mm/transparent_hugepage/defrag;
+cat /sys/kernel/mm/transparent_hugepage/enabled;
+echo never >  /sys/kernel/mm/transparent_hugepage/defrag;
+echo never > /sys/kernel/mm/transparent_hugepage/enabled;
