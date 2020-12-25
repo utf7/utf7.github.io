@@ -11,9 +11,9 @@ keywords: Spark 配置
 | 参数                      | 说明                                  | 举例                                  |
 |:--------------------------|:--------------------------------------|:--------------------------------------|
 | hive.default.fileformat     | hive 表默认文件格式           | 默认textfile，可设置parquet,orc 等 代码在：HiveSerDe.scala |
-| 添加http代理     |  git config --global http.proxy url           | git config --global http.proxy http://127.0.0.1:1080 |
-| 取消 https 代理     |  git config --global --unset https.proxy   | git config --global --unset https.proxy       |
-| 取消 http 代理     |  git config --global --unset http.proxy     | git config --global --unset http.proxy      |
+| spark.hadoop.mapreduce.input.fileinputformat.list-status.num-threads     | 并发遍历目录的线程，当input 的目录比较多的时候，可提高性能         | ，默认是1，建议24-32  |
+| spark.sql.sources.parallelPartitionDiscovery.threshold     |  并发遍历输入目录的阈值，默认是32，表示超过32个才会启动线程并发遍历   | 建议设置为1 超过1个就并发遍历，并发遍历通常会快很多，并发查询一天的数据，有24个小时分区，设置为1则会并发遍历24个分区目录|
+| spark.sql.statistics.parallelFileListingInStatsComputation.enabled     |  是否开启多线程并发list，默认为true   | 建议设置为true，用于目录比较多的情况     |
 | 添加文件/更改到暂存区     | git add filename                      | git add filename                      |
 | 添加所有文件/更改到暂存区 | git add .                             | git add ./-A (new,modified,deleted)   |
 | 提交                      | git commit -m msg                    | git commit -m "update blog"           |
