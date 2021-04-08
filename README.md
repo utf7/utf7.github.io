@@ -1,6 +1,8 @@
 # utf7
 
-我的个人博客：<https://utf7.github.io>，欢迎 Star 和 Fork。
+我的个人博客：<https://utf7.github.io>，微信公众号： yechaotalk
+
+关注大数据、云计算、摇滚乐
 
 ## 概览
 
@@ -13,8 +15,6 @@
 ## 效果预览
 
 ### [在线预览 &rarr;](https://utf7.github.io)
-
-![screenshot home](https://utf7.github.io/assets/images/screenshots/home.png)
 
 ## Fork 指南
 
