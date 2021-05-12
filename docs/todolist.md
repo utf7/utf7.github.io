@@ -16,8 +16,11 @@
 
 
 jstat -gcutil 38398 1000
+
 jhat -J-Xmx20240m hbase.heap.bin
+
 jmap -histo 31549 >jmap-nodemanager-hostname.jmap
+
 jmap -dump:format=b,file=yarn-31549-hostname.heap.bin 31549
 
 
