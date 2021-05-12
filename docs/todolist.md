@@ -14,3 +14,36 @@
 
 ## 3、HiveMeta 可能存在 内存泄露 GC hang 住，短期调内存，需要分析问题
 
+
+jstat -gcutil 38398 1000
+jhat -J-Xmx20240m hbase.heap.bin
+jmap -histo 31549 >jmap-nodemanager-hostname.jmap
+jmap -dump:format=b,file=yarn-31549-hostname.heap.bin 31549
+
+
+
+类名字：
+
+https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getName
+
+Element Type	   	Encoding
+boolean	   	Z
+byte	   	B
+char	   	C
+class or interface	   	Lclassname;
+double	   	D
+float	   	F
+int	   	I
+long	   	J
+short	   	S
+
+示例：
+ String.class.getName()
+     returns "java.lang.String"
+ byte.class.getName()
+     returns "byte"
+ (new Object[3]).getClass().getName()
+     returns "[Ljava.lang.Object;"
+ (new int[3][4][5][6][7][8][9]).getClass().getName()
+     returns "[[[[[[[I"
+
