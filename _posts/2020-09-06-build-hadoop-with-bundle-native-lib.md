@@ -127,6 +127,17 @@ ING] CMake Error at /usr/share/cmake3/Modules/FindPackageHandleStandardArgs.cmak
 yum install -y zlib-devel
 ```
 
+### 安装openssl
+
+如果没有openssl的话，则
+ ```
+[WARNING] CMake Error at /usr/share/cmake3/Modules/FindPackageHandleStandardArgs.cmake:164 (message):
+[WARNING]   Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the
+[WARNING]   system variable OPENSSL_ROOT_DIR (missing: OPENSSL_CRYPTO_LIBRARY
+
+yum install -y  openssl-devel
+```
+
 ### 编译hadoop3 
 
 上面的库都编译好以后，我们开始编译 `hadoop3`，并且支持 `ISA-L,zstd,snappy`
