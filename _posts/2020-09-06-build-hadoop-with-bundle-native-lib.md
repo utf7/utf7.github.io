@@ -150,6 +150,11 @@ yum install -y  openssl-devel
 mvn clean install -DskipTests -Pdist,native  -Dtar -Dbundle.snappy=true -Drequire.snappy=true  -Dsnappy.prefix=/usr/lib64  -Dsnappy.lib=/usr/lib64  -Drequire.zstd=true -Dbundle.zstd=true -Dzstd.lib=/usr/local/lib -Dbundle.isal=true -Drequire.isal=true -Disal.prefix=/usr/lib64 -Disal.lib=/usr/lib64  
 ```
 
+bundle openssl 
+
+```
+mvn clean install -DskipTests -Pdist,native  -Dtar -Dbundle.snappy=true -Drequire.snappy=true  -Dsnappy.prefix=/usr/lib64  -Dsnappy.lib=/usr/lib64  -Drequire.zstd=true -Dbundle.zstd=true -Dzstd.lib=/usr/local/lib -Dbundle.isal=true -Drequire.isal=true -Disal.prefix=/usr/lib64 -Disal.lib=/usr/lib64  -Drequire.openssl=true -Dbundle.openssl=true -Dopenssl.lib=/usr/lib64
+```
 
 编译完成后，会在 hadoop-dist/target 目录下产生 hadoop-${version}.tar.gz 的包，如下图
 
