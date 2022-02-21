@@ -82,6 +82,12 @@ make && make install
 
 ![](/images/posts/hadoop/build-hadoop-with-native/snappy-lib.png "snappy-lib.png")
 
+如果没有的话，则执行如下命令可以安装：
+
+```yum install snappy snappy-devel```
+
+
+
 
 ### 编译 protobuff
 
@@ -96,6 +102,29 @@ cd protobuf-2.5.0
 make
 make check
 make install
+```
+
+### cmake 
+
+如果cmake 没有，或者版本过低的话，则执行如下
+```
+[ERROR] Failed to execute goal org.apache.hadoop:hadoop-maven-plugins:3.2.1-xima-2022021512:cmake-compile (cmake-compile) on project hadoop-common: Error executing CMake: Cannot run program "cmake" (in directory "/root/project/hadoop/hadoop-common-project/hadoop-common/target/native"): error=2, 没有那个文件或目录 -> [Help 1]
+
+ yum install -y cmake3
+
+ ln -s /usr/bin/cmake3 /usr/bin/cmake
+ ```
+
+
+### zlib
+
+如果没有安装zlib的话，可以执行如下命令安装
+
+```
+ING] CMake Error at /usr/share/cmake3/Modules/FindPackageHandleStandardArgs.cmake:164 (message):
+[WARNING]   Could NOT find ZLIB (missing: ZLIB_INCLUDE_DIR)
+
+yum install -y zlib-devel
 ```
 
 ### 编译hadoop3 
