@@ -83,6 +83,21 @@ make && make install
 ![](/images/posts/hadoop/build-hadoop-with-native/snappy-lib.png "snappy-lib.png")
 
 
+### 编译 protobuff
+
+```
+#如果编译protobuf报错： error: C++ preprocessor "/lib/cpp" fails sanity check
+#则需要 yum install gcc-c++
+
+wget https://github.com/protocolbuffers/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
+tar -zxvf protobuf-2.5.0.tar.gz
+cd protobuf-2.5.0
+./configure
+make
+make check
+make install
+```
+
 ### 编译hadoop3 
 
 上面的库都编译好以后，我们开始编译 `hadoop3`，并且支持 `ISA-L,zstd,snappy`
@@ -94,6 +109,7 @@ make && make install
 ```shell
 mvn clean install -DskipTests -Pdist,native  -Dtar -Dbundle.snappy=true -Drequire.snappy=true  -Dsnappy.prefix=/usr/lib64  -Dsnappy.lib=/usr/lib64  -Drequire.zstd=true -Dbundle.zstd=true -Dzstd.lib=/usr/local/lib -Dbundle.isal=true -Drequire.isal=true -Disal.prefix=/usr/lib64 -Disal.lib=/usr/lib64  
 ```
+
 
 编译完成后，会在 hadoop-dist/target 目录下产生 hadoop-${version}.tar.gz 的包，如下图
 
