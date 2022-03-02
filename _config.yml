@@ -91,15 +91,14 @@ weibo_username: chenyechao
 # ---------------- #
 #      Comments    #
 # ---------------- #
-# support provider: disqus, duoshuo
-#comments_provider: disqus
-comments_provider: duoshuo
+# support provider: disqus, gitment, gitalk, utterances
+comments_provider: gitalk
 
-duoshuo_username: utf7
-disqus_username: utf7
-disqus_shortname: http-utf7-github-io
-# 在使用 disqus 的时候可点击显示多说评论框
-lazy_load_duoshuo: false
+gitalk:
+    owner: utf7
+    repo: blog-comments
+    clientID: x
+    clientSecret: y
 
 # ---------------- #
 #    Analytics     #
