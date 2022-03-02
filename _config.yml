@@ -97,8 +97,9 @@ comments_provider: gitalk
 gitalk:
     owner: utf7
     repo: blog-comments
-    clientID: ffe93bda5dc3c848dd72
-    clientSecret: 5fe46088be14101b9d825651a8d7c63f4512e4c8
+    oauth:
+        clientID: ffe93bda5dc3c848dd72
+        clientSecret: 5fe46088be14101b9d825651a8d7c63f4512e4c8
 
 # ---------------- #
 #    Analytics     #
