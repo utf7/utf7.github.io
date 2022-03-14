@@ -10,44 +10,66 @@ excerpt:  Docker,CentOS
 # 安装 Docker
 
 
-## 1、安装依赖
+## 1、卸载旧版本
 
-yum install -y yum-utils device-mapper-persistent-data lvm2
-
+```bash
+sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-selinux \
+                  docker-engine-selinux \
+                  docker-engine
+```
+                  
 ## 2、配置yum 仓库
 
+```bash
+$ sudo yum install -y yum-utils
 
-yum-config-manager  --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+$ sudo yum-config-manager \
+    --add-repo \
+    https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 
+$ sudo sed -i 's/download.docker.com/mirrors.aliyun.com\/docker-ce/g' /etc/yum.repos.d/docker-ce.repo
+```
 
 ## 3、安装docker
 
-docker-ce : The Docker Engine - Community
-
-yum install docker-ce
+```bash
+sudo yum install -y docker-ce docker-ce-cli containerd.io
+```
 
 
 ## 4、启动docker
 
-systemctl enable docker
+```
+sudo systemctl enable docker
 
-systemctl start docker
+sudo systemctl start docker
 
-systemctl status docker
-
+systemctl status docker 
+```
 
 ## 5、验证docker 
 
- sudo docker run hello-world
+```bash
+docker run --rm hello-world
+```
 
 
 ## 6、修改docker 镜像地址
 
 
-默认docker image 镜像网络访问不了（或者慢），这里配置阿里云的镜像地址
+默认 docker image 镜像网络访问不了（或者慢），这里配置阿里云的镜像地址
 
+```bash
 
 vim /etc/docker/daemon.json
+```
 
 
 ```json
@@ -63,6 +85,9 @@ vim /etc/docker/daemon.json
 
 ##  7、卸载docker:
 
+```bash
 sudo yum remove docker-ce
 
 sudo rm -rf /var/lib/docker
+
+```
