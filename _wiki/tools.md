@@ -35,4 +35,12 @@ cat test.txt |sort -hr -k 2  -k 3
 ```
 
 
+### HBase
+
+修改日志级别
+```
+ curl http://rs1:60030/logLevel?log=+org.apache.hadoop.metrics2\&level=WARN
+ ```
+
+
  
