@@ -12,37 +12,37 @@ excerpt: 程序员书写用词规范
 
 常见的名词规范如下：
 
-Hadoop
-HDFS
-YARN
-MapReduce 或者MR
-EMR
-Hive
-HBase
-Cassandra
-MySQL
-Spark
-Flink
-Kafka
-TensorFlow 或者 TF
-Elasticsearch 或者 ES
-Kylin
-Hudi
-Iceberg
-Parquet
-ORC
-Presto
-Trino
-ClickHouse 或者 CK
-Doris
-StarRocks
-Impala
-Zookeeper 或者ZK
-RocksDB
-Java
-Linux 
-CentOS
-Docker
-Kubernetes  或者 K8s
-SLA
-Tableau
+Hadoop  
+HDFS  
+YARN  
+MapReduce 或者 MR  
+EMR  
+Hive  
+HBase  
+Cassandra  
+MySQL  
+Spark  
+Flink  
+Kafka  
+TensorFlow 或者 TF  
+Elasticsearch 或者 ES  
+Kylin  
+Hudi  
+Iceberg  
+Parquet  
+ORC  
+Presto  
+Trino  
+ClickHouse 或者 CK  
+Doris  
+StarRocks  
+Impala  
+Zookeeper 或者 ZK  
+RocksDB  
+Java  
+Linux   
+CentOS  
+Docker  
+Kubernetes  或者 K8s  
+SLA  
+Tableau   
