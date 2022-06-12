@@ -8,7 +8,7 @@ excerpt: 程序员书写用词规范
 ---
 
 
-书写用词规范：比如hbase,mysql,sla,hadoop,clickhouse 都是不推荐的使用，常见的名词需要注意大小写
+书写用词规范,特别需要注意大小组合，否则会显得不专业：比如 hbase,mysql,sla,hadoop,clickhouse 都是不推荐的，常见的名词需要注意大小写
 
 常见的名词规范如下：
 
