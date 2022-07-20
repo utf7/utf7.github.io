@@ -35,7 +35,7 @@ Spark 相关：
 平均 Spark Executor 堆外内存使用率 sum(executor.max_offheap_used*executorNum)/sum(spark.executor.memoryoverhead*executorNum) 注意算法. 
 平均 Spark Executor 总内存使用率   sum((executor.max_offheap_used+executor.max_heap_used)*executorNum)/sum((spark.executor.memory+spark.executor.memoryoverhead)*executorNum) 注意算法
 (不太严谨，堆内外的峰值内存不一定同时出现）. 
-
+ 
 平均每个Spark 任务的 Task 数量. 
 平均每个Spark shuffle 读的数据量. 
 平均每个Spark shuffle 写的数据量. 
