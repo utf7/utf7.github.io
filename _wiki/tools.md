@@ -24,6 +24,9 @@ keywords: Common Tools
  
  `lspci -vvv | grep Ethernet`
  
+- 查看 dmesg 时间
+ date -d "1970-01-01 UTC `echo "$(date +%s)-$(cat /proc/uptime|cut -f 1 -d' ')+69740.690129"|bc `seconds"
+ 
 - 排序 
 ```
  -n 表示按照数值排序
