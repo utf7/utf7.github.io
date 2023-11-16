@@ -99,7 +99,7 @@ gitalk:
     repo: blog-comments
     oauth:
         clientID: ffe93bda5dc3c848dd72
-        clientSecret: 5fe46088be14101b9d825651a8d7c63f4512e4c8
+        clientSecret: 5983da1d06a225afdf2373d7dd2129cdcb6e43de
 
 # ---------------- #
 #    Analytics     #
