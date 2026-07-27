@@ -67,20 +67,27 @@ excerpt_separator: "\n\n"
 permalink: /:year/:month/:day/:title/
 plugins:
     - rouge
-#     - jekyll-html-pipeline
     - jekyll-paginate
     - jekyll-sitemap
     - jekyll-feed
     - jemoji
-#     - jekyll-mentions
 collections:
     wiki:
         output: true
         permalink: /wiki/:path/
-        
-repository: utf7/utf7.github.io
+
 github: [metadata]
 
+# Large PDFs / local-only files — keep in git if needed, but skip Pages build
+exclude:
+  - docs/presto
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .github
+  - blog_template
+  - README.md
+  - LICENSE
 
 # ---------------- #
 #      Socials     #
@@ -91,21 +98,29 @@ weibo_username: chenyechao
 # ---------------- #
 #      Comments    #
 # ---------------- #
-# support provider: disqus, gitment, gitalk, utterances
-comments_provider: gitalk
+# support provider: utterances, giscus, disqus
+# utterances: install https://github.com/apps/utterances on the comments repo
+comments_provider: utterances
 
-gitalk:
-    owner: utf7
-    repo: blog-comments
-    oauth:
-        clientID: ffe93bda5dc3c848dd72
-        clientSecret: 5983da1d06a225afdf2373d7dd2129cdcb6e43de
+utterances:
+    repo: utf7/blog-comments
+    issue_term: pathname
+    theme: github-light
+
+# giscus:
+#     repo: utf7/blog-comments
+#     repo_id: REPLACE_ME
+#     category: Announcements
+#     category_id: REPLACE_ME
+#     mapping: pathname
+#     theme: light
 
 # ---------------- #
 #    Analytics     #
 # ---------------- #
+# Set to a GA4 Measurement ID (G-XXXXXXXX) to enable; leave empty to disable
 google:
-    analytics_id: UA-80669434-1
+    analytics_id:
 
 # ---------------- #
 #      Datas       #

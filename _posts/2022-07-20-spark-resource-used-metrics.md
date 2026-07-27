@@ -4,7 +4,7 @@ title: 大数据资源使用效率统计
 description: 大数据资源使用效率统计
 categories: [大数据]
 keywords: 大数据,Spark,YARN,hadoop
-excerpt:大数据资源使用效率统计
+excerpt: 大数据资源使用效率统计
 ---
 
 

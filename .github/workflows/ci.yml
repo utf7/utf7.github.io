@@ -2,32 +2,34 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.1
-        with: 
-          persist-credentials: false
+        uses: actions/checkout@v4
 
-      - name: Set Ruby 2.7
-        uses: actions/setup-ruby@v1
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: "3.2"
+          bundler-cache: true
 
-      - name: Install and Build
-        run: |
-          gem install bundler
-          bundle install
-          bundle exec jekyll build
-        
+      - name: Build
+        run: bundle exec jekyll build
+
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.6.2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BRANCH: built
-          FOLDER: _site
-          CLEAN: true
+          token: ${{ secrets.ACCESS_TOKEN || github.token }}
+          branch: built
+          folder: _site
+          clean: true
