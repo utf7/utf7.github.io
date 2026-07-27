@@ -103,7 +103,7 @@ weibo_username: chenyechao
 comments_provider: utterances
 
 utterances:
-    repo: utf7/blog-comments
+    repo: utf7/utf7.github.io
     issue_term: pathname
     theme: github-light
 
