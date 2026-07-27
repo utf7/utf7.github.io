@@ -22,8 +22,27 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Bundle CSS
+        run: bash scripts/bundle-css.sh
+
       - name: Build
+        env:
+          JEKYLL_ENV: production
+          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bundle exec jekyll build
+
+      - name: Lazy-load images in HTML
+        run: |
+          find _site -name '*.html' -print0 | xargs -0 perl -pi -e 's/<img(?![^>]*\bloading=)/<img loading="lazy" decoding="async"/g'
+
+      - name: Build Pagefind index
+        # pagefind npm package ships CJK/extended support needed for Chinese
+        run: npx -y pagefind --site _site
 
       - name: Deploy
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'

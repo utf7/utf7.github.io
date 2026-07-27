@@ -14,6 +14,14 @@ encoding: "utf-8"
 source_code: https://github.com/utf7/utf7.github.io
 side_bar_repo_limit: 5
 repository: utf7/utf7.github.io
+# Prefer explicit list so the sidebar works without GitHub API metadata.
+# If empty/removed, falls back to site.github.public_repositories (needs token in CI).
+side_bar_repos:
+  -
+    name: utf7.github.io
+    html_url: https://github.com/utf7/utf7.github.io
+    description: utf7 的个人博客
+
 
 # ---------------- #
 #      Author      #
@@ -78,9 +86,8 @@ collections:
 
 github: [metadata]
 
-# Large PDFs / local-only files — keep in git if needed, but skip Pages build
+# Local-only files — skip Pages build
 exclude:
-  - docs/presto
   - Gemfile
   - Gemfile.lock
   - vendor
@@ -88,6 +95,10 @@ exclude:
   - blog_template
   - README.md
   - LICENSE
+  - scripts
+  - pagefind.yml
+  - node_modules
+
 
 # ---------------- #
 #      Socials     #

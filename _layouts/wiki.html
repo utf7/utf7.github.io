@@ -16,17 +16,18 @@ layout: default
 <section class="container content">
 <div class="columns">
   <div class="column three-fourths" >
-    <article class="article-content markdown-body">
+    <article class="article-content markdown-body" data-pagefind-body>
+    <span data-pagefind-meta="title" hidden>{{ page.title }}</span>
     {{ content }}
     </article>
-    <div class="share">
+    <div class="share" data-pagefind-ignore>
       {% include sns-share.html %}
     </div>
-    <div class="comment">
+    <div class="comment" data-pagefind-ignore>
       {% include comments.html %}
     </div>
   </div>
-  <div class="column one-fourth">
+  <div class="column one-fourth" data-pagefind-ignore>
     {% include sidebar-search.html %}
     {% include sidebar-post-nav.html %}
   </div>

@@ -5,21 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% if page.title %}{{ page.title }} &mdash; {% endif %}{{ site.title }}</title>
-    <link rel="stylesheet" href="{{ site.url }}/assets/vendor/primer-css/css/primer.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/vendor/primer-markdown/dist/user-content.min.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/vendor/octicons/octicons/octicons.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/components/collection.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/components/repo-card.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/sections/repo-list.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/sections/mini-repo-list.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/components/boxed-group.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/globals/common.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/vendor/share.js/dist/css/share.min.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/globals/responsive.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/posts/index.css">
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/globals/prism.css">
+    <link rel="stylesheet" href="{{ '/assets/css/site.bundle.css' | relative_url }}">
     {% for css in page.css %}
-    <link rel="stylesheet" href="{{ site.url }}/assets/css/{{css}}">
+    <link rel="stylesheet" href="{{ '/assets/css/' | relative_url }}{{ css }}">
     {% endfor %}
 
     {% if site.ios_app_name %}
@@ -27,8 +15,8 @@
        <meta name="apple-mobile-web-app-status-bar-style" content="black">
     {% endif %}
     <link rel="canonical" href="{{ page.url | absolute_url }}">
-    <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ site.subscribe_rss }}">
-    <link rel="shortcut icon" href="{{ site.url }}/favicon.ico">
+    <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ site.subscribe_rss | relative_url }}">
+    <link rel="shortcut icon" href="{{ '/favicon.ico' | relative_url }}">
     {% if page.title %}
     <meta property="og:title" content="{{ page.title }}">
       {% if page.keywords %}
@@ -78,10 +66,9 @@
     </script>
 </head>
 <body class="{{ page.class }}" data-mz="{{ page.class }}">
-    <script src="{{ site.url }}/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <header class="site-header">
+    <header class="site-header" data-pagefind-ignore>
         <div class="container">
-            <h1><a href="{{ site.url }}/" title="{{ site.title }}"><span class="octicon octicon-mark-github"></span> {{ site.title }}</a></h1>
+            <h1><a href="{{ '/' | relative_url }}" title="{{ site.title }}"><span class="octicon octicon-mark-github"></span> {{ site.title }}</a></h1>
             <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -89,7 +76,7 @@
             </button>
             <nav class="site-header-nav" role="navigation">
                 {% for nav in site.navs %}
-                <a href="{{ nav.href }}" class="{% if page.menu == nav.label %} selected {% endif %} site-header-nav-item" target="{{ nav.target | default: _self }}" title="{{ nav.label }}">{{ nav.label }}</a>
+                <a href="{{ nav.href }}" class="{% if page.menu == nav.label %} selected {% endif %} site-header-nav-item" target="{{ nav.target | default: '_self' }}" title="{{ nav.label }}">{{ nav.label }}</a>
                 {% endfor %}
             </nav>
         </div>

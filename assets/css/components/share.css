@@ -1,0 +1,26 @@
+/* Lightweight share bar (replaces share.js + iconfont) */
+.share-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 1rem 0;
+}
+.share-bar a,
+.share-bar button {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #586069;
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 3px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.share-bar a:hover,
+.share-bar button:hover {
+  background: #e1e4e8;
+  text-decoration: none;
+}

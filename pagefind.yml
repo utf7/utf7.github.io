@@ -1,0 +1,14 @@
+# Pagefind config — run after `jekyll build`
+site: _site
+# Prefer CJK-capable indexing for Chinese posts
+force_language: zh
+exclude_selectors:
+  - "[data-pagefind-ignore]"
+  - "script"
+  - "style"
+  - "nav"
+  - ".pagination"
+  - ".comment"
+  - ".share"
+  - "#site_search"
+  - "#search_results"

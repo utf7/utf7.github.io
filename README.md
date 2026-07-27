@@ -54,7 +54,14 @@ Fork 本项目之后，还需要做一些事情才能让你的页面「正确」
 
 1. 排版建议遵照一定的规范，推荐 [中文文案排版指北（简体中文版）][1]。
 
-2. 在本地预览博客效果可以参考 [Setting up your Pages site locally with Jekyll][2]。
+2. 在本地预览博客效果可以参考 [Setting up your Pages site locally with Jekyll][2]。完整本地预览（含中文搜索）建议：
+
+   ```bash
+   bash scripts/bundle-css.sh
+   bundle exec jekyll build
+   npx -y pagefind --site _site
+   bundle exec jekyll serve --skip-initial-build
+   ```
 
 ## 经验与思考
 
