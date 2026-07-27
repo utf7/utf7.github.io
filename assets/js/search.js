@@ -1,62 +1,78 @@
-jQuery(function() {
-    // Initalize lunr with the fields it will be searching on. I've given title
-    // a boost of 10 to indicate matches on this field are more important.
-    window.idx = lunr(function () {
-        this.field('id');
-        this.field('title', { boost: 10 });
-        this.field('author');
-        this.field('category');
+/**
+ * Lazy-load Pagefind on first search interaction (Chinese-friendly static search).
+ */
+(function () {
+  var input = document.getElementById('search_box');
+  var button = document.getElementById('site_search_do');
+  var resultsEl = document.getElementById('search_results');
+  if (!input || !resultsEl) return;
+
+  var pagefind = null;
+  var loading = null;
+
+  function basePath() {
+    // Prefer absolute site root; pagefind lives at /pagefind/
+    return '/pagefind/';
+  }
+
+  function loadPagefind() {
+    if (pagefind) return Promise.resolve(pagefind);
+    if (loading) return loading;
+    loading = import(basePath() + 'pagefind.js').then(function (mod) {
+      pagefind = mod;
+      return pagefind;
+    }).catch(function (err) {
+      loading = null;
+      resultsEl.innerHTML = '<li>搜索索引未生成（请先运行 pagefind）</li>';
+      throw err;
     });
+    return loading;
+  }
 
-    // Download the data from the JSON file we generated
-    window.data = $.getJSON('/assets/search_data.json');
-
-    // Wait for the data to load and add it to lunr
-    window.data.then(function(loaded_data){
-        $.each(loaded_data, function(index, value){
-            window.idx.add(
-                $.extend({ "id": index }, value)
-            );
-        });
-    });
-
-    // Event when search action triggered
-    $("#site_search_do").click(function(){
-        var query = $("#search_box").val(); // Get the value for the text field
-        var results = window.idx.search(query); // Get lunr to perform a search
-        display_search_results(results); // Hand the results off to be displayed
-    });
-
-    $("#search_box").keydown(function(e) {
-        if (e.which == 13) {
-            $("#site_search_do").click();
-            return false;
-        }
-    })
-
-    function display_search_results(results) {
-        var $search_results = $("#search_results");
-
-        // Wait for data to load
-        window.data.then(function(loaded_data) {
-
-            // Are there any results?
-            if (results.length) {
-                $search_results.empty(); // Clear any old results
-
-                // Iterate over the results
-                results.forEach(function(result) {
-                    var item = loaded_data[result.ref];
-
-                    // Build a snippet of HTML for this result
-                    var appendString = '<li><a href="' + item.url + '">' + item.title + '</a></li>';
-
-                    // Add it to the results
-                    $search_results.append(appendString);
-                });
-            } else {
-                $search_results.html('<li>No results found</li>');
-            }
-        });
+  function renderResults(search) {
+    if (!search || !search.results || !search.results.length) {
+      resultsEl.innerHTML = '<li>未找到结果</li>';
+      return;
     }
-});
+
+    var top = search.results.slice(0, 10);
+    Promise.all(top.map(function (r) { return r.data(); })).then(function (rows) {
+      resultsEl.innerHTML = rows.map(function (row) {
+        var title = row.meta && row.meta.title ? row.meta.title : row.url;
+        return '<li><a href="' + row.url + '">' + title + '</a></li>';
+      }).join('');
+    });
+  }
+
+  function runSearch() {
+    var query = (input.value || '').trim();
+    if (!query) {
+      resultsEl.innerHTML = '';
+      return;
+    }
+    resultsEl.innerHTML = '<li>搜索中…</li>';
+    loadPagefind().then(function (pf) {
+      return pf.search(query);
+    }).then(renderResults).catch(function () {
+      /* error already shown */
+    });
+  }
+
+  function warm() {
+    loadPagefind().catch(function () {});
+  }
+
+  input.addEventListener('focus', warm, { once: true });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      runSearch();
+    }
+  });
+  if (button) {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      runSearch();
+    });
+  }
+})();

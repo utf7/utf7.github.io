@@ -5,25 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出 &mdash; utf7</title>
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    <link rel="stylesheet" href="/assets/css/site.bundle.css">
     
 
     
     <link rel="canonical" href="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/">
     <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
-    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
     
     <meta property="og:title" content="在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出">
       
@@ -54,10 +42,9 @@
     </script>
 </head>
 <body class="" data-mz="">
-    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <header class="site-header">
+    <header class="site-header" data-pagefind-ignore>
         <div class="container">
-            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <h1><a href="/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
             <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -65,15 +52,15 @@
             </button>
             <nav class="site-header-nav" role="navigation">
                 
-                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                <a href="/" class=" site-header-nav-item" target="_self" title="首页">首页</a>
                 
-                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                <a href="/categories/" class=" site-header-nav-item" target="_self" title="分类">分类</a>
                 
-                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                <a href="/wiki/" class=" site-header-nav-item" target="_self" title="维基">维基</a>
                 
-                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                <a href="/links/" class=" site-header-nav-item" target="_self" title="链接">链接</a>
                 
-                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                <a href="/about/" class=" site-header-nav-item" target="_self" title="关于">关于</a>
                 
             </nav>
         </div>
@@ -95,7 +82,7 @@
           
           <span class="meta-info">
             <span class="octicon octicon-file-directory"></span>
-            <a href="https://utf7.github.io/categories/#Spark" title="Spark">Spark</a>
+            <a href="/categories/#Spark" title="Spark">Spark</a>
           </span>
           
         </div>
@@ -108,14 +95,15 @@
 <section class="container content">
 <div class="columns">
   <div class="column three-fourths" >
-    <article class="article-content markdown-body">
+    <article class="article-content markdown-body" data-pagefind-body>
+    <span data-pagefind-meta="title" hidden>在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出</span>
     <h2 id="1-问题">1. 问题</h2>
 
 <p>公司数仓业务有一个 <code class="language-plaintext highlighter-rouge">sql</code> 任务，每天会产生大量的小文件，每个文件只有几百 <code class="language-plaintext highlighter-rouge">KB</code>～几 <code class="language-plaintext highlighter-rouge">M</code> 大小，小文件过多会对 <code class="language-plaintext highlighter-rouge">HDFS</code> 性能造成比较大的影响，同时也影响数据的读写性能（Spark 任务某些情况下会缓存文件信息），虽然开发了小文件合并工具会去定期合并小文件，但还是想从源头上来解决这个问题，尽量生成比较合适的文件大小，而不是事后补救。</p>
 
 <p>下图是优化前一天 18 点这个分区的数据，可以看出小文件问题明显。</p>
 
-<p><img src="/images/posts/spark/spark-repartition-small-files/small-files.png" alt="small-files" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/spark/spark-repartition-small-files/small-files.png" alt="small-files" /></p>
 
 <h2 id="2-分析">2. 分析</h2>
 
@@ -228,7 +216,7 @@
 
 <p>优化以后，我们发现今天新生成的数据文件明显变大，大小都在95M 左右，小文件问题解决了。</p>
 
-<p><img src="/images/posts/spark/spark-repartition-small-files/big-files.png" alt="small-files" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/spark/spark-repartition-small-files/big-files.png" alt="small-files" /></p>
 
 <p>有一个奇怪的点，优化以后数据量会比以前大一些，大概会多<code class="language-plaintext highlighter-rouge">5%-10%</code>  ，数据表格式是<code class="language-plaintext highlighter-rouge">ORC</code>， 按常理来说，ORC 合并的话，应该会稍微小一点，或者基本上没有变化，因为 <code class="language-plaintext highlighter-rouge">ORC</code> 里面有很多统计信息或者如果更多相同的数据，可以编码压缩掉，经过研究，发现应该是 <code class="language-plaintext highlighter-rouge">repartition</code> 是会重新做一次全量的<code class="language-plaintext highlighter-rouge">shuffle</code>，这样的话，不利于 <code class="language-plaintext highlighter-rouge">ORC</code> 编码和压缩,除了 REPARTITION，Spark 的 Partition 还支持 <code class="language-plaintext highlighter-rouge">COALESCE</code> ，我们可以使用<code class="language-plaintext highlighter-rouge">COALESCE</code> 来替代<code class="language-plaintext highlighter-rouge">REPARTITION</code>.</p>
 
@@ -366,10 +354,28 @@
 </ol>
 
     </article>
-    <div class="share">
-      <div class="share-component"></div>
+    <div class="share" data-pagefind-ignore>
+      <div class="share-bar" role="group" aria-label="分享">
+  <a href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Futf7.github.io%2F2020%2F10%2F08%2Fuse-spark-repartition-hint-to-reduce-small-files%2F&title=%E5%9C%A8+Spark+SQL+%E4%BD%BF%E7%94%A8+REPARTITION+Hint+%E6%9D%A5%E5%87%8F%E5%B0%91%E5%B0%8F%E6%96%87%E4%BB%B6%E8%BE%93%E5%87%BA" target="_blank" rel="noopener noreferrer">微博</a>
+  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Futf7.github.io%2F2020%2F10%2F08%2Fuse-spark-repartition-hint-to-reduce-small-files%2F&text=%E5%9C%A8+Spark+SQL+%E4%BD%BF%E7%94%A8+REPARTITION+Hint+%E6%9D%A5%E5%87%8F%E5%B0%91%E5%B0%8F%E6%96%87%E4%BB%B6%E8%BE%93%E5%87%BA" target="_blank" rel="noopener noreferrer">X</a>
+  <button type="button" id="share-copy-link" data-url="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/">复制链接</button>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('share-copy-link');
+  if (!btn || !navigator.clipboard) return;
+  btn.addEventListener('click', function () {
+    navigator.clipboard.writeText(btn.getAttribute('data-url')).then(function () {
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = old; }, 1500);
+    });
+  });
+})();
+</script>
+
     </div>
-    <div class="comment">
+    <div class="comment" data-pagefind-ignore>
       
   
       
@@ -386,20 +392,15 @@
 
     </div>
   </div>
-  <div class="column one-fourth">
+  <div class="column one-fourth" data-pagefind-ignore>
     
 <h3>Search</h3>
 <div id="site_search">
-    <input type="text" id="search_box" placeholder="Search">
-    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+    <input type="text" id="search_box" placeholder="搜索文章…" autocomplete="off">
+    <button class="btn btn-default" id="site_search_do" type="button" aria-label="搜索"><span class="octicon octicon-search"></span></button>
 </div>
-
 <ul id="search_results"></ul>
-
-<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
-<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
-<script src="https://utf7.github.io/assets/js/search.js"></script>
-
+<script type="module" src="/assets/js/search.js"></script>
 
     
 <h3>Post Directory</h3>
@@ -411,14 +412,14 @@
   </section>
 </div>
 
-<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+<script src="/assets/js/toc.js" defer></script>
 
   </div>
 </div>
 </section>
 <!-- /section.content -->
 
-    <footer class="container">
+    <footer class="container" data-pagefind-ignore>
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
                     © 2026
@@ -437,23 +438,23 @@
             <ul class="site-footer-links mobile-hidden">
                 
                 <li>
-                    <a href="/" title="首页" target="">首页</a>
+                    <a href="/" title="首页" target="_self">首页</a>
                 </li>
                 
                 <li>
-                    <a href="/categories/" title="分类" target="">分类</a>
+                    <a href="/categories/" title="分类" target="_self">分类</a>
                 </li>
                 
                 <li>
-                    <a href="/wiki/" title="维基" target="">维基</a>
+                    <a href="/wiki/" title="维基" target="_self">维基</a>
                 </li>
                 
                 <li>
-                    <a href="/links/" title="链接" target="">链接</a>
+                    <a href="/links/" title="链接" target="_self">链接</a>
                 </li>
                 
                 <li>
-                    <a href="/about/" title="关于" target="">关于</a>
+                    <a href="/about/" title="关于" target="_self">关于</a>
                 </li>
                 
                 <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
@@ -462,16 +463,9 @@
         </div>
     </footer>
     <!-- / footer -->
-    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
-    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
-    <script src="https://utf7.github.io/assets/js/prism.js"></script>
-    <script>
-      jQuery(document).ready(function($) {
-        $('.geopattern').each(function(){
-          $(this).geopattern($(this).data('pattern-id'));
-        });
-      });
-    </script>
+    <script src="/assets/js/geopattern.js" defer></script>
+    <script src="/assets/js/prism.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
     
 </body>
 </html>

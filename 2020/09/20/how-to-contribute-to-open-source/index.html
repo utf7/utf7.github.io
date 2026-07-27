@@ -5,25 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>如何向开源社区提交代码 &mdash; utf7</title>
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    <link rel="stylesheet" href="/assets/css/site.bundle.css">
     
 
     
     <link rel="canonical" href="https://utf7.github.io/2020/09/20/how-to-contribute-to-open-source/">
     <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
-    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
     
     <meta property="og:title" content="如何向开源社区提交代码">
       
@@ -54,10 +42,9 @@
     </script>
 </head>
 <body class="" data-mz="">
-    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <header class="site-header">
+    <header class="site-header" data-pagefind-ignore>
         <div class="container">
-            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <h1><a href="/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
             <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -65,15 +52,15 @@
             </button>
             <nav class="site-header-nav" role="navigation">
                 
-                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                <a href="/" class=" site-header-nav-item" target="_self" title="首页">首页</a>
                 
-                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                <a href="/categories/" class=" site-header-nav-item" target="_self" title="分类">分类</a>
                 
-                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                <a href="/wiki/" class=" site-header-nav-item" target="_self" title="维基">维基</a>
                 
-                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                <a href="/links/" class=" site-header-nav-item" target="_self" title="链接">链接</a>
                 
-                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                <a href="/about/" class=" site-header-nav-item" target="_self" title="关于">关于</a>
                 
             </nav>
         </div>
@@ -95,12 +82,12 @@
           
           <span class="meta-info">
             <span class="octicon octicon-file-directory"></span>
-            <a href="https://utf7.github.io/categories/#HBase" title="HBase">HBase</a>
+            <a href="/categories/#HBase" title="HBase">HBase</a>
           </span>
           
           <span class="meta-info">
             <span class="octicon octicon-file-directory"></span>
-            <a href="https://utf7.github.io/categories/#OpenSource" title="OpenSource">OpenSource</a>
+            <a href="/categories/#OpenSource" title="OpenSource">OpenSource</a>
           </span>
           
         </div>
@@ -113,14 +100,15 @@
 <section class="container content">
 <div class="columns">
   <div class="column three-fourths" >
-    <article class="article-content markdown-body">
+    <article class="article-content markdown-body" data-pagefind-body>
+    <span data-pagefind-meta="title" hidden>如何向开源社区提交代码</span>
     <p>本文将以 Apache HBase 项目为例，介绍如何向社区提交代码。</p>
 
 <h2 id="fork-apache-上游项目">fork apache 上游项目：</h2>
 
 <p>登陆 <code class="language-plaintext highlighter-rouge">github</code>，然后在 github 上面 fork 一下 apache/hbase</p>
 
-<p><img src="/images/posts/github/hbase-pr/hbase-fork.png" alt="hbase-fork" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/github/hbase-pr/hbase-fork.png" alt="hbase-fork" /></p>
 
 <h2 id="clone-你fork的仓库到本地">clone 你fork的仓库到本地</h2>
 
@@ -147,7 +135,7 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
 
 <h2 id="在-hbase-jira-空间创建一个-jira">在 HBase jira 空间，创建一个 jira</h2>
 
-<p><img src="/images/posts/github/hbase-pr/hbase-jira1.png" alt="hbase-jira1" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/github/hbase-pr/hbase-jira1.png" alt="hbase-jira1" /></p>
 
 <p>jira 填写标题、Issue Type,Priority,Component（可选），影响版本、描述等</p>
 
@@ -187,7 +175,7 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
 
 <p>然后去github 看，会触发一个让你创建一个pull/merge之类的（我合理截图的是之前提交给pulsar的，hbase 也是一样的）</p>
 
-<p><img src="/images/posts/github/hbase-pr/hbase-jira2.png" alt="hbase-jira2" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/github/hbase-pr/hbase-jira2.png" alt="hbase-jira2" /></p>
 
 <p>填写如下内容</p>
 
@@ -195,7 +183,7 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
 
 <p>一个是内容描述</p>
 
-<p><img src="/images/posts/github/hbase-pr/hbase-jira3.png" alt="hbase-jira3" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/github/hbase-pr/hbase-jira3.png" alt="hbase-jira3" /></p>
 
 <p>然后点击确认</p>
 
@@ -203,7 +191,7 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
 
 <h4 id="查看jira">查看jira</h4>
 
-<p><img src="/images/posts/github/hbase-pr/hbase-jira4.png" alt="hbase-jira4" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/github/hbase-pr/hbase-jira4.png" alt="hbase-jira4" /></p>
 
 <p>然后可能就会有社区的人帮你review 代码，或者留言了，注意观察跟进一下，根据修改建议，修改代码。</p>
 
@@ -220,10 +208,28 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
 <p>4、修改在本地环境测试通过以后再提交</p>
 
     </article>
-    <div class="share">
-      <div class="share-component"></div>
+    <div class="share" data-pagefind-ignore>
+      <div class="share-bar" role="group" aria-label="分享">
+  <a href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Futf7.github.io%2F2020%2F09%2F20%2Fhow-to-contribute-to-open-source%2F&title=%E5%A6%82%E4%BD%95%E5%90%91%E5%BC%80%E6%BA%90%E7%A4%BE%E5%8C%BA%E6%8F%90%E4%BA%A4%E4%BB%A3%E7%A0%81" target="_blank" rel="noopener noreferrer">微博</a>
+  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Futf7.github.io%2F2020%2F09%2F20%2Fhow-to-contribute-to-open-source%2F&text=%E5%A6%82%E4%BD%95%E5%90%91%E5%BC%80%E6%BA%90%E7%A4%BE%E5%8C%BA%E6%8F%90%E4%BA%A4%E4%BB%A3%E7%A0%81" target="_blank" rel="noopener noreferrer">X</a>
+  <button type="button" id="share-copy-link" data-url="https://utf7.github.io/2020/09/20/how-to-contribute-to-open-source/">复制链接</button>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('share-copy-link');
+  if (!btn || !navigator.clipboard) return;
+  btn.addEventListener('click', function () {
+    navigator.clipboard.writeText(btn.getAttribute('data-url')).then(function () {
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = old; }, 1500);
+    });
+  });
+})();
+</script>
+
     </div>
-    <div class="comment">
+    <div class="comment" data-pagefind-ignore>
       
   
       
@@ -240,20 +246,15 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
 
     </div>
   </div>
-  <div class="column one-fourth">
+  <div class="column one-fourth" data-pagefind-ignore>
     
 <h3>Search</h3>
 <div id="site_search">
-    <input type="text" id="search_box" placeholder="Search">
-    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+    <input type="text" id="search_box" placeholder="搜索文章…" autocomplete="off">
+    <button class="btn btn-default" id="site_search_do" type="button" aria-label="搜索"><span class="octicon octicon-search"></span></button>
 </div>
-
 <ul id="search_results"></ul>
-
-<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
-<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
-<script src="https://utf7.github.io/assets/js/search.js"></script>
-
+<script type="module" src="/assets/js/search.js"></script>
 
     
 <h3>Post Directory</h3>
@@ -265,14 +266,14 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
   </section>
 </div>
 
-<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+<script src="/assets/js/toc.js" defer></script>
 
   </div>
 </div>
 </section>
 <!-- /section.content -->
 
-    <footer class="container">
+    <footer class="container" data-pagefind-ignore>
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
                     © 2026
@@ -291,23 +292,23 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
             <ul class="site-footer-links mobile-hidden">
                 
                 <li>
-                    <a href="/" title="首页" target="">首页</a>
+                    <a href="/" title="首页" target="_self">首页</a>
                 </li>
                 
                 <li>
-                    <a href="/categories/" title="分类" target="">分类</a>
+                    <a href="/categories/" title="分类" target="_self">分类</a>
                 </li>
                 
                 <li>
-                    <a href="/wiki/" title="维基" target="">维基</a>
+                    <a href="/wiki/" title="维基" target="_self">维基</a>
                 </li>
                 
                 <li>
-                    <a href="/links/" title="链接" target="">链接</a>
+                    <a href="/links/" title="链接" target="_self">链接</a>
                 </li>
                 
                 <li>
-                    <a href="/about/" title="关于" target="">关于</a>
+                    <a href="/about/" title="关于" target="_self">关于</a>
                 </li>
                 
                 <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
@@ -316,16 +317,9 @@ upstream	https://github.com/apache/hbase.git <span class="o">(</span>push<span c
         </div>
     </footer>
     <!-- / footer -->
-    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
-    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
-    <script src="https://utf7.github.io/assets/js/prism.js"></script>
-    <script>
-      jQuery(document).ready(function($) {
-        $('.geopattern').each(function(){
-          $(this).geopattern($(this).data('pattern-id'));
-        });
-      });
-    </script>
+    <script src="/assets/js/geopattern.js" defer></script>
+    <script src="/assets/js/prism.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
     
 </body>
 </html>

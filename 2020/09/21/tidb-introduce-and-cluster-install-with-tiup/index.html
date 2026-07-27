@@ -5,25 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TiDB 介绍以及使用 TiUP 离线部署 TiDB 集群 &mdash; utf7</title>
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    <link rel="stylesheet" href="/assets/css/site.bundle.css">
     
 
     
     <link rel="canonical" href="https://utf7.github.io/2020/09/21/tidb-introduce-and-cluster-install-with-tiup/">
     <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
-    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
     
     <meta property="og:title" content="TiDB 介绍以及使用 TiUP 离线部署 TiDB 集群">
       
@@ -54,10 +42,9 @@
     </script>
 </head>
 <body class="" data-mz="">
-    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <header class="site-header">
+    <header class="site-header" data-pagefind-ignore>
         <div class="container">
-            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <h1><a href="/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
             <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -65,15 +52,15 @@
             </button>
             <nav class="site-header-nav" role="navigation">
                 
-                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                <a href="/" class=" site-header-nav-item" target="_self" title="首页">首页</a>
                 
-                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                <a href="/categories/" class=" site-header-nav-item" target="_self" title="分类">分类</a>
                 
-                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                <a href="/wiki/" class=" site-header-nav-item" target="_self" title="维基">维基</a>
                 
-                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                <a href="/links/" class=" site-header-nav-item" target="_self" title="链接">链接</a>
                 
-                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                <a href="/about/" class=" site-header-nav-item" target="_self" title="关于">关于</a>
                 
             </nav>
         </div>
@@ -95,7 +82,7 @@
           
           <span class="meta-info">
             <span class="octicon octicon-file-directory"></span>
-            <a href="https://utf7.github.io/categories/#TiDB" title="TiDB">TiDB</a>
+            <a href="/categories/#TiDB" title="TiDB">TiDB</a>
           </span>
           
         </div>
@@ -108,7 +95,8 @@
 <section class="container content">
 <div class="columns">
   <div class="column three-fourths" >
-    <article class="article-content markdown-body">
+    <article class="article-content markdown-body" data-pagefind-body>
+    <span data-pagefind-meta="title" hidden>TiDB 介绍以及使用 TiUP 离线部署 TiDB 集群</span>
     <h2 id="1-tidb-介绍与架构">1. TiDB 介绍与架构</h2>
 
 <p>以下内容来自官网：</p>
@@ -117,7 +105,7 @@
 
 <p>TiDB 整体架构拆分成了多个模块，各模块之间互相通信，组成完整的 TiDB 系统。对应的架构图如下：</p>
 
-<p><img src="/images/posts/tidb/install/tidb-architecture.png" alt="tidb-architecture" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/tidb/install/tidb-architecture.png" alt="tidb-architecture" /></p>
 
 <ul>
   <li>
@@ -136,7 +124,7 @@
 
     <p><strong>关于 TiKV 存储架构</strong>: TiKV Server 是使用 RocksDB 作为本地的 LSM 存储引擎，利用 Raft 协议来做数据复制，避免单机失效。数据写入走 Raft 接口写入，而不是直接写入 RocksDB,通过将表数据按照 Key 拆分成很多 Region ，Region 被分配到TiKVServer 中。使用 PD 来将 Region 尽可能均匀的散布在集群的所有节点中，从而实现水平扩展以及负载均衡。TiKV 以 Region 为单位做数据的复制，也就是一个 Region 的数据会保存多个副本，TiKV 将每一个副本叫做一个 Replica。Replica 之间是通过 Raft 来保持数据的一致，一个 Region 的多个 Replica 会保存在不同的节点上，构成一个 Raft Group。其中一个 Replica 会作为这个 Group 的 Leader，其他的 Replica 作为 Follower。默认情况下，所有的读和写都是通过 Leader 进行，读操作在 Leader 上即可完成，而写操作再由 Leader 复制给 Follower。 大家理解了 Region 之后，应该可以理解下面这张图：</p>
 
-    <p><img src="/images/posts/tidb/install/tidb-storage-3.png" alt="tidb-storage-3.png" /></p>
+    <p><img loading="lazy" decoding="async" src="/images/posts/tidb/install/tidb-storage-3.png" alt="tidb-storage-3.png" /></p>
   </li>
 </ul>
 
@@ -566,7 +554,7 @@ ID                   Role          Host           Ports                         
 
 <p>http://192.168.100.107:2379/dashboard/#/overview</p>
 
-<p><img src="/images/posts/tidb/install/tidb-dashboard.png" alt="tidb-dashboard" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/tidb/install/tidb-dashboard.png" alt="tidb-dashboard" /></p>
 
 <p>如下链接可以查看 <code class="language-plaintext highlighter-rouge">Grafana</code></p>
 
@@ -699,10 +687,28 @@ mysql&gt; <span class="k">select</span> <span class="k">*</span> from tab_tidb<s
 </ol>
 
     </article>
-    <div class="share">
-      <div class="share-component"></div>
+    <div class="share" data-pagefind-ignore>
+      <div class="share-bar" role="group" aria-label="分享">
+  <a href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Futf7.github.io%2F2020%2F09%2F21%2Ftidb-introduce-and-cluster-install-with-tiup%2F&title=TiDB+%E4%BB%8B%E7%BB%8D%E4%BB%A5%E5%8F%8A%E4%BD%BF%E7%94%A8+TiUP+%E7%A6%BB%E7%BA%BF%E9%83%A8%E7%BD%B2+TiDB+%E9%9B%86%E7%BE%A4" target="_blank" rel="noopener noreferrer">微博</a>
+  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Futf7.github.io%2F2020%2F09%2F21%2Ftidb-introduce-and-cluster-install-with-tiup%2F&text=TiDB+%E4%BB%8B%E7%BB%8D%E4%BB%A5%E5%8F%8A%E4%BD%BF%E7%94%A8+TiUP+%E7%A6%BB%E7%BA%BF%E9%83%A8%E7%BD%B2+TiDB+%E9%9B%86%E7%BE%A4" target="_blank" rel="noopener noreferrer">X</a>
+  <button type="button" id="share-copy-link" data-url="https://utf7.github.io/2020/09/21/tidb-introduce-and-cluster-install-with-tiup/">复制链接</button>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('share-copy-link');
+  if (!btn || !navigator.clipboard) return;
+  btn.addEventListener('click', function () {
+    navigator.clipboard.writeText(btn.getAttribute('data-url')).then(function () {
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = old; }, 1500);
+    });
+  });
+})();
+</script>
+
     </div>
-    <div class="comment">
+    <div class="comment" data-pagefind-ignore>
       
   
       
@@ -719,20 +725,15 @@ mysql&gt; <span class="k">select</span> <span class="k">*</span> from tab_tidb<s
 
     </div>
   </div>
-  <div class="column one-fourth">
+  <div class="column one-fourth" data-pagefind-ignore>
     
 <h3>Search</h3>
 <div id="site_search">
-    <input type="text" id="search_box" placeholder="Search">
-    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+    <input type="text" id="search_box" placeholder="搜索文章…" autocomplete="off">
+    <button class="btn btn-default" id="site_search_do" type="button" aria-label="搜索"><span class="octicon octicon-search"></span></button>
 </div>
-
 <ul id="search_results"></ul>
-
-<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
-<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
-<script src="https://utf7.github.io/assets/js/search.js"></script>
-
+<script type="module" src="/assets/js/search.js"></script>
 
     
 <h3>Post Directory</h3>
@@ -744,14 +745,14 @@ mysql&gt; <span class="k">select</span> <span class="k">*</span> from tab_tidb<s
   </section>
 </div>
 
-<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+<script src="/assets/js/toc.js" defer></script>
 
   </div>
 </div>
 </section>
 <!-- /section.content -->
 
-    <footer class="container">
+    <footer class="container" data-pagefind-ignore>
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
                     © 2026
@@ -770,23 +771,23 @@ mysql&gt; <span class="k">select</span> <span class="k">*</span> from tab_tidb<s
             <ul class="site-footer-links mobile-hidden">
                 
                 <li>
-                    <a href="/" title="首页" target="">首页</a>
+                    <a href="/" title="首页" target="_self">首页</a>
                 </li>
                 
                 <li>
-                    <a href="/categories/" title="分类" target="">分类</a>
+                    <a href="/categories/" title="分类" target="_self">分类</a>
                 </li>
                 
                 <li>
-                    <a href="/wiki/" title="维基" target="">维基</a>
+                    <a href="/wiki/" title="维基" target="_self">维基</a>
                 </li>
                 
                 <li>
-                    <a href="/links/" title="链接" target="">链接</a>
+                    <a href="/links/" title="链接" target="_self">链接</a>
                 </li>
                 
                 <li>
-                    <a href="/about/" title="关于" target="">关于</a>
+                    <a href="/about/" title="关于" target="_self">关于</a>
                 </li>
                 
                 <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
@@ -795,16 +796,9 @@ mysql&gt; <span class="k">select</span> <span class="k">*</span> from tab_tidb<s
         </div>
     </footer>
     <!-- / footer -->
-    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
-    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
-    <script src="https://utf7.github.io/assets/js/prism.js"></script>
-    <script>
-      jQuery(document).ready(function($) {
-        $('.geopattern').each(function(){
-          $(this).geopattern($(this).data('pattern-id'));
-        });
-      });
-    </script>
+    <script src="/assets/js/geopattern.js" defer></script>
+    <script src="/assets/js/prism.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
     
 </body>
 </html>

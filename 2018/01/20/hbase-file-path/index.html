@@ -5,25 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>HBase 文件路径 &mdash; utf7</title>
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    <link rel="stylesheet" href="/assets/css/site.bundle.css">
     
 
     
     <link rel="canonical" href="https://utf7.github.io/2018/01/20/hbase-file-path/">
     <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
-    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
     
     <meta property="og:title" content="HBase 文件路径">
       
@@ -54,10 +42,9 @@
     </script>
 </head>
 <body class="" data-mz="">
-    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <header class="site-header">
+    <header class="site-header" data-pagefind-ignore>
         <div class="container">
-            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <h1><a href="/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
             <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -65,15 +52,15 @@
             </button>
             <nav class="site-header-nav" role="navigation">
                 
-                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                <a href="/" class=" site-header-nav-item" target="_self" title="首页">首页</a>
                 
-                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                <a href="/categories/" class=" site-header-nav-item" target="_self" title="分类">分类</a>
                 
-                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                <a href="/wiki/" class=" site-header-nav-item" target="_self" title="维基">维基</a>
                 
-                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                <a href="/links/" class=" site-header-nav-item" target="_self" title="链接">链接</a>
                 
-                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                <a href="/about/" class=" site-header-nav-item" target="_self" title="关于">关于</a>
                 
             </nav>
         </div>
@@ -95,7 +82,7 @@
           
           <span class="meta-info">
             <span class="octicon octicon-file-directory"></span>
-            <a href="https://utf7.github.io/categories/#HBase" title="HBase">HBase</a>
+            <a href="/categories/#HBase" title="HBase">HBase</a>
           </span>
           
         </div>
@@ -108,7 +95,8 @@
 <section class="container content">
 <div class="columns">
   <div class="column three-fourths" >
-    <article class="article-content markdown-body">
+    <article class="article-content markdown-body" data-pagefind-body>
+    <span data-pagefind-meta="title" hidden>HBase 文件路径</span>
     <h1 id="hbase-文件路径">HBase 文件路径</h1>
 
 <p>本篇将分析 HBase 中的目录以及对应的作用，基于 Apache-HBase 1.2.6</p>
@@ -150,7 +138,7 @@
 namespace+table+(startkey,endkey)+CF+hfile名称列表
 hfile 名称列表是如何找到对应的HFile（archive目录和未compcation之前回去实际表目录去找，什么逻辑？）</p>
 
-<p><img src="/images/posts/hbase/hbase-file-path/hbase_snapshot_data.manifest.jpg" alt="" title="data.manifest" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/hbase/hbase-file-path/hbase_snapshot_data.manifest.jpg" alt="" title="data.manifest" /></p>
 
 <h2 id="tmp-目录">.tmp 目录</h2>
 <p>.tmp 目录为 HBase 的临时目录</p>
@@ -167,11 +155,11 @@ hfile 名称列表是如何找到对应的HFile（archive目录和未compcation�
 WAL 存储再 HDFS 中，当发生 RegionServer 宕机重启后，RS 会读取 HDFS中的 WAL 进行 REPLAY 回放从而实现故障恢复。
 WAL 类似 MySQL 的 BinLog ，从数据安全的角度，建议开启 WAL <br />
 下图是WAL 日志中的一个存储截图：
-<img src="/images/posts/hbase/hbase-file-path/hbase_wal_hdfs_path.png" alt="" title="WAL 日志路径" /></p>
+<img loading="lazy" decoding="async" src="/images/posts/hbase/hbase-file-path/hbase_wal_hdfs_path.png" alt="" title="WAL 日志路径" /></p>
 
 <p>wal 日志路径为 hbase.rootdir/WALs/serverName/URLEncoder.encode(serverName).default.Timestamp
 WAL 日志的命名规则如下
-<img src="/images/posts/hbase/hbase-file-path/hbase_wal_name.png" alt="" title="WAL 日志命名规则" /></p>
+<img loading="lazy" decoding="async" src="/images/posts/hbase/hbase-file-path/hbase_wal_name.png" alt="" title="WAL 日志命名规则" /></p>
 
 <p>注意 meta 表使用单独的 WAL 日志保存</p>
 
@@ -252,10 +240,28 @@ WAL 日志的命名规则如下
 
 
     </article>
-    <div class="share">
-      <div class="share-component"></div>
+    <div class="share" data-pagefind-ignore>
+      <div class="share-bar" role="group" aria-label="分享">
+  <a href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Futf7.github.io%2F2018%2F01%2F20%2Fhbase-file-path%2F&title=HBase+%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84" target="_blank" rel="noopener noreferrer">微博</a>
+  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Futf7.github.io%2F2018%2F01%2F20%2Fhbase-file-path%2F&text=HBase+%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84" target="_blank" rel="noopener noreferrer">X</a>
+  <button type="button" id="share-copy-link" data-url="https://utf7.github.io/2018/01/20/hbase-file-path/">复制链接</button>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('share-copy-link');
+  if (!btn || !navigator.clipboard) return;
+  btn.addEventListener('click', function () {
+    navigator.clipboard.writeText(btn.getAttribute('data-url')).then(function () {
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = old; }, 1500);
+    });
+  });
+})();
+</script>
+
     </div>
-    <div class="comment">
+    <div class="comment" data-pagefind-ignore>
       
   
       
@@ -272,20 +278,15 @@ WAL 日志的命名规则如下
 
     </div>
   </div>
-  <div class="column one-fourth">
+  <div class="column one-fourth" data-pagefind-ignore>
     
 <h3>Search</h3>
 <div id="site_search">
-    <input type="text" id="search_box" placeholder="Search">
-    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+    <input type="text" id="search_box" placeholder="搜索文章…" autocomplete="off">
+    <button class="btn btn-default" id="site_search_do" type="button" aria-label="搜索"><span class="octicon octicon-search"></span></button>
 </div>
-
 <ul id="search_results"></ul>
-
-<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
-<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
-<script src="https://utf7.github.io/assets/js/search.js"></script>
-
+<script type="module" src="/assets/js/search.js"></script>
 
     
 <h3>Post Directory</h3>
@@ -297,14 +298,14 @@ WAL 日志的命名规则如下
   </section>
 </div>
 
-<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+<script src="/assets/js/toc.js" defer></script>
 
   </div>
 </div>
 </section>
 <!-- /section.content -->
 
-    <footer class="container">
+    <footer class="container" data-pagefind-ignore>
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
                     © 2026
@@ -323,23 +324,23 @@ WAL 日志的命名规则如下
             <ul class="site-footer-links mobile-hidden">
                 
                 <li>
-                    <a href="/" title="首页" target="">首页</a>
+                    <a href="/" title="首页" target="_self">首页</a>
                 </li>
                 
                 <li>
-                    <a href="/categories/" title="分类" target="">分类</a>
+                    <a href="/categories/" title="分类" target="_self">分类</a>
                 </li>
                 
                 <li>
-                    <a href="/wiki/" title="维基" target="">维基</a>
+                    <a href="/wiki/" title="维基" target="_self">维基</a>
                 </li>
                 
                 <li>
-                    <a href="/links/" title="链接" target="">链接</a>
+                    <a href="/links/" title="链接" target="_self">链接</a>
                 </li>
                 
                 <li>
-                    <a href="/about/" title="关于" target="">关于</a>
+                    <a href="/about/" title="关于" target="_self">关于</a>
                 </li>
                 
                 <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
@@ -348,16 +349,9 @@ WAL 日志的命名规则如下
         </div>
     </footer>
     <!-- / footer -->
-    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
-    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
-    <script src="https://utf7.github.io/assets/js/prism.js"></script>
-    <script>
-      jQuery(document).ready(function($) {
-        $('.geopattern').each(function(){
-          $(this).geopattern($(this).data('pattern-id'));
-        });
-      });
-    </script>
+    <script src="/assets/js/geopattern.js" defer></script>
+    <script src="/assets/js/prism.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
     
 </body>
 </html>

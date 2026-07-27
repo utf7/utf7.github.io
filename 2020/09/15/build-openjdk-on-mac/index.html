@@ -5,25 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mac 上从源代码编译 OpenJDk &mdash; utf7</title>
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
-    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    <link rel="stylesheet" href="/assets/css/site.bundle.css">
     
 
     
     <link rel="canonical" href="https://utf7.github.io/2020/09/15/build-openjdk-on-mac/">
     <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
-    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
     
     <meta property="og:title" content="Mac 上从源代码编译 OpenJDk">
       
@@ -54,10 +42,9 @@
     </script>
 </head>
 <body class="" data-mz="">
-    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <header class="site-header">
+    <header class="site-header" data-pagefind-ignore>
         <div class="container">
-            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <h1><a href="/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
             <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -65,15 +52,15 @@
             </button>
             <nav class="site-header-nav" role="navigation">
                 
-                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                <a href="/" class=" site-header-nav-item" target="_self" title="首页">首页</a>
                 
-                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                <a href="/categories/" class=" site-header-nav-item" target="_self" title="分类">分类</a>
                 
-                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                <a href="/wiki/" class=" site-header-nav-item" target="_self" title="维基">维基</a>
                 
-                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                <a href="/links/" class=" site-header-nav-item" target="_self" title="链接">链接</a>
                 
-                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                <a href="/about/" class=" site-header-nav-item" target="_self" title="关于">关于</a>
                 
             </nav>
         </div>
@@ -95,12 +82,12 @@
           
           <span class="meta-info">
             <span class="octicon octicon-file-directory"></span>
-            <a href="https://utf7.github.io/categories/#Java" title="Java">Java</a>
+            <a href="/categories/#Java" title="Java">Java</a>
           </span>
           
           <span class="meta-info">
             <span class="octicon octicon-file-directory"></span>
-            <a href="https://utf7.github.io/categories/#Mac" title="Mac">Mac</a>
+            <a href="/categories/#Mac" title="Mac">Mac</a>
           </span>
           
         </div>
@@ -113,7 +100,8 @@
 <section class="container content">
 <div class="columns">
   <div class="column three-fourths" >
-    <article class="article-content markdown-body">
+    <article class="article-content markdown-body" data-pagefind-body>
+    <span data-pagefind-meta="title" hidden>Mac 上从源代码编译 OpenJDk</span>
     <h1 id="mac-上从源代码编译-openjdk">Mac 上从源代码编译 OpenJDk</h1>
 
 <p>最近被问了一个关于 <code class="language-plaintext highlighter-rouge">YARN</code> 任务关于 <code class="language-plaintext highlighter-rouge">JVM</code> 启动内存参数相关的问题，上网搜索发现关于一些 <code class="language-plaintext highlighter-rouge">JVM</code> 参数的说法，通常质量都比较低，就想着去看一下 <code class="language-plaintext highlighter-rouge">OpenJDK</code> 的代码， <code class="language-plaintext highlighter-rouge">OpenJDK</code>  主要是使用 <code class="language-plaintext highlighter-rouge">C++ </code>写的,虽然没用过 <code class="language-plaintext highlighter-rouge">C++</code>,但我想一些简单的参数意义从代码中还是能看懂的，同时有感于对 <code class="language-plaintext highlighter-rouge">JVM</code> 一些参数总是一知半解，想通过看代码来加深印象，便于记忆。就像以前做 <code class="language-plaintext highlighter-rouge">HBase</code> 一样，各种参数很难记住或者理解不深刻，但是通过实践+看代码的方式来巩固加深理解。比如很多人会有这样的误解，对于 <code class="language-plaintext highlighter-rouge">JDK7/8</code> 只要不设置为 <code class="language-plaintext highlighter-rouge">G1</code>，就是默认 <code class="language-plaintext highlighter-rouge">CMS</code>, 其实并不是,比如 <code class="language-plaintext highlighter-rouge">JDK 8</code> 模式的 <code class="language-plaintext highlighter-rouge">GC</code> 既不是 <code class="language-plaintext highlighter-rouge">G1</code> 也不是<code class="language-plaintext highlighter-rouge">CMS</code>,并且仔细看的话，<code class="language-plaintext highlighter-rouge">CMS</code> 在其他版本中从来就没有被当作为默认的 <code class="language-plaintext highlighter-rouge">GC</code> 方式。刚开始在 <code class="language-plaintext highlighter-rouge">github</code> 上面在线看代码，看代码的过程中发现不是很方便，于是就想着把代码下载下来，在 <code class="language-plaintext highlighter-rouge">IDE</code> 中查看，也方便查找，然后就想着如何在 <code class="language-plaintext highlighter-rouge">Mac</code> 上面编译一下 <code class="language-plaintext highlighter-rouge">OpenJDK</code> ,于是就有了这篇文章。</p>
@@ -163,14 +151,14 @@
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash configure <span class="nt">--with-boot-jdk</span><span class="o">=</span>/Users/admin/jdk-11.0.8+10/Contents/Home <span class="nt">--with-jvm-variants</span><span class="o">=</span>server <span class="nt">--with-target-bits</span><span class="o">=</span>64  <span class="nt">--enable-dtrace</span> <span class="nt">--enable-ccache</span> <span class="nt">--with-num-cores</span><span class="o">=</span>4 <span class="nt">--with-memory-size</span><span class="o">=</span>4096 <span class="nt">--with-jtreg</span><span class="o">=</span>/Users/admin/jtreg <span class="nt">--with-freetype</span><span class="o">=</span>bundled <span class="nt">--disable-warnings-as-errors</span> <span class="nt">--enable-debug</span> <span class="nt">--enable-dtrace</span>
 </code></pre></div></div>
 
-<p><img src="/images/posts/java/build-jdk-config.png" alt="configure" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/java/build-jdk-config.png" alt="configure" /></p>
 
 <p>编译时间挺长的，请耐心等待。</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make images
 </code></pre></div></div>
 
-<p><img src="/images/posts/java/build-jdk-image.jpg" alt="make-images-output" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/java/build-jdk-image.jpg" alt="make-images-output" /></p>
 
 <p>验证：</p>
 
@@ -180,7 +168,7 @@
 
 <p>查看版本：</p>
 
-<p><img src="/images/posts/java/build-jdk-version.png" alt="buidl-jdk-show-version" /></p>
+<p><img loading="lazy" decoding="async" src="/images/posts/java/build-jdk-version.png" alt="buidl-jdk-show-version" /></p>
 
 <h3 id="错误汇总">错误汇总</h3>
 
@@ -257,10 +245,28 @@ configure exiting with result code 1</p>
 <p>https://ci.adoptopenjdk.net/view/Dependencies/job/jtreg/lastSuccessfulBuild/artifact/</p>
 
     </article>
-    <div class="share">
-      <div class="share-component"></div>
+    <div class="share" data-pagefind-ignore>
+      <div class="share-bar" role="group" aria-label="分享">
+  <a href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Futf7.github.io%2F2020%2F09%2F15%2Fbuild-openjdk-on-mac%2F&title=Mac+%E4%B8%8A%E4%BB%8E%E6%BA%90%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91+OpenJDk" target="_blank" rel="noopener noreferrer">微博</a>
+  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Futf7.github.io%2F2020%2F09%2F15%2Fbuild-openjdk-on-mac%2F&text=Mac+%E4%B8%8A%E4%BB%8E%E6%BA%90%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91+OpenJDk" target="_blank" rel="noopener noreferrer">X</a>
+  <button type="button" id="share-copy-link" data-url="https://utf7.github.io/2020/09/15/build-openjdk-on-mac/">复制链接</button>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('share-copy-link');
+  if (!btn || !navigator.clipboard) return;
+  btn.addEventListener('click', function () {
+    navigator.clipboard.writeText(btn.getAttribute('data-url')).then(function () {
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = old; }, 1500);
+    });
+  });
+})();
+</script>
+
     </div>
-    <div class="comment">
+    <div class="comment" data-pagefind-ignore>
       
   
       
@@ -277,20 +283,15 @@ configure exiting with result code 1</p>
 
     </div>
   </div>
-  <div class="column one-fourth">
+  <div class="column one-fourth" data-pagefind-ignore>
     
 <h3>Search</h3>
 <div id="site_search">
-    <input type="text" id="search_box" placeholder="Search">
-    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+    <input type="text" id="search_box" placeholder="搜索文章…" autocomplete="off">
+    <button class="btn btn-default" id="site_search_do" type="button" aria-label="搜索"><span class="octicon octicon-search"></span></button>
 </div>
-
 <ul id="search_results"></ul>
-
-<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
-<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
-<script src="https://utf7.github.io/assets/js/search.js"></script>
-
+<script type="module" src="/assets/js/search.js"></script>
 
     
 <h3>Post Directory</h3>
@@ -302,14 +303,14 @@ configure exiting with result code 1</p>
   </section>
 </div>
 
-<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+<script src="/assets/js/toc.js" defer></script>
 
   </div>
 </div>
 </section>
 <!-- /section.content -->
 
-    <footer class="container">
+    <footer class="container" data-pagefind-ignore>
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
                     © 2026
@@ -328,23 +329,23 @@ configure exiting with result code 1</p>
             <ul class="site-footer-links mobile-hidden">
                 
                 <li>
-                    <a href="/" title="首页" target="">首页</a>
+                    <a href="/" title="首页" target="_self">首页</a>
                 </li>
                 
                 <li>
-                    <a href="/categories/" title="分类" target="">分类</a>
+                    <a href="/categories/" title="分类" target="_self">分类</a>
                 </li>
                 
                 <li>
-                    <a href="/wiki/" title="维基" target="">维基</a>
+                    <a href="/wiki/" title="维基" target="_self">维基</a>
                 </li>
                 
                 <li>
-                    <a href="/links/" title="链接" target="">链接</a>
+                    <a href="/links/" title="链接" target="_self">链接</a>
                 </li>
                 
                 <li>
-                    <a href="/about/" title="关于" target="">关于</a>
+                    <a href="/about/" title="关于" target="_self">关于</a>
                 </li>
                 
                 <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
@@ -353,16 +354,9 @@ configure exiting with result code 1</p>
         </div>
     </footer>
     <!-- / footer -->
-    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
-    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
-    <script src="https://utf7.github.io/assets/js/prism.js"></script>
-    <script>
-      jQuery(document).ready(function($) {
-        $('.geopattern').each(function(){
-          $(this).geopattern($(this).data('pattern-id'));
-        });
-      });
-    </script>
+    <script src="/assets/js/geopattern.js" defer></script>
+    <script src="/assets/js/prism.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
     
 </body>
 </html>
