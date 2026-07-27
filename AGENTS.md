@@ -17,6 +17,6 @@ This repo is a single **Jekyll static blog** (Chinese personal blog, deployed to
 ### Non-obvious caveats
 
 - Gems are installed to the **system gem path** (`/var/lib/gems`), so dependency installs require `sudo` (e.g. `sudo bundle install`). Running `bundle exec jekyll serve/build` does **not** need sudo.
-- `bundle exec jekyll build` prints a **YAML Exception** for `_posts/2022-07-20-spark-resource-used-metrics.md` (malformed front matter in that post's content). This is a pre-existing content issue, not an environment problem; Jekyll skips that file and still builds the rest of the site.
-- The build logs `To use retry middleware with Faraday v2.0+, install faraday-retry gem` — a harmless warning that does not block the build.
-- No `Gemfile.lock` is committed (it's gitignored), so gem versions resolve from the `github-pages` gem at install time.
+- `Gemfile` pins `github-pages` + `webrick`; `Gemfile.lock` is committed. CI uses Ruby 3.2 (`ruby/setup-ruby` + bundler-cache) and deploys `_site` → `built` branch.
+- Comments use **Utterances** (`comments_provider: utterances` in `_config.yml`); the utterances GitHub App must be installed on `utterances.repo`.
+- Large/local-only paths under `docs/presto` (and a few tooling files) are listed in `_config.yml` `exclude` and are skipped by the Pages build.
