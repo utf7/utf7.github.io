@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>一次 java/scala 整型溢出的问题 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/09/01/java-scala-int-overflow-case/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="一次 java/scala 整型溢出的问题">
+      
+    <meta name="keywords" content="Java,整型溢出">
+    <meta property="og:keywords" content="Java,整型溢出">
+      
+    <meta name="description" content="Java,scala">
+    <meta property="og:description" content="Java,scala">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/09/01/java-scala-int-overflow-case/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-09-01">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="一次 java/scala 整">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">一次 java/scala 整型溢出的问题</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/09/01
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Java" title="Java">Java</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="一次-javascala-整型溢出的问题">一次 Java/Scala 整型溢出的问题</h1>
+
+<p>刚到新公司，为了测试一下内部的 <code class="language-plaintext highlighter-rouge">git</code> 权限，就随便修改了一点代码，提交一下，看是否可以正常提交代码。</p>
+
+<p>本来想修改的都是没有什么影响的代码，结果第一次提交代码就出现了问题。。。</p>
+
+<p>记录一下，引以为戒。</p>
+
+<p>原来的代码是这样的：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="n">val</span> <span class="n">readLimit</span> <span class="o">=</span> <span class="mi">21990232555520L</span>
+</code></pre></div></div>
+
+<p>修改后为：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="n">val</span> <span class="n">readLimit</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024L</span>
+</code></pre></div></div>
+
+<p>表示读限制为 20TB</p>
+
+<p>谁知道竟然出现了问题,你们猜是什么问题？？？</p>
+
+<p>～我是分隔符～</p>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<p>可能有些人已经发现了，发生了整型溢出导致readLimit 为负数，险些踉成大错。。。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span><span class="mi">1024</span> <span class="o">=</span> <span class="mi">21474836480</span>
+<span class="c1">//Java 中int 最大值为：Integer.MAX_VALUE = 2147483647</span>
+</code></pre></div></div>
+
+<p>显然  20 * 1024 * 1024 *1024 &gt; Integer.MAX_VALUE，最终导致整型溢出。</p>
+
+<p>说实话这个错误发生的对我来说并不是偶然，如果这次不出现，可能以后我还是会犯类似的，这里面有一个思维定势。</p>
+
+<p>虽然整型溢出和范围我一直都是有概念的，比如写类似如下代码的时候，我会非常小心和注意。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">readLimit</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="o">;</span><span class="c1">//错误，溢出</span>
+</code></pre></div></div>
+
+<p>但是假如写如下代码：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">long</span> <span class="n">readLimit</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024L</span>
+</code></pre></div></div>
+
+<p>没有想到这块会整型溢出，误以为会自动类型推导的，因为后面特意写了 <code class="language-plaintext highlighter-rouge">*1024L</code> 来表示这个一个<code class="language-plaintext highlighter-rouge"> long </code>类型。</p>
+
+<p>这块也是我的一个思维定势，比如 <code class="language-plaintext highlighter-rouge">HBase</code> <a href="https://github.com/apache/hbase/blob/rel/2.3.1/hbase-common/src/main/java/org/apache/hadoop/hbase/HConstants.java#L420">源代码</a> 中，默认的 <code class="language-plaintext highlighter-rouge">Region Size</code> 最大值的代码 :</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="no">DEFAULT_MAX_FILE_SIZE</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024L</span><span class="o">;</span>
+</code></pre></div></div>
+
+<p>当然如上代码是没有问题的，因为 <code class="language-plaintext highlighter-rouge">10*1024*1024</code> 并没有超过整型的最大值，但是这种写法是不值得推荐的。</p>
+
+<p>其实这个问题，细想想的话，Java 操作符优先级的话，应该是可以发现的，但还是发生了一个思维定势想当然的低级错误。</p>
+
+<p>最后推荐一下比较好的写法是</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">long</span> <span class="n">readLimit</span> <span class="o">=</span> <span class="mi">20L</span> <span class="o">*</span> <span class="mi">1024L</span> <span class="o">*</span> <span class="mi">1024L</span> <span class="o">*</span> <span class="mi">1024L</span> <span class="o">*</span> <span class="mi">1024L</span>
+<span class="n">或者</span>
+<span class="kt">long</span> <span class="n">readLimit</span> <span class="o">=</span> <span class="mi">20L</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+</code></pre></div></div>
+
+<p>也就是先把 <code class="language-plaintext highlighter-rouge">long </code>类型放在前面即可。</p>
+
+<p>非常不推荐如下写法</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>long readLimit = x*y*z*1024L
+</code></pre></div></div>
+
+<p>即使当时不发生溢出，也有可能因为参数，或者调整了xyz的大小导致溢出</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

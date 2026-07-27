@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>salt 中关于locale的问题 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/11/10/salt-locale-problem/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="salt 中关于locale的问题">
+      
+    <meta name="keywords" content="Salt/locale">
+    <meta property="og:keywords" content="Salt/locale">
+      
+    <meta name="description" content="salt 中关于locale的问题">
+    <meta property="og:description" content="salt 中关于locale的问题">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/11/10/salt-locale-problem/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-11-10">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="salt 中关于locale的">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">salt 中关于locale的问题</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/11/10
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Salt" title="Salt">Salt</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="记录一次诡异的-hivespark-乱码问题">记录一次诡异的 Hive/Spark 乱码问题</h2>
+
+<p>最近遇到一个诡异的事情，Hive/Spark 写入汉字乱码。</p>
+
+<p>检查 Hive/Spark 的各种参数也没有发现有什么变动，客户端配置也是一样的。</p>
+
+<p>有一个诡异的地方是</p>
+
+<p><code class="language-plaintext highlighter-rouge">spark-sql -f xxx.sql,xxx.sql</code> 如果 <code class="language-plaintext highlighter-rouge">xxx.sql</code> 中如果有汉字，则也会有问题。</p>
+
+<p><code class="language-plaintext highlighter-rouge">spark-submit client</code> 模式则没有问题，<code class="language-plaintext highlighter-rouge">cluster</code> 模式则会有问题。</p>
+
+<p>这里面唯一区别是 <code class="language-plaintext highlighter-rouge">client</code> 的 <code class="language-plaintext highlighter-rouge">Driver</code> 在 本地，<code class="language-plaintext highlighter-rouge">cluster</code> 在 <code class="language-plaintext highlighter-rouge">YARN（NodeManager）</code> 节点。</p>
+
+<p>另外 <code class="language-plaintext highlighter-rouge">Spark/MR</code> 读写数据也有问题，不过 <code class="language-plaintext highlighter-rouge">hive cli</code> 不启动 <code class="language-plaintext highlighter-rouge">MR</code> 的话，则没有问题。。。比如 <code class="language-plaintext highlighter-rouge">select * from t limit 10</code>  这种不会启动 <code class="language-plaintext highlighter-rouge">MR</code>，则是本地运行的。</p>
+
+<p>分析来看，不管是 <code class="language-plaintext highlighter-rouge">Hive/Spark</code> 只要任务跑在 YARN 上面则会有问题。</p>
+
+<p>所以这块感觉和 <code class="language-plaintext highlighter-rouge">NodeManager</code> 有关系，因为 <code class="language-plaintext highlighter-rouge">on YARN</code> 的进程都是 <code class="language-plaintext highlighter-rouge">NodeManager fork</code> 出来的。</p>
+
+<p>因为最近在做 <code class="language-plaintext highlighter-rouge">Zstandard</code> 修改了代码，所以同事怀疑是否代码引起的。我反复check了代码，并没有涉及到字符编码相关的内容。不应该出现此类问题。</p>
+
+<p>由于修改了 <code class="language-plaintext highlighter-rouge">Hadoop</code> 代码，需要重启 <code class="language-plaintext highlighter-rouge">NodeManager</code> ，最近变动就是重启了 <code class="language-plaintext highlighter-rouge">NodeManager</code>以及添加了 <code class="language-plaintext highlighter-rouge">Zstandard</code> 的支持。</p>
+
+<p>登陆出现问题的主机</p>
+
+<p>执行 <code class="language-plaintext highlighter-rouge">locale</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nv">LANG</span><span class="o">=</span>en_US.UTF-8
+    <span class="nv">LCCTYPE</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_NUMERIC</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_TIME</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_COLLATE</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_MONETARY</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_MESSAGES</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_PAPER</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_NAME</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_ADDRESS</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_TELEPHONE</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_MEASUREMENT</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_IDENTIFICATION</span><span class="o">=</span><span class="s2">"en_US.UTF-8"</span>
+    <span class="nv">LC_ALL</span><span class="o">=</span>
+</code></pre></div></div>
+
+<p>貌似也没啥问题。百思不得其解：</p>
+
+<p>此时赶快将节点回滚到之前的版本，然后慢慢重启 <code class="language-plaintext highlighter-rouge">NodeManager</code>，发现确实问题渐渐修复了。</p>
+
+<p>还有另外一个现象是并不是所有内容都是乱码的，这个猜测和 <code class="language-plaintext highlighter-rouge">Map/Reduce</code> 以及 <code class="language-plaintext highlighter-rouge">Spark Executor</code> 跑在不同的 <code class="language-plaintext highlighter-rouge">NodeManager</code> 节点有关系。</p>
+
+<p>这时候根据多年的经验直觉，赶快保存的异常的节点 <code class="language-plaintext highlighter-rouge">NodeManager</code> 保留的 <code class="language-plaintext highlighter-rouge">lsof</code> 句柄信息，</p>
+
+<p>diff 一下进程加载的 fd，是不是少加载了什么导致的，比较2个进程加载的fd 发现有一个</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps <span class="nt">-ef</span>|grep <span class="nt">-v</span> <span class="nb">grep</span>|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk <span class="s1">'{print $2}'</span>|xargs lsof <span class="nt">-p</span> |sort <span class="nt">-n</span> <span class="o">&gt;</span> lsof_before   
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps <span class="nt">-ef</span>|grep <span class="nt">-v</span> <span class="nb">grep</span>|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk <span class="s1">'{print $2}'</span>|xargs lsof <span class="nt">-p</span> |sort <span class="nt">-n</span>  <span class="o">&gt;</span> lsof_after. 
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>diff lsof_before lsof_after
+</code></pre></div></div>
+
+<p>然后发现少了</p>
+
+<p><code class="language-plaintext highlighter-rouge">/usr/lib/locale/locale-archive</code></p>
+
+<p>咦，什么鬼。。。为啥没有这个，分明我登陆节点执行，<code class="language-plaintext highlighter-rouge">locale</code> 输出是正常的。</p>
+
+<p>所以就把问题定位点放在 <code class="language-plaintext highlighter-rouge">/usr/lib/locale/locale-archive</code> 为什么少了这个地方。</p>
+
+<p>出问题的 NodeManager 启动命令如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salt <span class="s1">'nm-*'</span> cmd.run <span class="s1">'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'</span>
+</code></pre></div></div>
+
+<p>我在一个节点测试了一下，使用</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> <span class="nt">-u</span> yarn bash <span class="nt">-c</span> <span class="s2">"source /etc/profile;yarn-daemon.sh start nodemanager"</span>
+</code></pre></div></div>
+
+<p>启动一个 NM 测试，发现并没有什么异常。。。。太诡异了。。。</p>
+
+<p>节点还没有重启完，我赶快把所有的节点检查了一下，是否都丢失 <code class="language-plaintext highlighter-rouge">/usr/lib/locale/locale-archive</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salt <span class="s2">"*"</span> cmd.run <span class="s2">" ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print </span><span class="se">\$</span><span class="s2">2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"</span>
+
+</code></pre></div></div>
+
+<p>发现我之前启动的节点都是没有 <code class="language-plaintext highlighter-rouge">locale-archive</code> ，而同事新启动的则是没有问题的。莫不是启动方式有问题？？？诡异。<br />
+执行： <code class="language-plaintext highlighter-rouge">salt -E "nm-*" cmd.run "locale"</code></p>
+
+<pre><code class="language-LANG=en_US.UTF-8">    LC_CTYPE=C
+    LC_NUMERIC=C
+    LC_TIME=C
+    LC_COLLATE=C
+    LC_MONETARY=C
+    LC_MESSAGES=C
+    LC_PAPER=C
+    LC_NAME=C
+    LC_ADDRESS=C
+    LC_TELEPHONE=C
+    LC_MEASUREMENT=C
+    LC_IDENTIFICATION=C
+    LC_ALL=
+</code></pre>
+<p>发现 <code class="language-plaintext highlighter-rouge">locale</code> 很多输出都是<code class="language-plaintext highlighter-rouge">C</code>，这个与我之前在机器上面执行的结果是不一致的。</p>
+
+<p>所以应该是 <code class="language-plaintext highlighter-rouge">salt</code> 导致的，问了一下同事是如何重启的，他是kill 掉 <code class="language-plaintext highlighter-rouge">NodeManager</code>,并没有启动，而是让监控脚本自动拉起的。</p>
+
+<p>而我当时为了启动快一些，是直接使用 <code class="language-plaintext highlighter-rouge">salt</code> 批量 <code class="language-plaintext highlighter-rouge">stop</code> 然后 <code class="language-plaintext highlighter-rouge">start</code> 的。</p>
+
+<p>至此原因排查出来的，原来是 <code class="language-plaintext highlighter-rouge">salt</code> 的锅。</p>
+
+<p>后来去github 把salt 代码拉了下来，看了一下。问题出在这边：</p>
+
+<p><code class="language-plaintext highlighter-rouge">salt</code> 默认会 <code class="language-plaintext highlighter-rouge">reset_system_locale</code>,代码截图如下：</p>
+
+<p><img src="/images/posts/salt/reset_system_locale_code1.png" alt="reset_system_locale_code1" /></p>
+
+<p><img src="/images/posts/salt/reset_system_locale_code2.png" alt="reset_system_locale_code1" /></p>
+
+<p>个人感觉这边salt处理的很有问题，虽然提供了参数，但我仍然认为是个bug，不知道为啥会考虑默认重置locale。</p>
+
+<p>很坑！！！</p>
+
+<p>看了一下代码，可以执行<code class="language-plaintext highlighter-rouge">salt</code> 命令的时候，添加参数 <code class="language-plaintext highlighter-rouge">reset_system_locale=False</code> 解决：</p>
+
+<p>修改 <code class="language-plaintext highlighter-rouge">NodeManger</code> 启动脚本,<code class="language-plaintext highlighter-rouge">Hive/Spark</code> 乱码问题解决</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salt <span class="s1">'nm-*'</span> cmd.run <span class="nv">reset_system_locale</span><span class="o">=</span>False <span class="s1">'sudo -u yarn bash -c "source /etc/profile;yarn-daemon.sh start nodemanager"'</span>
+</code></pre></div></div>
+
+<p>验证：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salt <span class="s2">"nm-*"</span> cmd.run <span class="s2">" ps -ef|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print </span><span class="se">\$</span><span class="s2">2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"</span>
+</code></pre></div></div>
+
+<p>如果有使用 <code class="language-plaintext highlighter-rouge">salt</code> 的同学，具体可以使用如下命令来测试 测试这个问题：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salt <span class="s1">'nm-*'</span> cmd.run <span class="nv">reset_system_locale</span><span class="o">=</span>False <span class="s1">'locale'</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> salt 'nm-*' cmd.run  'locale'
+</code></pre></div></div>
+
+<p>PS：
+关于 <code class="language-plaintext highlighter-rouge">locale</code> ： 可参考如下几个链接：</p>
+
+<p>1.https://wiki.archlinux.org/index.php/locale<br />
+2.https://man7.org/linux/man-pages/man1/localedef.1.html<br />
+3.https://linuxhint.com/locales_debian/</p>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

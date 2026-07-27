@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>制作 JDK Docker 镜像 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2019/12/20/build-jdk-docker-image/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="制作 JDK Docker 镜像">
+      
+    <meta name="keywords" content="Docker">
+    <meta property="og:keywords" content="Docker">
+      
+    <meta name="description" content="制作 JDK docker 镜像">
+    <meta property="og:description" content="制作 JDK docker 镜像">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2019/12/20/build-jdk-docker-image/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2019-12-20">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="制作 JDK Docker 镜">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">制作 JDK Docker 镜像</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2019/12/20
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Docker" title="Docker">Docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="制作-jdk-docker-镜像">制作 JDK Docker 镜像</h1>
+
+<h2 id="1下载-jdk-包">1、下载 JDK 包</h2>
+
+<p>将下载的 jdk-8u231-linux-x64.tar.gz 放在与Dockerfile 一个路径</p>
+
+<h2 id="2编写-dockerfile">2、编写 Dockerfile</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim Dockerfile 
+
+FROM centos:7.6.1810
+MAINTAINER utf7
+
+RUN yum <span class="nb">install</span> <span class="nt">-y</span> vim
+RUN yum <span class="nb">install</span> <span class="nt">-y</span> net-tools
+
+RUN <span class="nb">mkdir</span> <span class="nt">-p</span> /jdk64
+ADD jdk-8u231-linux-x64.tar.gz /jdk64/
+
+ENV JAVA_HOME /jdk64/jdk1.8.0_231
+ENV PATH <span class="nv">$PATH</span>:<span class="nv">$JAVA_HOME</span>/bin
+
+WORKDIR /root/
+</code></pre></div></div>
+
+<p>这里安装了比较常用的 vim 和net-tools</p>
+
+<h2 id="3拉取-centos-image">3、拉取 centos image</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull centos:7.6.1810
+</code></pre></div></div>
+<h2 id="4构建image">4、构建image</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker build <span class="nt">-t</span> utf7/jdk8 <span class="nb">.</span>
+</code></pre></div></div>
+
+<h2 id="5查看-docker-images">5、查看 docker images</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># docker images</span>
+REPOSITORY                                               TAG                 IMAGE ID            CREATED             SIZE
+utf7/jdk8                                                 latest              204a86499ba4        6 minutes ago       860MB
+</code></pre></div></div>
+
+<h2 id="6docker-image-打-tag">6、docker image 打 tag</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker tag 204a86499ba4 utf7/jdk8:8u231
+</code></pre></div></div>
+
+<h2 id="7运行容器">7、运行容器</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-it</span> <span class="nt">--name</span> utf7-jdk8 <span class="nt">-d</span> utf7/jdk8:8u231
+</code></pre></div></div>
+
+<h2 id="8查看容器">8、查看容器</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># docker ps -a</span>
+CONTAINER ID        IMAGE                                      COMMAND                  CREATED              STATUS                      PORTS               NAMES
+3c6ed3a48c6a        utf7/jdk8:jdk8u231                          <span class="s2">"/bin/bash"</span>              About a minute ago   Up About a minute                               utf7-jdk8
+</code></pre></div></div>
+
+<h2 id="9进入docker-容器">9、进入docker 容器</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c">#进入容器</span>
+docker <span class="nb">exec</span> <span class="nt">-it</span> utf7-jdk8 /bin/bash
+
+<span class="c">#验证Java</span>
+java <span class="nt">-version</span>
+<span class="nb">echo</span> <span class="nv">$PATH</span>
+<span class="o">[</span>root@3c6ed3a48c6a ~]# java <span class="nt">-version</span>
+java version <span class="s2">"1.8.0_231"</span>
+Java<span class="o">(</span>TM<span class="o">)</span> SE Runtime Environment <span class="o">(</span>build 1.8.0_231-b11<span class="o">)</span>
+Java HotSpot<span class="o">(</span>TM<span class="o">)</span> 64-Bit Server VM <span class="o">(</span>build 25.231-b11, mixed mode<span class="o">)</span>
+<span class="o">[</span>root@3c6ed3a48c6a ~]# <span class="nb">echo</span> <span class="nv">$PATH</span>
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/jdk64/jdk1.8.0_231/bin
+</code></pre></div></div>
+
+<h2 id="10退出容器">10、退出容器</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">exit</span>
+</code></pre></div></div>
+
+<h2 id="11停止容器">11、停止容器</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker stop 3c6ed3a48c6a
+</code></pre></div></div>
+<h2 id="12删除容器">12、删除容器</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker <span class="nb">rm </span>3c6ed3a48c6a
+</code></pre></div></div>
+<h2 id="13删除-image">13、删除 image</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker rmi 204a86499ba4
+</code></pre></div></div>
+<h2 id="14删除-exited-状态的容器">14、删除 exited 状态的容器</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker <span class="nb">rm</span> <span class="si">$(</span>docker ps <span class="nt">-qf</span> <span class="nv">status</span><span class="o">=</span>exited<span class="si">)</span>
+</code></pre></div></div>
+
+<p><a href="https://github.com/utf7/Dockerfile/">my Dockerfile repo</a></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

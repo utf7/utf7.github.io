@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Github Markdown 写作帮助 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2016/09/23/github-markdown-help/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Github Markdown 写作帮助">
+      
+    <meta name="keywords" content="github，markdown,writing,notes">
+    <meta property="og:keywords" content="github，markdown,writing,notes">
+      
+    <meta name="description" content="Github Markdown 写作帮助">
+    <meta property="og:description" content="Github Markdown 写作帮助">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2016/09/23/github-markdown-help/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2016-09-23">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Github Markdown">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Github Markdown 写作帮助</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2016/09/23
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Markdown" title="Markdown">Markdown</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths">
+    <article class="article-content markdown-body">
+    <h2 id="github-markdown写作帮助">Github Markdown写作帮助</h2>
+
+<p>Github Markdown 语法又称 GFM</p>
+
+<h3 id="换行">换行</h3>
+<p>换行，两个空格+回车<br>
+换行并且留一个空行，则可以两个回车<br>
+如果需要使用标题，代码块，引用，等等标记，则需要前面有两个回车</p>
+
+<h3 id="标题">标题</h3>
+
+<p>使用不同数目的 <code class="language-plaintext highlighter-rouge">#</code> 来表示不同级别的标题</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 一级标题        
+## 二级标题        
+### 三级标题         
+</code></pre></div></div>
+
+<h1 id="一级标题">一级标题</h1>
+
+<h2 id="二级标题">二级标题</h2>
+
+<h3 id="三级标题">三级标题</h3>
+
+<h3 id="链接">链接</h3>
+<p>可以使用<code class="language-plaintext highlighter-rouge">[]()</code>来实现链接功能<br>
+该博客建立在 <code class="language-plaintext highlighter-rouge">[Github Pages](https://pages.github.com/)</code><br>
+该博客建立在 <a href="https://pages.github.com/">Github Pages</a></p>
+
+<h3 id="文本格式">文本格式</h3>
+
+<p>粗体，斜体，删除线</p>
+
+<p><img src="/images/posts/github/github-markwon-help/gfm_help.png" alt=""></p>
+
+<h3 id="插入代码">插入代码</h3>
+<p>可以使用``</p>
+
+<p>```<br>
+public void test(){ <br>
+	System.out.println(“Syntax highlighting”);<br>
+}<br>
+```</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public void test(){
+	System.out.println("Syntax highlighting");
+}
+</code></pre></div></div>
+
+<h3 id="代码高亮">代码高亮</h3>
+<p>```java<br>
+public void test(){<br>
+	System.out.println(“Syntax highlighting”);<br>
+}<br>
+```</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">(){</span>
+	<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Syntax highlighting"</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="列表">列表</h3>
+
+<p>可以使用 <code class="language-plaintext highlighter-rouge">-</code> 或 <code class="language-plaintext highlighter-rouge">*</code> 来实现列表功能。注意列表符与列表标题需要空格</p>
+
+<p>- Java<br>
+- Scala<br>
+- Markdown</p>
+
+<ul>
+  <li>Java</li>
+  <li>Scala</li>
+  <li>Markdown</li>
+</ul>
+
+<p>有序列表</p>
+
+<ol>
+  <li>Java</li>
+  <li>Scala</li>
+  <li>
+    <p>Markdown</p>
+  </li>
+  <li>Java</li>
+  <li>Scala</li>
+  <li>Markdown</li>
+</ol>
+
+<p>嵌套列表</p>
+
+<p>可以在行与行之间使用两个空格实现</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+1. Make my changes		  
+  1. Fix bug		  
+  2. Improve formatting		  
+    * Make the headings bigger		  
+2. Push my commits to GitHub		  
+3. Open a pull request		  
+  * Describe my changes		  
+  * Mention all the members of my team		  
+    * Ask for feedback		  
+</code></pre></div></div>
+
+<ol>
+  <li>Make my changes
+    <ol>
+      <li>Fix bug</li>
+      <li>Improve formatting
+        <ul>
+          <li>Make the headings bigger</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li>Push my commits to GitHub</li>
+  <li>Open a pull request
+    <ul>
+      <li>Describe my changes</li>
+      <li>Mention all the members of my team
+        <ul>
+          <li>Ask for feedback</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="任务列表"><del>任务列表</del></h3>
+<p><del>Github 支持任务列表 <code class="language-plaintext highlighter-rouge">[]</code>， 使用 <code class="language-plaintext highlighter-rouge">[x]</code> 表示任务完成</del></p>
+
+<p>- [x] Finish my changes<br>
+- [ ] Push my commits to GitHub<br>
+- [ ] Open a pull request</p>
+
+<ol class="task-list">
+  <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled checked>Finish my changes</li>
+  <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled>Push my commits to GitHub</li>
+  <li class="task-list-item">
+<input type="checkbox" class="task-list-item-checkbox" disabled>Open a pull request</li>
+</ol>
+
+<h3 id="忽略-markdown-格式">忽略 Markdown 格式</h3>
+<p>可以使用<code class="language-plaintext highlighter-rouge">\</code> 忽略 Markdown 的格式</p>
+
+<p><code class="language-plaintext highlighter-rouge">Let's rename \*our-new-project\* to \*our-old-project\*.</code></p>
+
+<p>Let’s rename *our-new-project* to *our-old-project*.</p>
+
+<h3 id="emoji-表情">emoji 表情</h3>
+
+<p>支持 emji 表情,支持 @ 某个 github 用户或者组织
+用法 <code class="language-plaintext highlighter-rouge">:EMOJICODE:</code>,<code class="language-plaintext highlighter-rouge">@user</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">@utf7 :+1: This PR looks great-it's ready to merge!:shipit:</code><br>
+@utf7 <img class="emoji" title=":+1:" alt=":+1:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png" height="20" width="20"> This PR looks great-it’s ready to merge!:shipit:</p>
+
+<p>参考：</p>
+
+<p><a href="https://help.github.com/categories/writing-on-github/">Writing on GitHub</a><br>
+<a href="https://help.github.com/articles/autolinked-references-and-urls/">Autolinked references and URLs</a><br>
+<a href="https://help.github.com/articles/working-with-advanced-formatting/">Working with advanced formatting</a></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js" repo="utf7/blog-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)">TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

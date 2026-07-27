@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>自动化运维工具 salt 安装使用 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/09/12/salt-install-and-useage/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="自动化运维工具 salt 安装使用">
+      
+    <meta name="keywords" content="Linux,Salt">
+    <meta property="og:keywords" content="Linux,Salt">
+      
+    <meta name="description" content="本文介绍自动化运维工具 salt 安装以及使用">
+    <meta property="og:description" content="本文介绍自动化运维工具 salt 安装以及使用">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/09/12/salt-install-and-useage/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-09-12">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="自动化运维工具 salt 安装">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">自动化运维工具 salt 安装使用</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/09/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Linux" title="Linux">Linux</a>
+          </span>
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Salt" title="Salt">Salt</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="介绍">介绍</h2>
+
+<p><code class="language-plaintext highlighter-rouge">salt</code> 与 <code class="language-plaintext highlighter-rouge">ansible</code>  类似，是常用的 <code class="language-plaintext highlighter-rouge">linux</code> 自动化运维工具，典型的应用场景为：多个节点执行命令、批量执行命令、分发文件、同步配置等，号称可以轻松管理成千上万台节点，速度较快。</p>
+
+<p><code class="language-plaintext highlighter-rouge">salt</code> 使用 <code class="language-plaintext highlighter-rouge">python</code> 编写，代码在 https://github.com/saltstack/salt ，采用 <code class="language-plaintext highlighter-rouge">Apache License 2.0</code> 协议。</p>
+
+<p><code class="language-plaintext highlighter-rouge">salt</code> 采用主从架构，主节点为 <code class="language-plaintext highlighter-rouge">master</code>，从节点叫做 <code class="language-plaintext highlighter-rouge">minion</code> 相当于 <code class="language-plaintext highlighter-rouge">agent</code>,本文将介绍如何安装以及使用 <code class="language-plaintext highlighter-rouge">salt</code>。</p>
+
+<h3 id="节点规划">节点规划</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>主机名</th>
+      <th>角色</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>test1</td>
+      <td>master/minion</td>
+    </tr>
+    <tr>
+      <td>test2</td>
+      <td>minion</td>
+    </tr>
+    <tr>
+      <td>Test3</td>
+      <td>minion</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="安装">安装</h3>
+
+<p>下载安装包，本地安装包放在 <code class="language-plaintext highlighter-rouge">/utf7/salt_pkgs/</code> 目录</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>test1 节点执行
+
+<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> /utf7/salt_pkgs/salt-master-2019.2.0-2.el7.noarch.rpm
+
+<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> /utf7/salt_pkgs/python36-zmq-15.3.0-6.el7.x86_64.rpm
+<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> /utf7/salt_pkgs/salt-2019.2.0-2.el7.noarch.rpm
+<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> /utf7/salt_pkgs/salt-minion-2019.2.0-2.el7.noarch.rpm
+</code></pre></div></div>
+
+<p>其他节点执行</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> /utf7/salt_pkgs/python36-zmq-15.3.0-6.el7.x86_64.rpm
+<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> /utf7/salt_pkgs/salt-2019.2.0-2.el7.noarch.rpm
+<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> /utf7/salt_pkgs/salt-minion-2019.2.0-2.el7.noarch.rpm
+</code></pre></div></div>
+
+<h3 id="配置">配置</h3>
+
+<p><code class="language-plaintext highlighter-rouge">salt</code> 节点角色分为 <code class="language-plaintext highlighter-rouge">master</code> 和 <code class="language-plaintext highlighter-rouge">minion</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">master</code> 配置文件为 <code class="language-plaintext highlighter-rouge">/etc/salt/master</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">minion</code> 配置文件为 <code class="language-plaintext highlighter-rouge">/etc/salt/minion</code></p>
+
+<h4 id="test1-master-节点">test1 master 节点</h4>
+
+<p>vim /etc/salt/master</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">file_roots</span><span class="pi">:</span>
+  <span class="na">base</span><span class="pi">:</span>
+
+    <span class="pi">-</span> <span class="s">/srv/salt/base</span>
+  <span class="na">dev</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/srv/salt/dev</span>
+
+<span class="na">pillar_roots</span><span class="pi">:</span>
+  <span class="na">base</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/srv/pillar/base</span>
+  <span class="na">prod</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/srv/pillar/prod</span>
+
+<span class="na">auto_accept</span><span class="pi">:</span> <span class="s">True</span>
+</code></pre></div></div>
+
+<p>然后创建上面配置对应的目录</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> /srv/salt/base
+<span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> /srv/salt/dev
+<span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> /srv/pillar/base
+<span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> /srv/pillar/prod
+</code></pre></div></div>
+
+<p>由于我的  <code class="language-plaintext highlighter-rouge">master</code> 节点同时也是 <code class="language-plaintext highlighter-rouge">minion</code> 功能，所以这里也需要配置 <code class="language-plaintext highlighter-rouge">minion</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">vim /etc/salt/minion</code></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">master</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">test1</span>
+<span class="na">id</span><span class="pi">:</span> <span class="s">test1</span>
+<span class="na">master_port</span><span class="pi">:</span> <span class="m">4506</span>
+</code></pre></div></div>
+
+<p>其他 <code class="language-plaintext highlighter-rouge">minion</code> 配置，除了 <code class="language-plaintext highlighter-rouge">id</code> ，其他都一样</p>
+
+<h4 id="test2-节点">test2 节点</h4>
+
+<p><code class="language-plaintext highlighter-rouge">vim /etc/salt/minion</code></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">master</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">test1</span>
+<span class="na">id</span><span class="pi">:</span> <span class="s">test2</span>
+<span class="na">master_port</span><span class="pi">:</span> <span class="m">4506</span>
+</code></pre></div></div>
+
+<h4 id="test3-节点">test3 节点</h4>
+
+<p><code class="language-plaintext highlighter-rouge">vim /etc/salt/minion</code></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">master</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">test1</span>
+<span class="na">id</span><span class="pi">:</span> <span class="s">test3</span>
+<span class="na">master_port</span><span class="pi">:</span> <span class="m">4506</span>
+</code></pre></div></div>
+
+<h3 id="启动命令">启动命令</h3>
+
+<p>启动 <code class="language-plaintext highlighter-rouge">master</code>  （在 <code class="language-plaintext highlighter-rouge">test1</code> 上执行）</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>/bin/systemctl <span class="nb">enable </span>salt-master<span class="p">;</span>
+<span class="nv">$ </span>/bin/systemctl restart salt-master  <span class="o">&gt;</span> /dev/null 2&gt;&amp;1
+</code></pre></div></div>
+
+<p>启动 <code class="language-plaintext highlighter-rouge">minion</code> （test1/test2/test3都需要启动）</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>/bin/systemctl <span class="nb">enable </span>salt-minion<span class="p">;</span>/bin/systemctl restart salt-minion <span class="o">&gt;</span> /dev/null 2&gt;&amp;1
+</code></pre></div></div>
+
+<h3 id="测试是否可用">测试是否可用</h3>
+
+<p>在 <code class="language-plaintext highlighter-rouge">master</code> 即 <code class="language-plaintext highlighter-rouge">test1</code> 节点执行如下命令</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/所有节点执行命令
+<span class="nv">$ </span>salt <span class="s2">"*"</span> cmd.run <span class="s2">"hostname"</span>
+</code></pre></div></div>
+
+<h3 id="执行命令">执行命令</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//所有节点执行命令
+<span class="nv">$ </span>salt <span class="s2">"*"</span> cmd.run <span class="s2">"hostname"</span>
+//以某个用户执行
+<span class="nv">$ </span>salt <span class="s2">"*"</span> cmd.run <span class="nv">runas</span><span class="o">=</span><span class="s2">"hadoop"</span> <span class="s2">"hostname;id"</span>
+//指定节点执行
+<span class="nv">$ </span>salt <span class="s2">"test"</span> cmd.run <span class="nv">runas</span><span class="o">=</span><span class="s2">"hadoop"</span> <span class="s2">"hostname;id"</span>
+//正则匹配
+<span class="nv">$ </span>salt <span class="nt">-E</span> <span class="s2">"test"</span> cmd.run <span class="nv">runas</span><span class="o">=</span><span class="s2">"hadoop"</span> <span class="s2">"hostname;id"</span>
+//指定多个节点执行
+<span class="nv">$ </span>salt <span class="nt">-E</span> <span class="s2">"test2|test3"</span> cmd.run <span class="nv">runas</span><span class="o">=</span><span class="s2">"hadoop"</span> <span class="s2">"hostname;id"</span>
+//debug 模式
+<span class="nv">$ </span>salt <span class="nt">-l</span> debug <span class="s2">"*"</span> cmd.run <span class="s2">"hostname"</span>
+
+</code></pre></div></div>
+
+<h3 id="拷贝文件">拷贝文件</h3>
+
+<p><code class="language-plaintext highlighter-rouge">salt-cp</code> 用于拷贝从 <code class="language-plaintext highlighter-rouge">master</code> 上面拷贝文件到 <code class="language-plaintext highlighter-rouge">minion</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+//拷贝文件
+<span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"salt-cp getfile test"</span> <span class="o">&gt;</span> getfile.txt<span class="p">;</span>
+<span class="nv">$ </span>salt-cp <span class="nt">-C</span> <span class="nt">-E</span> <span class="s2">"test"</span> getfile.txt /tmp/
+<span class="nv">$ </span>salt <span class="s2">"test"</span> cmd.run <span class="s2">"cat /tmp/getfile.txt"</span>
+
+<span class="nt">-C</span> 可以支持拷贝大文件，具体参考 salt-cp <span class="nt">-h</span>
+ <span class="nt">-C</span>, <span class="nt">--chunked</span>       Use chunked files transfer. Supports big files,
+                        recursive lookup and directories creation.
+
+                        
+</code></pre></div></div>
+
+<h3 id="文件服务器功能">文件服务器功能</h3>
+
+<p><code class="language-plaintext highlighter-rouge">Salt</code> 内置一个简单的文件服务器,用于分发文件给 <code class="language-plaintext highlighter-rouge">Salt minions</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Salt</code>文件服务器可以用于从 <code class="language-plaintext highlighter-rouge">master</code> 到 <code class="language-plaintext highlighter-rouge">minions</code> 的文件传输。</p>
+
+<p><code class="language-plaintext highlighter-rouge">salt</code> 自带的一个简单的 <code class="language-plaintext highlighter-rouge">ftp</code> 服务器功能，参考上面的 <code class="language-plaintext highlighter-rouge">master</code> 配置。</p>
+
+<h4 id="文件路径说明">文件路径说明</h4>
+
+<p><code class="language-plaintext highlighter-rouge">salt</code> 文件文件服务器中的路径 <code class="language-plaintext highlighter-rouge">url </code>以 <code class="language-plaintext highlighter-rouge">salt://</code> 开头，</p>
+
+<p>注意的是 <code class="language-plaintext highlighter-rouge">salt:// </code>表示的 <code class="language-plaintext highlighter-rouge">base</code>环境,拷贝文件到 <code class="language-plaintext highlighter-rouge">/srv/salt/base/</code>目录而不是<code class="language-plaintext highlighter-rouge">/srv/salt/</code>目录。</p>
+
+<h4 id="cpget_file-使用">cp.get_file 使用</h4>
+
+<p><code class="language-plaintext highlighter-rouge">cp.get_file</code> 命令可用于从 <code class="language-plaintext highlighter-rouge">master</code> 文件服务器上面拷贝文件到 <code class="language-plaintext highlighter-rouge">minion</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"salt get_file_test "</span> <span class="o">&gt;</span> /srv/salt/base/get_file_test.txt
+<span class="nv">$ </span><span class="nb">md5sum</span> /srv/salt/base/get_file_test.txt
+<span class="nv">$ </span>salt <span class="s1">'*'</span> cp.get_file <span class="s2">"salt://get_file_test.txt"</span>  <span class="s2">"/tmp/"</span>
+<span class="nv">$ </span>salt <span class="s1">'*'</span> cmd.run run.as<span class="o">=</span><span class="s2">"root"</span> <span class="s2">"md5sum /tmp/get_file_test.txt"</span>     
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">cp.get_file</code> 可以指定参数</p>
+
+<p>` makedirs=True`  如果目标目录不存在，则创建目录，默认不会创建目录，不存在则拷贝失败</p>
+
+<p><code class="language-plaintext highlighter-rouge">gzip=n</code>  n 为 <code class="language-plaintext highlighter-rouge">1-9</code>，表示压缩级别，数字越大，压缩比越高，越消耗 CPU</p>
+
+<h4 id="cpget_dir-使用">cp.get_dir 使用</h4>
+
+<p><code class="language-plaintext highlighter-rouge">cp.get_dir</code> 命令用于从 <code class="language-plaintext highlighter-rouge">master</code> 文件服务器上面拷贝文件夹/目录到 <code class="language-plaintext highlighter-rouge">minion</code></p>
+
+<p>使用方法与 <code class="language-plaintext highlighter-rouge">cp.get_file</code> 类似，区别是一个是文件，一个是文件夹</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>salt <span class="s1">'*'</span> cp.get_dir  salt://package  /tmp/ 
+
+<span class="nv">$ </span>salt <span class="s1">'*'</span> cp.get_dir salt://package  /tmp/utf7/  <span class="nv">makedirs</span><span class="o">=</span>True <span class="nb">gzip</span><span class="o">=</span>5
+</code></pre></div></div>
+
+<h3 id="问题处理">问题处理</h3>
+
+<p>安装好以后，发现在<code class="language-plaintext highlighter-rouge"> salt master </code>上面执行命令没有返回，表现如下</p>
+
+<blockquote>
+  <p>salt “*” cmd.run “hostname”</p>
+
+  <p>test1:
+   Minion did not return. [No response]
+Test2:
+   Minion did not return. [No response]
+Test3:
+   Minion did not return. [No response]
+ERROR: Minions returned with non-zero exit code</p>
+</blockquote>
+
+<p>到 <code class="language-plaintext highlighter-rouge">minoin </code>节点查看日志</p>
+
+<p><code class="language-plaintext highlighter-rouge">vim  /var/log/salt/minion</code></p>
+
+<pre><code class="language-log">2020-09-12 14:48:18,182 [salt.crypt       :1081][ERROR ][19925] The master key has changed, the salt master could have been subverted, verify salt master's public key
+2020-09-12 14:48:18,182 [salt.crypt       :764 ][CRITICAL][19925] The Salt Master server's public key did not authenticate!
+The master may need to be updated if it is a version of Salt lower than 2019.2.0, or
+If you are confident that you are connecting to a valid Salt Master, then remove the master public key and restart the Salt Minion.
+The master public key can be found at:
+/etc/salt/pki/minion/minion_master.pub
+2020-09-12 14:48:18,183 [salt.minion      :1026][ERROR ][19925] Error while bringing up minion for multi-master. Is master at test1 responding?
+</code></pre>
+
+<p>这里的原因是之前 <code class="language-plaintext highlighter-rouge">minion</code> 配置了其他节点的 <code class="language-plaintext highlighter-rouge">master</code> ，需要删除之前的 <code class="language-plaintext highlighter-rouge">master </code>公钥，重启各个 <code class="language-plaintext highlighter-rouge">minion</code> 即可</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> rm -rf  /etc/salt/pki/minion/minion_master.pub;
+ /bin/systemctl enable salt-minion;/bin/systemctl restart salt-minion &gt; /dev/null 2&gt;&amp;1
+</code></pre></div></div>
+
+<p>更多关于 <code class="language-plaintext highlighter-rouge">salt</code> 使用请参考官网 https://docs.saltstack.com/en/latest/</p>
+
+<h3 id="参考">参考</h3>
+
+<ol>
+  <li>https://docs.saltstack.com/en/latest/</li>
+  <li>https://docs.saltstack.com/en/latest/topics/installation/rhel.html</li>
+  <li>https://blog.csdn.net/quanliyadan/article/details/50496427</li>
+  <li>https://docs.saltstack.com/en/latest/ref/file_server/index.html</li>
+</ol>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

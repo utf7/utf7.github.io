@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spring 事务的一个误区 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2014/12/09/spring-transactional-notice/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Spring 事务的一个误区">
+      
+    <meta name="keywords" content="Spring,Transactional">
+    <meta property="og:keywords" content="Spring,Transactional">
+      
+    <meta name="description" content="Spring,Transactional">
+    <meta property="og:description" content="Spring,Transactional">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2014/12/09/spring-transactional-notice/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2014-12-09">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Spring 事务的一个误区">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Spring 事务的一个误区</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2014/12/09
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Spring" title="Spring">Spring</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>Spring Bean 假设有如下类</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="n">implement</span> <span class="nc">IService</span><span class="o">{</span>
+
+  <span class="nd">@Transactional</span><span class="o">(</span><span class="n">readOnly</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">propagation</span><span class="o">=</span><span class="nc">Propagation</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>   
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">methodA</span><span class="o">(){</span>
+     <span class="c1">//.....</span>
+
+
+    <span class="n">methodB</span><span class="o">()</span>
+
+    <span class="c1">//......</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Transactional</span><span class="o">(</span><span class="n">readOnly</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">propagation</span><span class="o">=</span><span class="nc">Propagation</span><span class="o">.</span><span class="na">REQUIRES_NEW</span><span class="o">)</span>   
+  <span class="kd">public</span> <span class="kt">void</span> <span class="n">methodB</span><span class="o">{</span>
+    <span class="c1">//......</span>
+
+  <span class="o">}</span>
+
+
+<span class="o">}</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ServiceFacade</span><span class="o">{</span>
+
+  <span class="nd">@Autowired</span>
+  <span class="kd">private</span> <span class="nc">Iservice</span> <span class="n">service</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">method</span><span class="o">(){</span>
+    <span class="c1">//...</span>
+    <span class="n">service</span><span class="o">.</span><span class="na">methodA</span><span class="o">();</span>
+   <span class="c1">//...</span>
+  <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>1.问调用<code class="language-plaintext highlighter-rouge"> ServiceFacade</code> 的 <code class="language-plaintext highlighter-rouge">method（）</code> 方法，请问  <code class="language-plaintext highlighter-rouge">methodA</code>  和  <code class="language-plaintext highlighter-rouge">methodB</code>   事务是怎么样的？</p>
+
+<p>2.在同一个事务还是两个事务，<code class="language-plaintext highlighter-rouge">methodA</code> 事务生效还是 <code class="language-plaintext highlighter-rouge">methodB</code> 事务生效，还是都生效？</p>
+
+<p>答案是<code class="language-plaintext highlighter-rouge"> methodA</code> 的事务生效，<code class="language-plaintext highlighter-rouge">methodB</code> 被嵌入到 <code class="language-plaintext highlighter-rouge">methodA</code> 中变成一个事务。</p>
+
+<p>为什么会这样呢？<code class="language-plaintext highlighter-rouge">methodB</code> 不是声明了 <code class="language-plaintext highlighter-rouge">Propagation.REQUIRES_NEW</code> 吗？</p>
+
+<p>答案得从 <code class="language-plaintext highlighter-rouge">Spring</code> 的事务实现说起，<code class="language-plaintext highlighter-rouge">Spring</code> 的事务是通过 <code class="language-plaintext highlighter-rouge">AOP</code> 动态代理实现的。</p>
+
+<p>为 <code class="language-plaintext highlighter-rouge">Bean</code> 生成代理。因为 <code class="language-plaintext highlighter-rouge">methodB</code> 在 <code class="language-plaintext highlighter-rouge">Service</code> 内部被调用，此时执行的并不是代理 <code class="language-plaintext highlighter-rouge">Bean</code> 的 <code class="language-plaintext highlighter-rouge">methodB</code>，所以<code class="language-plaintext highlighter-rouge">methodB</code> 上面的事务声明失效</p>
+
+<p><code class="language-plaintext highlighter-rouge">Facade</code> 调用 <code class="language-plaintext highlighter-rouge">Service</code> 的 <code class="language-plaintext highlighter-rouge">methodA</code> 方法的时候，实际上执行的是 <code class="language-plaintext highlighter-rouge">serviceProxy.methodA</code> ，所以 <code class="language-plaintext highlighter-rouge">method</code> 被<code class="language-plaintext highlighter-rouge">Spring</code>  事务接管,事务声明生效。</p>
+
+<p>解决的办法是，<code class="language-plaintext highlighter-rouge">methodB</code> 放在另外的 <code class="language-plaintext highlighter-rouge">Bean</code>中被<code class="language-plaintext highlighter-rouge">methodA</code> 调用或者 <code class="language-plaintext highlighter-rouge">Facade</code> 调用 <code class="language-plaintext highlighter-rouge">service.methodA()</code> ,然后调用 <code class="language-plaintext highlighter-rouge">service.methodB</code></p>
+
+<p>总结：<code class="language-plaintext highlighter-rouge">Spring</code> 的事务是基于 <code class="language-plaintext highlighter-rouge">AOP</code> 动态代理实现的。默认情况下，在同一个类中调用不同的方法，上面的事务声明是无效的。</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

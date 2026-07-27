@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HBase Region 重叠问题处理 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/07/21/hbase-region-overlap-error-case-and-solution/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="HBase Region 重叠问题处理">
+      
+    <meta name="keywords" content="HBase,Region,Overlap,HFile">
+    <meta property="og:keywords" content="HBase,Region,Overlap,HFile">
+      
+    <meta name="description" content="HBase,Region,Overlap,HFile">
+    <meta property="og:description" content="HBase,Region,Overlap,HFile">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/07/21/hbase-region-overlap-error-case-and-solution/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-07-21">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="HBase Region 重叠">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">HBase Region 重叠问题处理</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/07/21
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#HBase" title="HBase">HBase</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="hbase-region-重叠问题处理">HBase Region 重叠问题处理</h1>
+
+<p>最近某应用反馈 <code class="language-plaintext highlighter-rouge">HBase</code> 数据插入数据后、查询出现错误数据</p>
+
+<p>现象如下：</p>
+
+<p>有一行数据：</p>
+
+<p>前面时间 <code class="language-plaintext highlighter-rouge">T1</code> ：插入3列</p>
+
+<p>后面时间 <code class="language-plaintext highlighter-rouge">T2</code> ：插入<code class="language-plaintext highlighter-rouge">1</code> 列（通过 <code class="language-plaintext highlighter-rouge">put</code> 新值来更新某列数据）</p>
+
+<p><code class="language-plaintext highlighter-rouge">scan</code> 操作只能看到 时间点T1的 <code class="language-plaintext highlighter-rouge">3</code> 列数据，</p>
+
+<p><code class="language-plaintext highlighter-rouge">get</code> 操作只能看到时间点 <code class="language-plaintext highlighter-rouge">T2</code> 的 <code class="language-plaintext highlighter-rouge">1</code> 列最新数据</p>
+
+<p><strong>具体例子：</strong></p>
+
+<p>有一行数据数据 <code class="language-plaintext highlighter-rouge">rowkey</code> 是 <code class="language-plaintext highlighter-rouge">591420001</code>（还有一些时间戳字段省略），有3列，分别是</p>
+
+<p>流程：</p>
+
+<p>时间点T1:</p>
+
+<p>插入数据c1-c3 共3列，注意此时 <strong>c2=2</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ROW                                 COLUMN+CELL
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c1, <span class="nv">timestamp</span><span class="o">=</span>1595252551656, <span class="nv">value</span><span class="o">=</span>1
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c2, <span class="nv">timestamp</span><span class="o">=</span>1595252551656, <span class="nv">value</span><span class="o">=</span>2
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c3, <span class="nv">timestamp</span><span class="o">=</span>1595252551656, <span class="nv">value</span><span class="o">=</span>3
+</code></pre></div></div>
+
+<p>时间点T2  插入<strong>c2值为 2-1</strong>:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ROW                                 COLUMN+CELL
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c2, <span class="nv">timestamp</span><span class="o">=</span>1595252559734, <span class="nv">value</span><span class="o">=</span>2-1
+</code></pre></div></div>
+
+<p>按理说，scan 或者 get 出来多应该是</p>
+
+<p>hbase(main):006:0&gt; scan ‘test’ 或者 hbase(main):006:0&gt; get ‘test’,’591420001’</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ROW                                 COLUMN+CELL
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c1, <span class="nv">timestamp</span><span class="o">=</span>1595252551656, <span class="nv">value</span><span class="o">=</span>1
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c2, <span class="nv">timestamp</span><span class="o">=</span>1595252559734, <span class="nv">value</span><span class="o">=</span>2-1
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c3, <span class="nv">timestamp</span><span class="o">=</span>1595252551656, <span class="nv">value</span><span class="o">=</span>3
+</code></pre></div></div>
+
+<p>但实际情况是, scan 出来的结果是：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c1, <span class="nv">timestamp</span><span class="o">=</span>1595252551656, <span class="nv">value</span><span class="o">=</span>1
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c2, <span class="nv">timestamp</span><span class="o">=</span>1595252559734, <span class="nv">value</span><span class="o">=</span>2
+ 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c3, <span class="nv">timestamp</span><span class="o">=</span>1595252551656, <span class="nv">value</span><span class="o">=</span>3
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">get</code> 出来的结果是：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 5914200010001                          <span class="nv">column</span><span class="o">=</span>f:c2, <span class="nv">timestamp</span><span class="o">=</span>1595252559734, <span class="nv">value</span><span class="o">=</span>2-1
+</code></pre></div></div>
+
+<p><strong>详细了解以及现象：</strong></p>
+
+<p>刚听到这个描述，刚开始怀疑会不会是使用问题，是不是应用查询的时候，指定了版本，</p>
+
+<p>后来询问了是否设置了多版本之类的情况，答案是没有。</p>
+
+<p>又经过沟通询问，发现有些 <code class="language-plaintext highlighter-rouge">rowkey</code> 的数据是有问题，有些又是正常的，这是一个非常重要的信息，也就是只会发生在某些行数据中。</p>
+
+<p>由此信息怀疑问题是否和 <code class="language-plaintext highlighter-rouge">rowkey</code> 分布的 <code class="language-plaintext highlighter-rouge">Region</code> 有关系，</p>
+
+<p>根据对<code class="language-plaintext highlighter-rouge"> HBase</code> 的了解和直觉，大概猜测出了 <code class="language-plaintext highlighter-rouge">Region</code> 很可能发生了重叠的情况，</p>
+
+<p>Region 重叠，英文叫做 region overlap，意思是region 范围发生了交叉，</p>
+
+<p>正常<code class="language-plaintext highlighter-rouge">region</code> 
+~10
+10~20
+20~30
+30~40
+40~</p>
+
+<p>重叠<code class="language-plaintext highlighter-rouge">region</code>
+~10
+10~20
+15~25
+20~30
+30~40
+40~</p>
+
+<p>如上 10~20,15~25,20~30 就发生了重叠</p>
+
+<p><code class="language-plaintext highlighter-rouge">region</code> 还有一个常见的问题，叫做 <code class="language-plaintext highlighter-rouge">region</code> 空洞 <code class="language-plaintext highlighter-rouge">hole</code></p>
+
+<p>空洞 <code class="language-plaintext highlighter-rouge">region</code>
+~10
+10~20
+30~40
+40~</p>
+
+<p>如上 20~30 就区间没有了，也就是所谓的 <code class="language-plaintext highlighter-rouge">hole</code>, <code class="language-plaintext highlighter-rouge">region</code> 空洞通常是 <code class="language-plaintext highlighter-rouge">region</code> 没有 <code class="language-plaintext highlighter-rouge">assign</code> 成功导致</p>
+
+<p>时间点 <code class="language-plaintext highlighter-rouge">T1</code> 的数据插入的数据从hbase:meta表中找到 <code class="language-plaintext highlighter-rouge">regionA</code>，</p>
+
+<p>时间点 <code class="language-plaintext highlighter-rouge">T2</code> 的数据插入的数据从hbase:meta表中找到 <code class="language-plaintext highlighter-rouge">regionB</code>，</p>
+
+<p>然后 <code class="language-plaintext highlighter-rouge">5914200010001</code> 这个 <code class="language-plaintext highlighter-rouge">rowkey</code> 同时属于 regionA 和 RegionB （正常情况 region 是不会重叠的）</p>
+
+<p>于是检查集群，果然验证了自己的猜测</p>
+
+<p><img src="/images/posts/hbase/region-overlap/region-overlap1.png" alt="" title="region-overlap" /></p>
+
+<p>根据上图，可以看到使用红线框起来的这个 region 是有问题的，</p>
+
+<p>刚开始的时候，时间点T1 插入数据到了正常的 <code class="language-plaintext highlighter-rouge">region</code> 中，</p>
+
+<p>时间点 <code class="language-plaintext highlighter-rouge">T2</code>，插入数据，正好到<code class="language-plaintext highlighter-rouge">5192-5294</code> 这个异常的 <code class="language-plaintext highlighter-rouge">region</code> 中去了。</p>
+
+<p>所以导致 <code class="language-plaintext highlighter-rouge">scan</code> 和 <code class="language-plaintext highlighter-rouge">get</code> 结果不一致。</p>
+
+<p>这个异常的 <code class="language-plaintext highlighter-rouge">Region</code> 怎么来的？应用怀疑是 <code class="language-plaintext highlighter-rouge">HBase split</code> 出现了异常，导致的，那么真的是 <code class="language-plaintext highlighter-rouge">HBase</code> 自己 <code class="language-plaintext highlighter-rouge">split</code> 出来的吗？</p>
+
+<p>这个表是预先分区的 <code class="language-plaintext highlighter-rouge">splitkeys</code> 为 7位数(比如4750000,4800000)，</p>
+
+<p>而异常的 <code class="language-plaintext highlighter-rouge">region</code> 的 <code class="language-plaintext highlighter-rouge">startkey/endkey</code> 只有 <code class="language-plaintext highlighter-rouge">4</code> 位数, 基本上可以排除 <code class="language-plaintext highlighter-rouge">split</code> 出来的可能性.</p>
+
+<p>因为region的startkey 要不是预先分区指定的值，要不是 <code class="language-plaintext highlighter-rouge">split</code> 时候取的 <code class="language-plaintext highlighter-rouge">splitPonit</code> 值（也就是 <code class="language-plaintext highlighter-rouge">region</code>下面列族中最大的 <code class="language-plaintext highlighter-rouge">hfile midkey</code>) ，所以几乎不可能是 <code class="language-plaintext highlighter-rouge">split</code> 异常导致的</p>
+
+<p>当时有个大胆的推测，会不会是这个 <code class="language-plaintext highlighter-rouge">region</code> 是谁一顿操作猛如虎拷贝了一个其它表或者之前的表的 <code class="language-plaintext highlighter-rouge">region</code> 目录，放在表目录下，然后一顿操作猛如虎，把这个给上线了。。。</p>
+
+<p>后来 <code class="language-plaintext highlighter-rouge">check </code>了 <code class="language-plaintext highlighter-rouge">NameNode</code> 的审计日志，果然发现是被人拷贝过来的。。。</p>
+
+<p>通过观察这个 <code class="language-plaintext highlighter-rouge">region</code> 的 <code class="language-plaintext highlighter-rouge">.regioninfo</code> 信息，发现这个region 是数个月之前的，后来被人为拷贝过来的， 具体为啥拷贝就不细说了。。。</p>
+
+<p>这个 <code class="language-plaintext highlighter-rouge">case</code> 非常有意思, 会涉及到 <code class="language-plaintext highlighter-rouge">HBase</code> 的 <code class="language-plaintext highlighter-rouge">hbck</code>工具，<code class="language-plaintext highlighter-rouge">hfile</code>工具，如何查看 <code class="language-plaintext highlighter-rouge">master</code> 页面，<code class="language-plaintext highlighter-rouge">hbase:meta</code> 元数据信息，<code class="language-plaintext highlighter-rouge">hbase</code> 表的目录结构等等信息</p>
+
+<p>明白了问题的现象，和原因以后，我们如何处理这个问题呢？</p>
+
+<p><strong>处理思路：</strong></p>
+
+<p>恢复业务为先！</p>
+
+<p>下线错误 <code class="language-plaintext highlighter-rouge">region</code> -&gt; 修复 <code class="language-plaintext highlighter-rouge">hbase:meta</code> -&gt; <code class="language-plaintext highlighter-rouge">move</code> 走有问题的 <code class="language-plaintext highlighter-rouge">region</code> 目录 -&gt; <code class="language-plaintext highlighter-rouge">check</code> 有问题的 <code class="language-plaintext highlighter-rouge">region</code> 目录数据是否需要恢复 -&gt;将 出问题的 <code class="language-plaintext highlighter-rouge">reigon</code> 需要恢复的 <code class="language-plaintext highlighter-rouge">HFile</code> 导入进来</p>
+
+<p>这个问题非常考验对 <code class="language-plaintext highlighter-rouge">HBase</code> 的理解以及工具的使用。</p>
+
+<p>1、<code class="language-plaintext highlighter-rouge">unassign region</code> ：下线<code class="language-plaintext highlighter-rouge"> region</code></p>
+
+<p>2、<code class="language-plaintext highlighter-rouge">move region</code> 目录，将出问题的 <code class="language-plaintext highlighter-rouge">region</code> 拷贝走（这个目录中的数据后续可能还需要导入）</p>
+
+<p>3、<code class="language-plaintext highlighter-rouge">scan 'hbase:meta'</code> 找到出问题的 <code class="language-plaintext highlighter-rouge">region</code> 信息，从 <code class="language-plaintext highlighter-rouge">hbase:meta</code> 中删除</p>
+
+<p>4、导入数据 使用 <code class="language-plaintext highlighter-rouge">dobulkload</code> 将出问题的 <code class="language-plaintext highlighter-rouge">region hfile</code> 重新导入进去</p>
+
+<p>这一步其实有一个前提，因为错误的region 是被拷贝过来的，那么我们就需要研究一下</p>
+
+<p>这个错误的 <code class="language-plaintext highlighter-rouge">region</code> 当时拷贝过来的时候，是否含有 <code class="language-plaintext highlighter-rouge">hfile</code>，也就是旧的数据；一般来说旧数据按理说我们是不需要，我们需要的是拷贝过来的错误的 <code class="language-plaintext highlighter-rouge">region</code> 上线后面又写入的这部分数据，</p>
+
+<p>这部分数据虽然写到了错误的 <code class="language-plaintext highlighter-rouge">region</code>，但确实是需要的数据。</p>
+
+<p>这块的处理逻辑是需要推断，稍微判断失误，就可能会丢数据，或者导入不该导入的数据进来，</p>
+
+<p>首先使用<code class="language-plaintext highlighter-rouge"> hbase hfile</code>  工具，来检查一下这个错误的 <code class="language-plaintext highlighter-rouge">region</code> 下面的 <code class="language-plaintext highlighter-rouge">hfile</code> 的信息，</p>
+
+<p>可能会使用到如下命令：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+查看某个hfile 基本信息，比如startkey/endkey/midkey，又多少key，最大，最小，平均长度，时间戳等等
+
+<span class="nv">$ </span>hbase hfile <span class="nt">-f</span> hfile_path <span class="nt">-s</span>
+ 
+ 打印kv
+<span class="nv">$ </span>hbase hfile <span class="nt">-f</span> hfile_path <span class="nt">-p</span>
+打印key
+<span class="nv">$ </span>hbase hfile <span class="nt">-f</span> hfile_path <span class="nt">-e</span>
+
+</code></pre></div></div>
+
+<p>本案例中从这些 <code class="language-plaintext highlighter-rouge">hfile</code> 中打印出来的信息，可以发现 <code class="language-plaintext highlighter-rouge">hfile</code> 中的数据都是后写入的，根据 <code class="language-plaintext highlighter-rouge">rowkey</code> 信息（内含时间戳）以及 <code class="language-plaintext highlighter-rouge">KV</code> 的 <code class="language-plaintext highlighter-rouge">timestamp</code> 字段来判断。</p>
+
+<p>到此 <code class="language-plaintext highlighter-rouge">HBase</code> 其实已经可以正常读写了。</p>
+
+<p>不过 此时 <code class="language-plaintext highlighter-rouge">hbase</code> 的 <code class="language-plaintext highlighter-rouge">hmaster</code> 中还有脏数据，比如页面中还会显示这个错误的 <code class="language-plaintext highlighter-rouge">region</code></p>
+
+<p>5、根据需要决定是否重启 <code class="language-plaintext highlighter-rouge">HMaster</code>，清理 <code class="language-plaintext highlighter-rouge">HMaster</code> 内存中的脏数据</p>
+
+<p>如上是大概的推测：那么是否可以解决问题了，线上环境还是需要非常谨慎的。</p>
+
+<p><strong>制造 Region overlap/ 复现问题</strong></p>
+
+<p>首先我们来”制造”一个类似的问题，也就是生成一个错误的<code class="language-plaintext highlighter-rouge">region</code>，制造<code class="language-plaintext highlighter-rouge">region overlap</code>（当时环境使用的是2.x 的某个早期版本，<code class="language-plaintext highlighter-rouge">hbck2</code> 还不完善），复现问题：</p>
+
+<p>1) 首先创建一个表</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>create 'test','f', SPLITS =&gt; ['05', '15', '25']
+</code></pre></div></div>
+
+<p>2) 然后将这个表目录拷贝出来</p>
+
+<p>假设拷贝到 <code class="language-plaintext highlighter-rouge">/tmp/xxx/test</code></p>
+
+<p>3)随后删除表</p>
+
+<p><code class="language-plaintext highlighter-rouge">disbale 'test'</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">drop 'test'</code></p>
+
+<p>4)重新创建表（不同splitkeys)</p>
+
+<p>```create ‘test’, ‘f’, SPLITS =&gt; [‘10’, ‘20’, ‘30’]</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ 5)然后选取上一次建表的region目录拷贝到新表目录中
+
+比如：
+
+``` hdfs dfs -cp /tmp/xxx/test/4f3cab0063decfac00755c88337da380 /apps/hbase/data/data/default/test
+</code></pre></div></div>
+
+<p>6)上线有问题的 <code class="language-plaintext highlighter-rouge">region</code></p>
+
+<p>执行命令</p>
+
+<p>``` hbase hbck -j $hbase_home/hbase-operator-tools/hbase-hbck***.jar addFsRegionsMissingInMeta default:test
+``</p>
+
+<p>如上命令的意思是根据 <code class="language-plaintext highlighter-rouge">hdfs</code> 中的 <code class="language-plaintext highlighter-rouge">region</code> 目录等信息加载到 <code class="language-plaintext highlighter-rouge">hbase:meta</code> 表中</p>
+
+<p>7)重启 <code class="language-plaintext highlighter-rouge">hmaster</code></p>
+
+<p>8)上线这个有问题的 reigon</p>
+
+<p><code class="language-plaintext highlighter-rouge">hbase hbck -j  $hbase_home/hbase-operator-tools//hbase-hbck***.jar assigns 4f3cab0063decfac00755c88337da380
+</code></p>
+
+<p>查看 <code class="language-plaintext highlighter-rouge">hmaster</code> 界面，就可以成功看到 ` region overlap` 重叠的情况了</p>
+
+<p>然后 <code class="language-plaintext highlighter-rouge">scan hbase:meta</code> 就可以成功看到 这个错误的 <code class="language-plaintext highlighter-rouge">region</code> 信息也存在 <code class="language-plaintext highlighter-rouge">hbase:meta</code> 中了，此时就成功复现了 <code class="language-plaintext highlighter-rouge">region overlap</code></p>
+
+<p>**解决流程 **</p>
+
+<ol>
+  <li>下线错误<code class="language-plaintext highlighter-rouge">region</code>:进入 <code class="language-plaintext highlighter-rouge">hbase shell </code> 对出问题的 <code class="language-plaintext highlighter-rouge">region</code>执行 <code class="language-plaintext highlighter-rouge">unassign 'regionanme'</code></li>
+</ol>
+
+<p>2.移动错误 <code class="language-plaintext highlighter-rouge">region</code> 目录，</p>
+
+<p>例如移动到 hdfs://ns1/tmp/下新建一个目录放进去</p>
+
+<p>HBase 目录结构如下</p>
+
+<p><img src="/images/posts/hbase/region-overlap/table-path1.png" alt="" title="table-path1" /></p>
+
+<p>/apps/hbase/data/data/default/test/regionname/f/hfile</p>
+
+<p>data 表目录</p>
+
+<p>default：命名空间</p>
+
+<p>test:表名</p>
+
+<p>regionname： region目录</p>
+
+<p>region 目录下面有.regioninfo</p>
+
+<p>f：列族目录</p>
+
+<p>hfile: 为 hfile 文件</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">scan 'hbase:meta',{STARTROW =&gt; 'tablename,591420001000',LIMIT =&gt; 100} ,这里row填有问题的前面的row，</code></li>
+</ol>
+
+<p>可能提示遮挡问题有问题，可以追加到文件里，从文件里复制</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>命令：echo “scan ‘hbase:meta’,{STARTROW =&gt; ‘tablename,591420001000’,LIMIT =&gt; 100}”</td>
+      <td>hbase shell &gt; hbase.txt</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>4.<code class="language-plaintext highlighter-rouge">deleteall 'hbase:meta','tablename,rowkey.</code>有问题的 <code class="language-plaintext highlighter-rouge">region</code>.’</p>
+
+<p>示例命令：<code class="language-plaintext highlighter-rouge">deleteall 'hbase:meta','test,5192,1578035374274. *****6bdd9b41aefefd0f89c.'</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">hbase:meta</code> 表中脏数据清理以后客户端读写就获取不到错误 <code class="language-plaintext highlighter-rouge">region</code> 了</p>
+
+<p>5.数据导入</p>
+
+<p><code class="language-plaintext highlighter-rouge">hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles "/tmp/ hbase-loaddata /******89c/ " "t"</code></p>
+
+<p>示例命令： <code class="language-plaintext highlighter-rouge">hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles " /tmp/hbase-loaddata/*****6bdd9b41aefefd0f89c " "test" </code></p>
+
+<p>6、重启 `hmaster</p>
+
+<p>最后问题得以解决。</p>
+
+<p>这个问题，需要对 <code class="language-plaintext highlighter-rouge">unassign</code>、<code class="language-plaintext highlighter-rouge">hbck</code>、<code class="language-plaintext highlighter-rouge">region</code> 如何上下线，<code class="language-plaintext highlighter-rouge">hbase</code> 表目录结构,<code class="language-plaintext highlighter-rouge">hfile</code> 工具,<code class="language-plaintext highlighter-rouge">dobulkload</code> 工具，<code class="language-plaintext highlighter-rouge">.regioninfo</code>、<code class="language-plaintext highlighter-rouge">hbase:meta</code> 等工具链</p>
+
+<p>HBase 元数据原理和上下线、读写流程等都需要有一定的了解。</p>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EMR 与 HBase &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2019/08/15/emr-and-hbase/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="EMR 与 HBase">
+      
+    <meta name="keywords" content="EMR,Cloud,HBase">
+    <meta property="og:keywords" content="EMR,Cloud,HBase">
+      
+    <meta name="description" content="EMR,Cloud,HBase">
+    <meta property="og:description" content="EMR,Cloud,HBase">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2019/08/15/emr-and-hbase/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2019-08-15">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="EMR 与 HBase">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">EMR 与 HBase</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2019/08/15
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#EMR" title="EMR">EMR</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="emr-与-hbase">EMR 与 HBase</h1>
+
+<h2 id="emr-与-hbase-产品形态">EMR 与 HBase 产品形态</h2>
+
+<p>EMR 与 HBase 主要有2种形态：</p>
+
+<p>1、HBase 作为一个组件，存在与 EMR 中</p>
+
+<p>2、HBase 作为单独的服务，直接提供服务</p>
+
+<p>当然如果是第2种可能更多的还需要结合第一种形态使用。</p>
+
+<p>比如 Bulkload/Spark 分析等 是EMR 一套集群，HBase 是一套集群</p>
+
+<h2 id="云商家-emr-与开源的关系说明">云商家 EMR 与开源的关系说明：</h2>
+
+<h4 id="亚马逊">亚马逊：</h4>
+
+<p>基于开源,是否修改代码未知，推测可能会修改支持S3相关的内容。</p>
+
+<h4 id="microsoft-azure-hdinsight">Microsoft Azure HDInsight：</h4>
+
+<blockquote>
+  <p>基于 HDP 版本，目前最新是	HDInsight 4.0， 前者基于Hortonworks 数据平台 3.0</p>
+</blockquote>
+
+<blockquote>
+  <p>默认是HDInsight 3.6（默认），前者基于Hortonworks 数据平台 2.6</p>
+</blockquote>
+
+<h4 id="阿里云">阿里云：</h4>
+
+<blockquote>
+  <p>我们基于开源 Hadoop 的版本，在完全不改变原有接口的基础上，加入了我们的 emr-core 组件，深度支持阿里云的 OSS。这个组件的版本会跟在 Hadoop 版本后。</p>
+</blockquote>
+
+<h4 id="腾讯云">腾讯云：</h4>
+
+<blockquote>
+  <p>弹性 MapReduce 结合云技术和 Hadoop、Hive、Spark、Storm 等社区开源技术，为您提供安全、低成本、高可靠、&gt; 可弹性伸缩的云端 Hadoop 服务。</p>
+</blockquote>
+
+<p>应该是基于开源。</p>
+
+<h4 id="华为云">华为云：</h4>
+
+<blockquote>
+  <p>MRS服务拥有强大的Hadoop内核团队，基于华为FusionInsight大数据企业级平台构筑。</p>
+</blockquote>
+
+<h4 id="天翼云">天翼云：</h4>
+
+<blockquote>
+  <p>MRS 基于开源软件 Hadoop 进行功能增强、Spark 内存计算引擎、HBase 分布式存储数据
+库以及 Hive 数据仓库框架，提供海量数据的分析计算与存储能力。</p>
+</blockquote>
+
+<h2 id="云厂商-emr-组件版本信息">云厂商 EMR 组件版本信息</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"><strong>组件</strong></th>
+      <th style="text-align: center"><strong>亚马逊</strong></th>
+      <th style="text-align: center"><strong>微软</strong></th>
+      <th style="text-align: center"><strong>阿里云</strong></th>
+      <th style="text-align: center"><strong>腾讯云</strong></th>
+      <th style="text-align: center"><strong>华为云</strong></th>
+      <th style="text-align: right"><strong>天翼云</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">产品</td>
+      <td style="text-align: center">EMR</td>
+      <td style="text-align: center">HDInsight</td>
+      <td style="text-align: center">E-MapReduce</td>
+      <td style="text-align: center">弹性 MapReduce</td>
+      <td style="text-align: center">MapReduce 服务</td>
+      <td style="text-align: right">MapReduce 服务</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">版本</td>
+      <td style="text-align: center">emr-5.25.0</td>
+      <td style="text-align: center">HDInsight 4.0</td>
+      <td style="text-align: center">EMR-3.20.0</td>
+      <td style="text-align: center">EMR-V2.1.0</td>
+      <td style="text-align: center">MRS 2.0.1</td>
+      <td style="text-align: right">版本未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">更新时间</td>
+      <td style="text-align: center">2019.5</td>
+      <td style="text-align: center">2019.7</td>
+      <td style="text-align: center">2019.7</td>
+      <td style="text-align: center">2019.5</td>
+      <td style="text-align: center">2019.6</td>
+      <td style="text-align: right">未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">迭代周期</td>
+      <td style="text-align: center">每月</td>
+      <td style="text-align: center">未知</td>
+      <td style="text-align: center">每月</td>
+      <td style="text-align: center">1-2月</td>
+      <td style="text-align: center">2月左右</td>
+      <td style="text-align: right">未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Hadoop</td>
+      <td style="text-align: center">2.8.5</td>
+      <td style="text-align: center">3.1.1</td>
+      <td style="text-align: center">2.8.5</td>
+      <td style="text-align: center">2.8.4</td>
+      <td style="text-align: center">3.1.1</td>
+      <td style="text-align: right">2.7.2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">HBase</td>
+      <td style="text-align: center">1.4.9</td>
+      <td style="text-align: center">2.0.1</td>
+      <td style="text-align: center">1.4.9</td>
+      <td style="text-align: center">1.3.1</td>
+      <td style="text-align: center">2.1.1</td>
+      <td style="text-align: right">1.0.2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Hive</td>
+      <td style="text-align: center">2.3.5</td>
+      <td style="text-align: center">3.1.0</td>
+      <td style="text-align: center">3.1.1</td>
+      <td style="text-align: center">2.3.3</td>
+      <td style="text-align: center">3.1.0</td>
+      <td style="text-align: right">1.2.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Spark</td>
+      <td style="text-align: center">2.4.3</td>
+      <td style="text-align: center">2.3.1/2.4</td>
+      <td style="text-align: center">2.4.2</td>
+      <td style="text-align: center">2.3.2</td>
+      <td style="text-align: center">2.3.2</td>
+      <td style="text-align: right">2.1.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Presto</td>
+      <td style="text-align: center">0.220</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">0.213</td>
+      <td style="text-align: center">0.215</td>
+      <td style="text-align: center">308</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Tez</td>
+      <td style="text-align: center">0.9.2</td>
+      <td style="text-align: center">0.9.1</td>
+      <td style="text-align: center">0.9.1</td>
+      <td style="text-align: center">0.8.5</td>
+      <td style="text-align: center">0.9.1</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Zookeeper</td>
+      <td style="text-align: center">3.4.14</td>
+      <td style="text-align: center">3.4.6</td>
+      <td style="text-align: center">3.4.13</td>
+      <td style="text-align: center">3.4.9</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Flink</td>
+      <td style="text-align: center">1.8.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.7.2</td>
+      <td style="text-align: center">1.4.2</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Kafka</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.1.1/2.1.1</td>
+      <td style="text-align: center">2.11</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.1.0</td>
+      <td style="text-align: right">版本未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Storm</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.2.2</td>
+      <td style="text-align: center">1.1.0</td>
+      <td style="text-align: center">1.2.1</td>
+      <td style="text-align: right">版本未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Flume</td>
+      <td style="text-align: center">1.8.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.8.0</td>
+      <td style="text-align: center">1.6.0</td>
+      <td style="text-align: center">版本未知</td>
+      <td style="text-align: right"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Hue</td>
+      <td style="text-align: center">4.4.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">4.1.0</td>
+      <td style="text-align: center">4.4.0</td>
+      <td style="text-align: center">3.11.0</td>
+      <td style="text-align: right">版本未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Phoenix</td>
+      <td style="text-align: center">4.14.1</td>
+      <td style="text-align: center">5.0</td>
+      <td style="text-align: center">4.14.1</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Sqoop</td>
+      <td style="text-align: center">1.4.7</td>
+      <td style="text-align: center">1.4.7</td>
+      <td style="text-align: center">1.4.7</td>
+      <td style="text-align: center">1.4.7</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Oozie</td>
+      <td style="text-align: center">5.1.0</td>
+      <td style="text-align: center">4.3.1</td>
+      <td style="text-align: center">5.1.0</td>
+      <td style="text-align: center">4.3.1</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Ranger</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.1.0</td>
+      <td style="text-align: center">1.2.0</td>
+      <td style="text-align: center">0.7.1</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Tensorflow</td>
+      <td style="text-align: center">1.13.1</td>
+      <td style="text-align: center">1.8.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: left">MXNet</td>
+      <td style="text-align: center">1.4.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Mahout</td>
+      <td style="text-align: center">0.13.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">0.7.1</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Impala</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">2.12.2</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Druid</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">0.13.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Pig</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">0.17.0</td>
+      <td style="text-align: center">0.14.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Alluxio</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.8.1</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Loader</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">2.0.0</td>
+      <td style="text-align: right">版本未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Livy</td>
+      <td style="text-align: center">0.6.0</td>
+      <td style="text-align: center">0.5</td>
+      <td style="text-align: center">0.6.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Zeppelin</td>
+      <td style="text-align: center">0.8.1</td>
+      <td style="text-align: center">0.8.0</td>
+      <td style="text-align: center">0.8.1</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Ganglia</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">3.7.2</td>
+      <td style="text-align: center">3.7.2</td>
+      <td style="text-align: center">3.7.2</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Apache Ambari</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">2.7.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">JupyterHub</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">0.9.6</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Jupyter</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">4.4.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Knox</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1.1.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Apache DS</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">2.0.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Analytics Zoo</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">0.2.0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Superset</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">0.28.1</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">OS</td>
+      <td style="text-align: center"><em>版本未知</em></td>
+      <td style="text-align: center"><em>版本未知</em></td>
+      <td style="text-align: center">CentOS 7.4</td>
+      <td style="text-align: center"><em>版本未知</em></td>
+      <td style="text-align: center"><em>版本未知</em></td>
+      <td style="text-align: right"><em>版本未知</em></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>组件</strong></td>
+      <td style="text-align: center"><strong>亚马逊</strong></td>
+      <td style="text-align: center"><strong>微软</strong></td>
+      <td style="text-align: center"><strong>阿里云</strong></td>
+      <td style="text-align: center"><strong>腾讯云</strong></td>
+      <td style="text-align: center"><strong>华为云</strong></td>
+      <td style="text-align: right"><strong>天翼云</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>HBase 是否单独作为产品？</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"><strong>组件</strong></th>
+      <th style="text-align: center"><strong>阿里云</strong></th>
+      <th style="text-align: center"><strong>华为云</strong></th>
+      <th style="text-align: center"><strong>腾讯云</strong></th>
+      <th style="text-align: center"><strong>天翼云</strong></th>
+      <th style="text-align: center"><strong>亚马逊</strong></th>
+      <th style="text-align: right"><strong>亚马逊</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">产品</td>
+      <td style="text-align: center">云数据库 HBase 版</td>
+      <td style="text-align: center">表格存储服务 CloudTable</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: right">N/A</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>注意</strong></p>
+
+<p><em>N/A 表示无；版本未知表示有此组件，但不清楚具体版本</em></p>
+
+<p><em>统计时间为2019.8.16，有些云厂商有多个版本分支同时进行，这里只列出的最新主干分支</em></p>
+
+<p>*Loader 可能是华为提供的基于 Flume 的工具 *</p>
+
+<h2 id="emr-与-hbase-产品形态-1">EMR 与 HBase 产品形态</h2>
+
+<p>亚马逊、阿里云、华为云、腾讯云、天翼云 EMR产品中均包含 HBase 组件。</p>
+
+<p>腾讯云之前除了EMR提供，还单独提供了云HBase，后来又取消了，以弹性MapReduce提供,主要原因是HBase 通常会和Hadoop其他组件结合使用。</p>
+
+<p>阿里云提供<a href="https://cn.aliyun.com/product/hbase">云数据库HBase版</a>,放在了云计算基础 NOSQL 数据库</p>
+
+<p>华为云提供<a href="https://www.huaweicloud.com/product/cloudtable.html">CloudTable</a>其实就是HBase,放在EI企业智能，为什么放在这块主要是组织架构原因，MapReduce 服务也是放在这边。</p>
+
+<h2 id="hbase-是否适合提供云服务">HBase 是否适合提供云服务</h2>
+
+<h4 id="hbase-功能方面">HBase 功能方面</h4>
+
+<p>提供分布式 NOSQL 存储，高性能的写吞吐，还不错的读能力。业务场景也是比较丰富的，需求应该是一直在的。</p>
+
+<h4 id="hbase-架构方面">HBase 架构方面</h4>
+
+<p>HBase 是分布式的、计算存储分离的，本身是比较适合提供云服务的。</p>
+
+<h4 id="hbase-应用场景">HBase 应用场景</h4>
+
+<p>物联网、明细记录、消息日志类、用户画像标签、金融风控、社交消息feed流、监控、小对象存储（视频、图片）、时序时空、海量实时分布式存储。</p>
+
+<p>如笔者公司使用HBase 存储手机详单数据，最大存储单表近2PB（单副本GZIP压缩后）。</p>
+
+<h4 id="hbase-生态">HBase 生态</h4>
+
+<p>与Phoenix 结合提供SQL、二级索引；与 OpenTSDB 结合提供时序；GeoMesa 结合提供时空数据库功能；与 HGraphDB 结合提供图数据库功能；与 Kylin 结合提供 MOLAP；Spark 结合提供分析功能；Hive 其实也可以映射HBase 表来使用；还可与 Solr 结合提供全文索引功能。更多生态可以参考：<a href="https://github.com/rayokota/awesome-hbase">awesome-hbase</a></p>
+
+<h2 id="问题">问题：</h2>
+
+<p>1、本身没有独立的存储，依赖 HDFS，所以通常需要维护一套HDFS 系统</p>
+
+<p>2、依赖 ZK ，需要维护一套 ZK。</p>
+
+<p>以上2点不像类似 MongoDB 和 Cassandra 不依赖与其他外部组件，部署维护其他相对比较简单，HBase 复杂度会高很多，部署以及维护的成本也大。
+虽然架构上面是计算存储分离的，但是存储这块与云存储结合并不是很好，虽然架构上计算存储分离，相比也比较适合云原生，但云原生的“不纯粹” 。
+虽然 HBase 一直在去ZK和HDFS，也在推动支持更多的文件系统，比如S3，但仍然任重道远。
+如 AWS 中使用 HBase + S3,仍然需要部署一套 HDFS 系统，原因是S3不支持 flush/hflush 接口，而前者是 HBase 写 WAL 需要依赖的。
+<img src="/images/posts/hbase/hbase_s3.png" alt="" title="HBase on S3" /></p>
+
+<p>具体可参考 <a href="https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-hbase-s3.html">HBase on Amazon S3</a></p>
+
+<p>3、自身功能方面：目前 HBase 并没有内置SQL、二级索引等易于使用的功能,这块还是依赖生态组件来解决。这点往往会带来设计和使用上面的复杂度。
+这点上 与 MongoDB 和 Cassandra 相比，差了很多。</p>
+
+<p>4、易用性：HBase 对使用者有一点的要求，比如对rowkey设计，预先分区等；而且提供的 原生 API 也比较原始往往通过API 的 get/scan/put/delete 接口实现。与常规的数据库 SQL select/insert/update/delete 易用性差距还很大。</p>
+
+<p>5、稳定性：HBase 稳定性这块相比其他数据库差距还是很明显的。</p>
+
+<h2 id="链接"><strong><em>链接</em></strong></h2>
+
+<p>AWS EMR ：<a href="https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-release-5x.html">https://docs.aws.amazon.com/zh_cn/emr/latest/ReleaseGuide/emr-release-5x.html</a></p>
+
+<p>Microsfot Azure HDInsight : <a href="https://azure.microsoft.com/en-us/services/hdinsight/">https://azure.microsoft.com/en-us/services/hdinsight/</a></p>
+
+<p>Microsfot Azure HDInsight 版本: <a href="https://docs.microsoft.com/zh-cn/azure/hdinsight/hdinsight-component-versioning">https://docs.microsoft.com/zh-cn/azure/hdinsight/hdinsight-component-versioning</a></p>
+
+<p>阿里云  E-MapReduce ：<a href="https://help.aliyun.com/product/28066.html?spm=a2c4g.11174283.6.540.722b3d79Tt6gVH">https://help.aliyun.com/product/28066.html?spm=a2c4g.11174283.6.540.722b3d79Tt6gVH</a></p>
+
+<p>华为云 MapReduce服务 ：<a href="https://support.huaweicloud.com/productdesc-mrs/mrs_08_0005.html">https://support.huaweicloud.com/productdesc-mrs/mrs_08_0005.html</a></p>
+
+<p>腾讯云 弹性MapReduce ：<a href="https://cloud.tencent.com/document/product/589/20279">https://cloud.tencent.com/document/product/589/20279</a></p>
+
+<p>天翼云 MapReduce服务 ：<a href="https://www.ctyun.cn/help/list/1407">https://www.ctyun.cn/help/list/1407</a></p>
+
+<p>华为云 表格存储服务 CloudTable  <a href="https://www.huaweicloud.com/product/cloudtable.html">https://www.huaweicloud.com/product/cloudtable.html</a></p>
+
+<p>阿里云 云数据库 HBase 版 <a href="https://cn.aliyun.com/product/hbase?spm=a2c4g.11186623.cwnn_jpze.64.125b40acDBGNlH">https://cn.aliyun.com/product/hbase?spm=a2c4g.11186623.cwnn_jpze.64.125b40acDBGNlH</a></p>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

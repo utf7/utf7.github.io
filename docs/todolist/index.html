@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题） &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/docs/todolist/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题）">
+      
+    <meta name="keywords" content="utf7, seven,HBase">
+    <meta property="og:keywords" content="utf7, seven,HBase">
+      
+    <meta name="description" content="                        1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题）                                                                                 1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题）内存可以调稍微大一些，建议4-&gt;8~12G内存在分析，代码在看，基本定位问题，待修改代码验证2、DataNode 目录扫描优化，主要是3个方向：1、checkAndUpdate 锁优化 已经完成2、scan  锁优化,去掉不必要的锁 已经完成3、多线程scan（和锁无关，但可以加速scan 性能）已经完成可以避免高峰期做DirectoryScanner 调度，offpeak（0，8）其他时间段做为啥会有diff ？ datanode 不同步，可能是磁盘太多？快太多？？？小文件太多？？？？还是？？？3、HiveMeta 可能存在 内存泄露 GC hang 住，短期调内存，需要分析问题jstat -gcutil 38398 1000jhat -J-Xmx20240m hbase.heap.binjmap -histo 31549 &gt;jmap-nodemanager-hostname.jmapjmap -dump:format=b,file=yarn-31549-hostname.heap.bin 31549类名字：https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getNameElement Type	   	Encodingboolean	   	Zbyte	   	Bchar	   	Cclass or interface	   	Lclassname;double	   	Dfloat	   	Fint	   	Ilong	   	Jshort	   	S示例： String.class.getName()     returns “java.lang.String” byte.class.getName()     returns “byte” (new Object[3]).getClass().getName()     returns “[Ljava.lang.Object;” (new int[3][4][5][6][7][8][9]).getClass().getName()     returns “[[[[[[[I”                                                                                                                                                                                        Search                        My Popular Repositories                            ">
+    <meta property="og:description" content="                        1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题）                                                                                 1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题）内存可以调稍微大一些，建议4-&gt;8~12G内存在分析，代码在看，基本定位问题，待修改代码验证2、DataNode 目录扫描优化，主要是3个方向：1、checkAndUpdate 锁优化 已经完成2、scan  锁优化,去掉不必要的锁 已经完成3、多线程scan（和锁无关，但可以加速scan 性能）已经完成可以避免高峰期做DirectoryScanner 调度，offpeak（0，8）其他时间段做为啥会有diff ？ datanode 不同步，可能是磁盘太多？快太多？？？小文件太多？？？？还是？？？3、HiveMeta 可能存在 内存泄露 GC hang 住，短期调内存，需要分析问题jstat -gcutil 38398 1000jhat -J-Xmx20240m hbase.heap.binjmap -histo 31549 &gt;jmap-nodemanager-hostname.jmapjmap -dump:format=b,file=yarn-31549-hostname.heap.bin 31549类名字：https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getNameElement Type	   	Encodingboolean	   	Zbyte	   	Bchar	   	Cclass or interface	   	Lclassname;double	   	Dfloat	   	Fint	   	Ilong	   	Jshort	   	S示例： String.class.getName()     returns “java.lang.String” byte.class.getName()     returns “byte” (new Object[3]).getClass().getName()     returns “[Ljava.lang.Object;” (new int[3][4][5][6][7][8][9]).getClass().getName()     returns “[[[[[[[I”                                                                                                                                                                                        Search                        My Popular Repositories                            ">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/docs/todolist/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="1、NodeManage...">
+    <div class="container">
+        <div class="collection-title">
+            <h1 class="collection-header">1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题）</h1>
+            
+        </div>
+    </div>
+</section>
+<!-- / .banner -->
+ <section class="container content">
+        <div class="columns">
+            <div class="column two-thirds" >
+                <article class="article-content markdown-body">
+                    <h2 id="1nodemanager-内存泄露分析-oom现在定位externalshuffle-cache-index-问题">1、NodeManager 内存泄露分析 OOM（现在定位ExternalShuffle cache index 问题）</h2>
+
+<h4 id="内存可以调稍微大一些建议4-812g">内存可以调稍微大一些，建议4-&gt;8~12G</h4>
+<h4 id="内存在分析代码在看基本定位问题待修改代码验证">内存在分析，代码在看，基本定位问题，待修改代码验证</h4>
+
+<h2 id="2datanode-目录扫描优化主要是3个方向">2、DataNode 目录扫描优化，主要是3个方向：</h2>
+
+<h4 id="1checkandupdate-锁优化-已经完成">1、checkAndUpdate 锁优化 已经完成</h4>
+<h4 id="2scan--锁优化去掉不必要的锁-已经完成">2、scan  锁优化,去掉不必要的锁 已经完成</h4>
+<h4 id="3多线程scan和锁无关但可以加速scan-性能已经完成">3、多线程scan（和锁无关，但可以加速scan 性能）已经完成</h4>
+
+<h4 id="可以避免高峰期做directoryscanner-调度offpeak08其他时间段做">可以避免高峰期做DirectoryScanner 调度，offpeak（0，8）其他时间段做</h4>
+<h4 id="为啥会有diff--datanode-不同步可能是磁盘太多快太多小文件太多还是">为啥会有diff ？ datanode 不同步，可能是磁盘太多？快太多？？？小文件太多？？？？还是？？？</h4>
+
+<h2 id="3hivemeta-可能存在-内存泄露-gc-hang-住短期调内存需要分析问题">3、HiveMeta 可能存在 内存泄露 GC hang 住，短期调内存，需要分析问题</h2>
+
+<p>jstat -gcutil 38398 1000</p>
+
+<p>jhat -J-Xmx20240m hbase.heap.bin</p>
+
+<p>jmap -histo 31549 &gt;jmap-nodemanager-hostname.jmap</p>
+
+<p>jmap -dump:format=b,file=yarn-31549-hostname.heap.bin 31549</p>
+
+<p>类名字：</p>
+
+<p>https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getName</p>
+
+<p>Element Type	   	Encoding
+boolean	   	Z
+byte	   	B
+char	   	C
+class or interface	   	Lclassname;
+double	   	D
+float	   	F
+int	   	I
+long	   	J
+short	   	S</p>
+
+<p>示例：
+ String.class.getName()
+     returns “java.lang.String”
+ byte.class.getName()
+     returns “byte”
+ (new Object[3]).getClass().getName()
+     returns “[Ljava.lang.Object;”
+ (new int[3][4][5][6][7][8][9]).getClass().getName()
+     returns “[[[[[[[I”</p>
+
+
+                </article>
+                <div class="share">
+                    <div class="share-component"></div>
+                </div>
+                <div class="comment">
+                    
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+                </div>
+            </div>
+            <div class="column one-third">
+                
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+                <h3>My Popular Repositories</h3>
+
+
+            </div>
+        </div>
+    </section>
+    <!-- /section.content -->
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

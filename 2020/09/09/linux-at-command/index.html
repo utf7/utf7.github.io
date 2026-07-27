@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linux 一次性任务调度 at 命令简介 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/09/09/linux-at-command/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Linux 一次性任务调度 at 命令简介">
+      
+    <meta name="keywords" content="linux,at">
+    <meta property="og:keywords" content="linux,at">
+      
+    <meta name="description" content="本文介绍 Linux 一次性任务调度 at 命令的常规使用">
+    <meta property="og:description" content="本文介绍 Linux 一次性任务调度 at 命令的常规使用">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/09/09/linux-at-command/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-09-09">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Linux 一次性任务调度 a">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Linux 一次性任务调度 at 命令简介</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/09/09
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Linux" title="Linux">Linux</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="linux-一次性任务调度-at-命令">Linux 一次性任务调度 at 命令</h1>
+
+<h2 id="背景描述">背景描述</h2>
+
+<p>Linux 计划任务分为周期性和一次性，周期性使用 <code class="language-plaintext highlighter-rouge">crontab</code> 命令， <code class="language-plaintext highlighter-rouge">at</code> 用于执行一次性计划任务。</p>
+
+<h2 id="使用">使用</h2>
+
+<h3 id="创建-job">创建 job</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span> at 5:00 tomorrow   // 明天5点执行
+
+at&gt;date <span class="o">&gt;</span> /tmp/at_test.txt
+
+at&gt;&lt;EOT&gt;
+</code></pre></div></div>
+
+<p>输入 Ctrl+D 来表示停止添加命令,此时会输出本次编辑的计划信息：</p>
+
+<p><code class="language-plaintext highlighter-rouge">job 6 at Fri Sep 11 05:00:00 2020</code></p>
+
+<h3 id="查看-job">查看 job</h3>
+
+<p>执行 atq // 查询</p>
+
+<p><code class="language-plaintext highlighter-rouge">$atq</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">6	Fri Sep 11 05:00:00 2020 a hadoop</code></p>
+
+<p>at -l 与 atq 类似</p>
+
+<h3 id="查看-job-详细">查看 job 详细</h3>
+
+<p>at -c jobid</p>
+
+<h3 id="删除-job">删除 job</h3>
+
+<p><code class="language-plaintext highlighter-rouge">atrm jobid</code></p>
+
+<p>如：<code class="language-plaintext highlighter-rouge">atrm 6</code></p>
+
+<p>atrm  jobid</p>
+
+<p>at -d jobid</p>
+
+<p>at -r jobid</p>
+
+<h3 id="执行多个任务">执行多个任务</h3>
+
+<p>$  at now + 1 minute   // 明天5点执行
+at&gt;date &gt; /tmp/at_test.txt;hostname &gt; /tmp/at_test1.txt;
+at&gt;<EOT></EOT></p>
+
+<p>输入 Ctrl+D 来表示停止添加命令,此时会输出本次编辑的计划信息：</p>
+
+<p><code class="language-plaintext highlighter-rouge">job 11 at Fri Sep 11 01:30:00 2020</code></p>
+
+<h3 id="从文件中执行-job">从文件中执行 job</h3>
+
+<p>-f 表示执行文件中的命令</p>
+
+<p><code class="language-plaintext highlighter-rouge">at now + 1 minute -f test.sh</code></p>
+
+<p>另外也可以使用</p>
+
+<p><code class="language-plaintext highlighter-rouge">at now + 1 minute &lt; test.sh</code></p>
+
+<h3 id="常见时间格式">常见时间格式：</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>at 11:00 AM //今天上午11点
+
+at 11:00 AM tomorrow // 明天上午11点 
+
+at 11:00 AM next week // 下周今天11点
+
+at next week  // 下周的这个时刻
+
+at 11:00 AM next fri //下周五上午11点
+
+at next fri // 下周五这个时候
+
+at 11:00 AM next month //下个月的这个时候
+
+at 11:00 AM 3/15/2020 //执行某个时刻
+
+at now + 30 minutes //30分钟后
+
+at now + 2 hours //2小时后
+
+at tomorrow //明天的这时刻
+
+at thursday //周三这时刻
+
+at midnight //早上（中午）12点
+
+at now + 1 minute //一分钟后执行
+
+</code></pre></div></div>
+
+<p>更多用法请查看 <code class="language-plaintext highlighter-rouge">man at</code></p>
+
+<p>参考链接：</p>
+
+<ol>
+  <li>https://linux.die.net/man/1/at</li>
+  <li>https://www.howtogeek.com/451386/how-to-use-at-and-batch-on-linux-to-launch-processes/</li>
+</ol>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

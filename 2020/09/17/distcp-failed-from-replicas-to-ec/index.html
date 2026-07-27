@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hadoop Distcp 拷贝三副本到纠删码目录失败 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/09/17/distcp-failed-from-replicas-to-ec/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Hadoop Distcp 拷贝三副本到纠删码目录失败">
+      
+    <meta name="keywords" content="HDFS,Hadoop,distcp">
+    <meta property="og:keywords" content="HDFS,Hadoop,distcp">
+      
+    <meta name="description" content="Hadoop Distcp 拷贝三副本到纠删码目录失败">
+    <meta property="og:description" content="Hadoop Distcp 拷贝三副本到纠删码目录失败">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/09/17/distcp-failed-from-replicas-to-ec/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-09-17">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Hadoop Distcp 拷">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Hadoop Distcp 拷贝三副本到纠删码目录失败</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/09/17
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Hadoop" title="Hadoop">Hadoop</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h3 id="问题">问题：</h3>
+
+<p>在 hadoop 3 发起 distcp 命令拷贝另外一个集群的数据到本集群</p>
+
+<p>src 集群 hdfs 目录存储为三副本</p>
+
+<p>target 集群为 ec纠删码</p>
+
+<p>distcp 命令</p>
+
+<p><code class="language-plaintext highlighter-rouge">hadoop distcp -Dmapreduce.job.queuename=root.default  hdfs://src/test.db/testtable hdfs://target/ec/</code></p>
+
+<div class="language-verilog highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">20</span><span class="o">/</span><span class="mi">09</span><span class="o">/</span><span class="mi">17</span> <span class="mi">21</span><span class="o">:</span><span class="mi">56</span><span class="o">:</span><span class="mi">53</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="p">.</span><span class="n">Job</span><span class="o">:</span> <span class="n">Task</span> <span class="n">Id</span> <span class="o">:</span> <span class="n">attempt_1600259371672_0003_m_000012_2</span><span class="p">,</span> <span class="n">Status</span> <span class="o">:</span> <span class="n">FAILED</span>
+<span class="nl">Error:</span> <span class="n">java</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">IOException</span><span class="o">:</span> <span class="n">File</span> <span class="n">copy</span> <span class="n">failed</span><span class="o">:</span> <span class="n">hdfs</span><span class="o">:</span><span class="c1">//src/test.db/testtable/day=2020-09-13/part-00004-c5efd5dc-ca97-4716-b14a-944a5223099a-c000 --&gt; hdfs://target/ec/day=2020-08-13/part-00004-c5efd5dc-ca97-4716-b14a-944a5223099a-c000</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">copyFileWithRetry</span><span class="p">(</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">263</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">220</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">48</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">mapreduce</span><span class="p">.</span><span class="n">Mapper</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">Mapper</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">146</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">MapTask</span><span class="p">.</span><span class="n">runNewMapper</span><span class="p">(</span><span class="n">MapTask</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">799</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">MapTask</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">MapTask</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">347</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">YarnChild</span><span class="p">$</span><span class="mf">2.</span><span class="n">run</span><span class="p">(</span><span class="n">YarnChild</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">174</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">java</span><span class="p">.</span><span class="n">security</span><span class="p">.</span><span class="n">AccessController</span><span class="p">.</span><span class="n">doPrivileged</span><span class="p">(</span><span class="n">Native</span> <span class="n">Method</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">javax</span><span class="p">.</span><span class="n">security</span><span class="p">.</span><span class="n">auth</span><span class="p">.</span><span class="n">Subject</span><span class="p">.</span><span class="n">doAs</span><span class="p">(</span><span class="n">Subject</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">422</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">security</span><span class="p">.</span><span class="n">UserGroupInformation</span><span class="p">.</span><span class="n">doAs</span><span class="p">(</span><span class="n">UserGroupInformation</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">1730</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">YarnChild</span><span class="p">.</span><span class="n">main</span><span class="p">(</span><span class="n">YarnChild</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">168</span><span class="p">)</span>
+<span class="n">Caused</span> <span class="n">by</span><span class="o">:</span> <span class="n">java</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">IOException</span><span class="o">:</span> <span class="n">Couldn</span><span class="err">'</span><span class="n">t</span> <span class="n">run</span> <span class="n">retriable</span><span class="o">-</span><span class="n">command</span><span class="o">:</span> <span class="n">Copying</span> <span class="n">hdfs</span><span class="o">:</span><span class="c1">//src/test.db/testtable/day=2020-09-13/part-00004-c5efd5dc-ca97-4716-b14a-944a5223099a-c000 to hdfs://target/ec/testtable/day=2020-09-13/part-00004-c5efd5dc-ca97-4716-b14a-944a5223099a-c000</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">RetriableCommand</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">RetriableCommand</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">101</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">copyFileWithRetry</span><span class="p">(</span><span class="n">CopyMapper</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">259</span><span class="p">)</span>
+	<span class="p">...</span> <span class="mi">10</span> <span class="n">more</span>
+<span class="n">Caused</span> <span class="n">by</span><span class="o">:</span> <span class="n">java</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">IOException</span><span class="o">:</span> <span class="n">Checksum</span> <span class="n">mismatch</span> <span class="n">between</span> <span class="n">hdfs</span><span class="o">:</span><span class="n">hdfs</span><span class="o">:</span><span class="c1">//src/test.db/testtable/day=2020-09-13/part-00004-c5efd5dc-ca97-4716-b14a-944a5223099a-c000 and hdfs://target/ec/.distcp.tmp.attempt_1600259371672_0003_m_000012_2.</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">DistCpUtils</span><span class="p">.</span><span class="n">compareFileLengthsAndChecksums</span><span class="p">(</span><span class="n">DistCpUtils</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">641</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">RetriableFileCopyCommand</span><span class="p">.</span><span class="n">doCopy</span><span class="p">(</span><span class="n">RetriableFileCopyCommand</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">146</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">mapred</span><span class="p">.</span><span class="n">RetriableFileCopyCommand</span><span class="p">.</span><span class="n">doExecute</span><span class="p">(</span><span class="n">RetriableFileCopyCommand</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">115</span><span class="p">)</span>
+	<span class="n">at</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">hadoop</span><span class="p">.</span><span class="n">tools</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">RetriableCommand</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">RetriableCommand</span><span class="p">.</span><span class="n">java</span><span class="o">:</span><span class="mi">87</span><span class="p">)</span>
+	<span class="p">...</span> <span class="mi">11</span> <span class="n">more</span>
+</code></pre></div></div>
+
+<h3 id="解决办法">解决办法：</h3>
+
+<p>由于不同的 EC 策略文件，因为其校验值不同而导致Distcp 任务失败</p>
+
+<p>加上 <strong><code class="language-plaintext highlighter-rouge">-skipcrccheck</code></strong> 参数</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>hadoop distcp <span class="nt">-Dmapreduce</span>.job.queuename<span class="o">=</span>root.default  <span class="nt">-skipcrccheck</span> hdfs://src/test.db/testtable hdfs://target/ec/
+</code></pre></div></div>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

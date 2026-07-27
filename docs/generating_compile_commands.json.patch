@@ -1,0 +1,656 @@
+diff --git a/make/CompileCommands.gmk b/make/CompileCommands.gmk
+new file mode 100644
+index 00000000000..ad729830e53
+--- /dev/null
++++ b/make/CompileCommands.gmk
+@@ -0,0 +1,60 @@
++#
++# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
++# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++#
++# This code is free software; you can redistribute it and/or modify it
++# under the terms of the GNU General Public License version 2 only, as
++# published by the Free Software Foundation.  Oracle designates this
++# particular file as subject to the "Classpath" exception as provided
++# by Oracle in the LICENSE file that accompanied this code.
++#
++# This code is distributed in the hope that it will be useful, but WITHOUT
++# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++# version 2 for more details (a copy is included in the LICENSE file that
++# accompanied this code).
++#
++# You should have received a copy of the GNU General Public License version
++# 2 along with this work; if not, write to the Free Software Foundation,
++# Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
++#
++# Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
++# or visit www.oracle.com if you need additional information or have any
++# questions.
++#
++
++default: all
++
++include $(SPEC)
++include MakeBase.gmk
++
++# When FIXPATH is set, let it process the file to make sure all paths are usable
++# by system native tools. The FIXPATH tool assumes arguments preceeded by an @
++# character points to a text file containing further arguments (similar to a
++# linker). It replaces any such arguments with a different temporary filename,
++# whose contents has been processed to make any paths native. To obtain a
++# properly processed compile_commands.json, FIXPATH is then made to invoke an
++# AWK script with the unprocessed json file as the only argument, prepended with
++# an @ character. The AWK script simply copies the contents of this processed
++# file.
++#
++# The sed command encloses the fragments inside brackets and removes the final
++# trailing comma.
++$(OUTPUTDIR)/compile_commands.json: $(wildcard $(MAKESUPPORT_OUTPUTDIR)/compile-commands/*.json)
++	$(call LogWarn, Updating compile_commands.json)
++	$(RM) $@
++	$(FIND) $(MAKESUPPORT_OUTPUTDIR)/compile-commands/ -name \*.json | \
++	    $(SORT) | $(XARGS) $(CAT) >> $@.tmp
++	$(if $(FIXPATH),$(FIXPATH) $(AWK) 'BEGIN { \
++	    tmpfile = substr(ARGV[2],2); \
++	    cmd = "$(CP) " "\047" tmpfile "\047" " $@.tmp"; \
++	    system(cmd); \
++	}' -- @$@.tmp)
++	$(SED) -e '1s/^/[\$(NEWLINE)/' -e '$(DOLLAR)s/,\s\{0,\}$(DOLLAR)/\$(NEWLINE)]/' $@.tmp > $@
++	$(RM) $@.tmp
++
++TARGETS += $(OUTPUTDIR)/compile_commands.json
++
++all: $(TARGETS)
++
++.PHONY: all
+diff --git a/make/Main.gmk b/make/Main.gmk
+index 1a6e317e7fe..8313ea9fdff 100644
+--- a/make/Main.gmk
++++ b/make/Main.gmk
+@@ -262,6 +262,31 @@ hotspot-ide-project:
+ ALL_TARGETS += $(HOTSPOT_VARIANT_TARGETS) $(HOTSPOT_VARIANT_GENSRC_TARGETS) \
+     $(HOTSPOT_VARIANT_LIBS_TARGETS) hotspot-ide-project
+ 
++################################################################################
++# Generate libs and launcher targets for creating compile_commands.json fragments
++define DeclareCompileCommandsRecipe
++  $1-compile-commands:
++	$$(call LogInfo, Generating compile_commands.json fragments for $1)
++	+($(CD) $(TOPDIR)/make && $(MAKE) $(MAKE_ARGS) -f Main.gmk $1-only \
++	    GENERATE_COMPILE_COMMANDS_ONLY=true)
++
++  COMPILE_COMMANDS_TARGETS_$2 += $1-compile-commands
++endef
++
++$(foreach t, $(HOTSPOT_VARIANT_LIBS_TARGETS), \
++  $(eval $(call DeclareCompileCommandsRecipe,$t,HOTSPOT)) \
++)
++
++$(foreach t, $(LIBS_TARGETS) $(LAUNCHER_TARGETS), \
++  $(eval $(call DeclareCompileCommandsRecipe,$t,JDK)) \
++)
++
++compile-commands compile-commands-hotspot:
++	+($(CD) $(TOPDIR)/make && $(MAKE) $(MAKE_ARGS) -f CompileCommands.gmk)
++
++ALL_TARGETS += $(COMPILE_COMMANDS_TARGETS_HOTSPOT) $(COMPILE_COMMANDS_TARGETS_JDK)
++ALL_TARGETS += compile-commands compile-commands-hotspot
++
+ ################################################################################
+ # Build demos targets
+ 
+@@ -559,8 +584,12 @@ test-jdk-jtreg-native:
+ test-make:
+ 	($(CD) $(TOPDIR)/test/make && $(MAKE) $(MAKE_ARGS) -f TestMake.gmk $(TEST_TARGET))
+ 
++test-compile-commands:
++	($(CD) $(TOPDIR)/test/make && $(MAKE) $(MAKE_ARGS) -f TestMake.gmk test-compile-commands)
++
+ ALL_TARGETS += test test-hotspot-jtreg test-hotspot-jtreg-native \
+-    test-hotspot-internal test-hotspot-gtest test-jdk-jtreg-native test-make
++    test-hotspot-internal test-hotspot-gtest test-jdk-jtreg-native test-make \
++    test-compile-commands
+ 
+ ################################################################################
+ # Bundles
+@@ -735,6 +764,20 @@ else
+   $(foreach m, $(ALL_MODULES), $(eval $m-jmod: $($(m)_JMOD_DEPS)))
+   $(foreach m, $(INTERIM_IMAGE_MODULES), $(eval $m-interim-jmod: $($(m)_JMOD_DEPS)))
+ 
++  # Setup the minimal set of generated native source dependencies for hotspot
++  $(foreach v, $(JVM_VARIANTS), \
++    $(eval hotspot-$v-libs-compile-commands: hotspot-$v-gensrc) \
++    $(foreach m, $(filter java.desktop jdk.hotspot.agent, $(GENSRC_MODULES)), \
++      $(eval hotspot-$v-libs-compile-commands: $m-gensrc)) \
++  )
++
++  # For the full JDK compile commands, create all possible generated sources
++  $(foreach m, $(GENSRC_MODULES), $(eval $m-libs-compile-commands: $m-gensrc))
++  $(foreach m, $(filter $(JAVA_MODULES), $(LIBS_MODULES)), $(eval $m-libs-compile-commands: $m-java))
++
++  compile-commands-hotspot: $(COMPILE_COMMANDS_TARGETS_HOTSPOT)
++  compile-commands: $(COMPILE_COMMANDS_TARGETS_HOTSPOT) $(COMPILE_COMMANDS_TARGETS_JDK)
++
+   # Jmods cannot be created until we have the jmod tool ready to run. During
+   # a normal build we run it from the exploded image, but when cross compiling
+   # it's run from the buildjdk, which is either created at build time or user
+@@ -849,6 +892,8 @@ else
+ 
+   test-make: clean-test-make
+ 
++  test-compile-commands: compile-commands
++
+   build-test-lib: exploded-image-optimize
+ 
+   build-test-failure-handler: interim-langtools
+@@ -1071,7 +1116,7 @@ CLEAN_MODULE_PHASE_TARGETS := $(addprefix clean-, $(foreach m, $(ALL_MODULES), \
+ 
+ # Remove everything, except the output from configure.
+ clean: $(CLEAN_DIR_TARGETS)
+-	($(CD) $(OUTPUTDIR) && $(RM) -r build*.log*)
++	($(CD) $(OUTPUTDIR) && $(RM) -r build*.log* compile_commands.json)
+ 	$(ECHO) Cleaned all build artifacts.
+ 
+ clean-docs:
+diff --git a/make/ModuleWrapper.gmk b/make/ModuleWrapper.gmk
+index dd6a8afebf1..5f9c5fc82ec 100644
+--- a/make/ModuleWrapper.gmk
++++ b/make/ModuleWrapper.gmk
+@@ -100,5 +100,9 @@ $(eval $(call SetupCopyFiles, COPY_CONF, \
+         $(TARGETS)), \
+ ))
+ 
+-all: $(TARGETS) $(COPY_LIBS_TO_BIN) $(COPY_LIBS_TO_LIB) \
+-    $(COPY_INCLUDE) $(COPY_CMDS) $(COPY_CONF) $(LINK_LIBS_TO_LIB)
++ifeq ($(GENERATE_COMPILE_COMMANDS_ONLY), true)
++  all: $(filter $(MAKESUPPORT_OUTPUTDIR)/compile-commands/%, $(TARGETS))
++else
++  all: $(TARGETS) $(COPY_LIBS_TO_BIN) $(COPY_LIBS_TO_LIB) \
++      $(COPY_INCLUDE) $(COPY_CMDS) $(COPY_CONF) $(LINK_LIBS_TO_LIB)
++endif
+diff --git a/make/common/JdkNativeCompilation.gmk b/make/common/JdkNativeCompilation.gmk
+index bf09d4875e5..c1c0a4323cd 100644
+--- a/make/common/JdkNativeCompilation.gmk
++++ b/make/common/JdkNativeCompilation.gmk
+@@ -47,6 +47,29 @@ FindSrcDirsForComponent += \
+       $(TOPDIR)/src/$(strip $1)/$(OPENJDK_TARGET_OS_TYPE)/native/$(strip $2) \
+       $(TOPDIR)/src/$(strip $1)/share/native/$(strip $2)))
+ 
++# Find a library
++# Param 1 - module name
++# Param 2 - library name
++# Param 3 - optional subdir for library
++FindLib = \
++    $(call FindLibDirForModule, \
++        $(strip $1))$(strip $3)/$(LIBRARY_PREFIX)$(strip $2)$(SHARED_LIBRARY_SUFFIX)
++
++# Find a static library
++# Param 1 - module name
++# Param 2 - library name
++# Param 3 - optional subdir for library
++FindStaticLib = \
++    $(addprefix $(SUPPORT_OUTPUTDIR)/native/, \
++        $(strip $1)$(strip $3)/$(LIBRARY_PREFIX)$(strip $2)$(STATIC_LIBRARY_SUFFIX))
++
++# If only generating compile_commands.json, make these return empty to avoid
++# declaring dependencies.
++ifeq ($(GENERATE_COMPILE_COMMANDS_ONLY), true)
++  FindLib =
++  FindStaticLib =
++endif
++
+ GetJavaHeaderDir = \
+   $(wildcard $(SUPPORT_OUTPUTDIR)/headers/$(strip $1))
+ 
+diff --git a/make/common/NativeCompilation.gmk b/make/common/NativeCompilation.gmk
+index 6fd5ed5a61b..4f126a488a7 100644
+--- a/make/common/NativeCompilation.gmk
++++ b/make/common/NativeCompilation.gmk
+@@ -59,6 +59,29 @@ define GetSymbols
+   fi
+ endef
+ 
++################################################################################
++# Creates a recipe that creates a compile_commands.json fragment. Remove any
++# occurences of FIXPATH programs from the command to show the actual invocation.
++#
++# Param 1: Name of file to create
++# Param 2: Working directory
++# Param 3: Source file
++# Param 4: Compile command
++# Param 5: Object name
++################################################################################
++define WriteCompileCommandsFragment
++  $(call LogInfo, Creating compile commands fragment for $(notdir $3))
++  $(call MakeDir, $(dir $1))
++  $(call WriteFile,{ \
++      "directory": "$(strip $2)"$(COMMA) \
++      "file": "$(strip $3)"$(COMMA) \
++      "command": "$(strip $(subst $(DQUOTE),\$(DQUOTE),$(subst \,\\,\
++        $(subst $(FIXPATH),,$4))))"$(COMMA) \
++      "output": "$(strip $5)" \
++    }$(COMMA), \
++    $1)
++endef
++
+ ################################################################################
+ # Define a native toolchain configuration that can be used by
+ # SetupNativeCompilation calls
+@@ -203,6 +226,11 @@ define SetupCompileNativeFileBody
+   $1_OBJ := $$($$($1_BASE)_OBJECT_DIR)/$$(call replace_with_obj_extension, \
+       $$($1_FILENAME))
+ 
++  # Generate the corresponding compile_commands.json fragment.
++  $1_OBJ_JSON = $$(MAKESUPPORT_OUTPUTDIR)/compile-commands/$$(subst /,_,$$(subst \
++      $$(OUTPUTDIR)/,,$$($1_OBJ))).json
++  $$($1_BASE)_ALL_OBJS_JSON += $$($1_OBJ_JSON)
++
+   # Only continue if this object file hasn't been processed already. This lets
+   # the first found source file override any other with the same name.
+   ifeq ($$(findstring $$($1_OBJ), $$($$($1_BASE)_OBJS_SO_FAR)), )
+@@ -296,8 +324,15 @@ define SetupCompileNativeFileBody
+       $1_VARDEPS_FILE := $$(call DependOnVariable, $1_VARDEPS, $$($1_OBJ).vardeps)
+     endif
+ 
+-    $$($1_OBJ): $$($1_SRC_FILE) $$($$($1_BASE)_COMPILE_VARDEPS_FILE) \
+-        $$($$($1_BASE)_EXTRA_DEPS) $$($1_VARDEPS_FILE) | $$($$($1_BASE)_BUILD_INFO)
++    $1_OBJ_DEPS := $$($1_SRC_FILE) $$($$($1_BASE)_COMPILE_VARDEPS_FILE) \
++        $$($$($1_BASE)_EXTRA_DEPS) $$($1_VARDEPS_FILE)
++    $1_COMPILE_OPTIONS := $$($1_FLAGS) $(CC_OUT_OPTION)$$($1_OBJ) $$($1_SRC_FILE)
++
++    $$($1_OBJ_JSON): $$($1_OBJ_DEPS)
++	$$(call WriteCompileCommandsFragment, $$@, $$(PWD), $$($1_SRC_FILE), \
++	    $$($1_COMPILER) $$($1_COMPILE_OPTIONS), $$($1_OBJ))
++
++    $$($1_OBJ): $$($1_OBJ_DEPS) | $$($$($1_BASE)_BUILD_INFO)
+ 	$$(call LogInfo, Compiling $$($1_FILENAME) (for $$($$($1_BASE)_BASENAME)))
+ 	$$(call MakeDir, $$(@D))
+         ifneq ($(TOOLCHAIN_TYPE), microsoft)
+@@ -306,13 +341,11 @@ define SetupCompileNativeFileBody
+             # object file in the generated deps files. Fixing it with sed. If
+             # compiling assembly, don't try this.
+ 	    $$(call ExecuteWithLog, $$@, \
+-	        $$($1_COMPILER) $$($1_FLAGS) $$($1_DEP_FLAG) $$($1_DEP).tmp \
+-	            $(CC_OUT_OPTION)$$($1_OBJ) $$($1_SRC_FILE))
++	        $$($1_COMPILER) $$($1_DEP_FLAG) $$($1_DEP).tmp $$($1_COMPILE_OPTIONS))
+ 	    $(SED) 's|^$$(@F):|$$@:|' $$($1_DEP).tmp > $$($1_DEP)
+           else
+ 	    $$(call ExecuteWithLog, $$@, \
+-	        $$($1_COMPILER) $$($1_FLAGS) $$($1_DEP_FLAG) $$($1_DEP) \
+-	            $(CC_OUT_OPTION)$$($1_OBJ) $$($1_SRC_FILE))
++	        $$($1_COMPILER) $$($1_DEP_FLAG) $$($1_DEP) $$($1_COMPILE_OPTIONS))
+           endif
+           # Create a dependency target file from the dependency file.
+           # Solution suggested by http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
+@@ -328,8 +361,7 @@ define SetupCompileNativeFileBody
+           # on Windows. No need to save exit code from compilation since
+           # pipefail is always active on Windows.
+ 	  $$(call ExecuteWithLog, $$@, \
+-	      $$($1_COMPILER) $$($1_FLAGS) -showIncludes \
+-	          $(CC_OUT_OPTION)$$($1_OBJ) $$($1_SRC_FILE)) \
++	      $$($1_COMPILER) -showIncludes $$($1_COMPILE_OPTIONS)) \
+ 	      | $(TR) -d '\r' | $(GREP) -v -e "^Note: including file:" \
+ 	          -e "^$$($1_FILENAME)$$$$" || test "$$$$?" = "1" ; \
+ 	  $(ECHO) $$@: \\ > $$($1_DEP) ; \
+@@ -687,17 +719,25 @@ define SetupNativeCompilationBody
+         -include $$($1_PCH_DEP)
+         -include $$($1_PCH_DEP_TARGETS)
+ 
++        $1_PCH_COMMAND := $$($1_CC) $$($1_CFLAGS) $$($1_EXTRA_CFLAGS) $$($1_SYSROOT_CFLAGS) \
++            $$($1_OPT_CFLAGS) -x c++-header -c $(C_FLAG_DEPS) $$($1_PCH_DEP)
++
+         $$($1_PCH_FILE): $$($1_PRECOMPILED_HEADER) $$($1_COMPILE_VARDEPS_FILE)
+ 		$$(call LogInfo, Generating precompiled header)
+ 		$$(call MakeDir, $$(@D))
+-		$$(call ExecuteWithLog, $$@, \
+-		    $$($1_CC) $$($1_CFLAGS) $$($1_EXTRA_CFLAGS) $$($1_SYSROOT_CFLAGS) \
+-		    $$($1_OPT_CFLAGS) \
+-		    -x c++-header -c $(C_FLAG_DEPS) $$($1_PCH_DEP) $$< -o $$@)
++		$$(call ExecuteWithLog, $$@, $$($1_PCH_COMMAND) $$< -o $$@)
+ 		$(SED) $(DEPENDENCY_TARGET_SED_PATTERN) $$($1_PCH_DEP) > $$($1_PCH_DEP_TARGETS)
+ 
+         $$($1_ALL_OBJS): $$($1_PCH_FILE)
+ 
++        # Generate the corresponding compile_commands.json fragment.
++        $1_PCH_FILE_JSON := $$(MAKESUPPORT_OUTPUTDIR)/compile-commands/$$(subst /,_,$$(subst \
++            $$(OUTPUTDIR)/,,$$($1_PCH_FILE))).json
++        $1_ALL_OBJS_JSON += $$($1_PCH_FILE_JSON)
++
++        $$($1_PCH_FILE_JSON): $$($1_PRECOMPILED_HEADER) $$($1_COMPILE_VARDEPS_FILE)
++		$$(call WriteCompileCommandsFragment, $$@, $$(PWD), $$<, \
++		    $$($1_PCH_COMMAND) $$< -o $$($1_PCH_FILE), $$($1_PCH_FILE))
+       endif
+     endif
+   endif
+@@ -1018,6 +1058,10 @@ define SetupNativeCompilationBody
+                   endif
+                 endif
+   endif
++
++  ifeq ($(GENERATE_COMPILE_COMMANDS_ONLY), true)
++    $1 := $$($1_ALL_OBJS_JSON)
++  endif
+ endef
+ 
+ endif # _NATIVE_COMPILATION_GMK
+diff --git a/make/conf/jib-profiles.js b/make/conf/jib-profiles.js
+index 91304f900cd..4443d7a49da 100644
+--- a/make/conf/jib-profiles.js
++++ b/make/conf/jib-profiles.js
+@@ -522,7 +522,7 @@ var getJibProfilesProfiles = function (input, common, data) {
+         .forEach(function (name) {
+             var maketestName = name + "-testmake";
+             profiles[maketestName] = concatObjects(profiles[name], testmakeBase);
+-            profiles[maketestName].default_make_targets = [ "test-make" ];
++            profiles[maketestName].default_make_targets = [ "test-make", "test-compile-commands" ];
+         });
+ 
+     // Profiles for building the zero jvm variant. These are used for verification
+diff --git a/make/hotspot/lib/CompileJvm.gmk b/make/hotspot/lib/CompileJvm.gmk
+index a4b67f09fd5..9c8f0a9286d 100644
+--- a/make/hotspot/lib/CompileJvm.gmk
++++ b/make/hotspot/lib/CompileJvm.gmk
+@@ -184,15 +184,17 @@ VM_VERSION_OBJ := $(JVM_OUTPUTDIR)/objs/vm_version$(OBJ_SUFFIX)
+ $(VM_VERSION_OBJ): $(filter-out $(VM_VERSION_OBJ) $(JVM_MAPFILE), \
+     $(BUILD_LIBJVM_TARGET_DEPS))
+ 
+-ifeq ($(OPENJDK_TARGET_OS), windows)
+-  # It doesn't matter which jvm.lib file gets exported, but we need
+-  # to pick just one.
+-  ifeq ($(JVM_VARIANT), $(JVM_VARIANT_MAIN))
+-    $(eval $(call SetupCopyFiles, COPY_JVM_LIB, \
+-        DEST := $(LIB_OUTPUTDIR), \
+-        FILES :=$(BUILD_LIBJVM_IMPORT_LIBRARY), \
+-    ))
+-    TARGETS += $(COPY_JVM_LIB)
++ifneq ($(GENERATE_COMPILE_COMMANDS_ONLY), true)
++  ifeq ($(OPENJDK_TARGET_OS), windows)
++    # It doesn't matter which jvm.lib file gets exported, but we need
++    # to pick just one.
++    ifeq ($(JVM_VARIANT), $(JVM_VARIANT_MAIN))
++      $(eval $(call SetupCopyFiles, COPY_JVM_LIB, \
++          DEST := $(LIB_OUTPUTDIR), \
++          FILES :=$(BUILD_LIBJVM_IMPORT_LIBRARY), \
++      ))
++      TARGETS += $(COPY_JVM_LIB)
++    endif
+   endif
+ endif
+ 
+@@ -231,44 +233,46 @@ TARGETS += $(BUILD_LIBJVM)
+ # Search the output for the operator(s) of interest, to see where they are
+ # referenced.
+ 
+-ifneq ($(filter $(TOOLCHAIN_TYPE), gcc clang solstudio), )
+-
+-  DEMANGLED_REGEXP := [^:]operator (new|delete)
+-
+-  # Running c++filt to find offending symbols in all files is too expensive,
+-  # especially on Solaris, so use mangled names when looking for symbols.
+-  # Save the demangling for when something is actually found.
+-  ifeq ($(TOOLCHAIN_TYPE), solstudio)
+-    MANGLED_SYMS := \
+-        __1c2n6FL_pv_ \
+-        __1c2N6FL_pv_ \
+-        __1c2k6Fpv_v_ \
+-        __1c2K6Fpv_v_ \
+-        #
+-    UNDEF_PATTERN := UNDEF
+-  else
+-    MANGLED_SYMS := \
+-        _ZdaPv \
+-        _ZdlPv \
+-        _Znam \
+-        _Znwm \
+-        #
+-    UNDEF_PATTERN := ' U '
++ifneq ($(GENERATE_COMPILE_COMMANDS_ONLY), true)
++  ifneq ($(filter $(TOOLCHAIN_TYPE), gcc clang solstudio), )
++
++    DEMANGLED_REGEXP := [^:]operator (new|delete)
++
++    # Running c++filt to find offending symbols in all files is too expensive,
++    # especially on Solaris, so use mangled names when looking for symbols.
++    # Save the demangling for when something is actually found.
++    ifeq ($(TOOLCHAIN_TYPE), solstudio)
++      MANGLED_SYMS := \
++          __1c2n6FL_pv_ \
++          __1c2N6FL_pv_ \
++          __1c2k6Fpv_v_ \
++          __1c2K6Fpv_v_ \
++          #
++      UNDEF_PATTERN := UNDEF
++    else
++      MANGLED_SYMS := \
++          _ZdaPv \
++          _ZdlPv \
++          _Znam \
++          _Znwm \
++          #
++      UNDEF_PATTERN := ' U '
++    endif
++
++    define SetupOperatorNewDeleteCheck
++        $1.op_check: $1
++	  if [ -n "`$(NM) $$< | $(GREP) $(addprefix -e , $(MANGLED_SYMS)) \
++	      | $(GREP) $(UNDEF_PATTERN)`" ]; then \
++	    $(ECHO) "$$<: Error: Use of global operators new and delete is not allowed in Hotspot:"; \
++	    $(NM) $$< | $(CXXFILT) | $(EGREP) '$(DEMANGLED_REGEXP)' | $(GREP) $(UNDEF_PATTERN); \
++	    $(ECHO) "See: $(TOPDIR)/make/hotspot/lib/CompileJvm.gmk"; \
++	    exit 1; \
++	  fi
++	  $(TOUCH) $$@
++
++      TARGETS += $1.op_check
++    endef
++
++    $(foreach o, $(BUILD_LIBJVM_ALL_OBJS), $(eval $(call SetupOperatorNewDeleteCheck,$o)))
+   endif
+-
+-  define SetupOperatorNewDeleteCheck
+-    $1.op_check: $1
+-	if [ -n "`$(NM) $$< | $(GREP) $(addprefix -e , $(MANGLED_SYMS)) \
+-	    | $(GREP) $(UNDEF_PATTERN)`" ]; then \
+-	  $(ECHO) "$$<: Error: Use of global operators new and delete is not allowed in Hotspot:"; \
+-	  $(NM) $$< | $(CXXFILT) | $(EGREP) '$(DEMANGLED_REGEXP)' | $(GREP) $(UNDEF_PATTERN); \
+-	  $(ECHO) "See: $(TOPDIR)/make/hotspot/lib/CompileJvm.gmk"; \
+-	  exit 1; \
+-	fi
+-	$(TOUCH) $$@
+-
+-    TARGETS += $1.op_check
+-  endef
+-
+-  $(foreach o, $(BUILD_LIBJVM_ALL_OBJS), $(eval $(call SetupOperatorNewDeleteCheck,$o)))
+ endif
+diff --git a/make/launcher/Launcher-jdk.pack.gmk b/make/launcher/Launcher-jdk.pack.gmk
+index 1f95b64cfa7..ca44b48ad43 100644
+--- a/make/launcher/Launcher-jdk.pack.gmk
++++ b/make/launcher/Launcher-jdk.pack.gmk
+@@ -90,21 +90,15 @@ $(eval $(call SetupJdkExecutable, BUILD_UNPACKEXE, \
+     CFLAGS_linux := -fPIC, \
+     CFLAGS_solaris := -KPIC, \
+     CFLAGS_macosx := -fPIC, \
+-    LDFLAGS := $(UNPACKEXE_ZIPOBJS) \
+-        $(LDFLAGS_JDKEXE) $(LDFLAGS_CXX_JDK) \
++    LDFLAGS := $(LDFLAGS_JDKEXE) $(LDFLAGS_CXX_JDK) \
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LIBS := $(UNPACKEXE_LIBS) $(LIBCXX), \
+     OBJECT_DIR := $(SUPPORT_OUTPUTDIR)/native/$(MODULE)/unpackexe, \
+     MANIFEST := $(TOPDIR)/src/jdk.pack/windows/native/unpack200/unpack200_proto.exe.manifest, \
+     MANIFEST_VERSION := $(VERSION_NUMBER_FOUR_POSITIONS), \
++    EXTRA_OBJECT_FILES := $(UNPACKEXE_ZIPOBJS) \
+ ))
+ 
+-ifneq ($(USE_EXTERNAL_LIBZ), true)
+-
+-  $(BUILD_UNPACKEXE): $(UNPACKEXE_ZIPOBJS)
+-
+-endif
+-
+ TARGETS += $(BUILD_UNPACKEXE)
+ 
+ ################################################################################
+diff --git a/make/launcher/LauncherCommon.gmk b/make/launcher/LauncherCommon.gmk
+index 836ac50fa29..20744753265 100644
+--- a/make/launcher/LauncherCommon.gmk
++++ b/make/launcher/LauncherCommon.gmk
+@@ -171,10 +171,10 @@ define SetupBuildLauncherBody
+ 
+   ifeq ($$($1_WINDOWS_STATIC_LINK), true)
+     $1_CFLAGS += $(filter-out -MD, $(CFLAGS_JDKEXE))
+-    $1_WINDOWS_JLI_LIB := $(SUPPORT_OUTPUTDIR)/native/java.base/jli_static.lib
++    $1_WINDOWS_JLI_LIB := $(call FindStaticLib, java.base,jli_static)
+   else
+     $1_CFLAGS += $(CFLAGS_JDKEXE)
+-    $1_WINDOWS_JLI_LIB := $(SUPPORT_OUTPUTDIR)/native/java.base/libjli/jli.lib
++    $1_WINDOWS_JLI_LIB := $(call FindStaticLib, java.base, jli, /libjli)
+   endif
+ 
+   $$(eval $$(call SetupJdkExecutable, BUILD_LAUNCHER_$1, \
+@@ -216,7 +216,7 @@ define SetupBuildLauncherBody
+   TARGETS += $$($1)
+ 
+   ifneq (,$(filter $(OPENJDK_TARGET_OS), macosx aix))
+-    $$(BUILD_LAUNCHER_$1): $(SUPPORT_OUTPUTDIR)/native/java.base/libjli_static.a
++    $$(BUILD_LAUNCHER_$1): $(call FindStaticLib, java.base, jli_static)
+   endif
+ 
+   ifeq ($(OPENJDK_TARGET_OS), windows)
+diff --git a/make/lib/Awt2dLibraries.gmk b/make/lib/Awt2dLibraries.gmk
+index 973cd16523e..1779a1da65b 100644
+--- a/make/lib/Awt2dLibraries.gmk
++++ b/make/lib/Awt2dLibraries.gmk
+@@ -733,11 +733,11 @@ else # OPENJDK_TARGET_OS not windows
+   ifeq ($(ENABLE_HEADLESS_ONLY), false)
+     $(BUILD_LIBJAWT): $(BUILD_LIBAWT_XAWT)
+   else
+-    $(BUILD_LIBJAWT): $(INSTALL_LIBRARIES_HERE)/$(LIBRARY_PREFIX)awt_headless$(SHARED_LIBRARY_SUFFIX)
++    $(BUILD_LIBJAWT): $(call FindLib, $(MODULE), awt_headless)
+   endif
+ 
+   ifeq ($(OPENJDK_TARGET_OS), macosx)
+-    $(BUILD_LIBJAWT): $(INSTALL_LIBRARIES_HERE)/$(LIBRARY_PREFIX)awt_lwawt$(SHARED_LIBRARY_SUFFIX)
++   $(BUILD_LIBJAWT): $(call FindLib, $(MODULE), awt_lwawt)
+   endif
+ 
+ endif # OPENJDK_TARGET_OS
+diff --git a/make/lib/Lib-jdk.accessibility.gmk b/make/lib/Lib-jdk.accessibility.gmk
+index b7f820b8ba3..cdf3a7ced8f 100644
+--- a/make/lib/Lib-jdk.accessibility.gmk
++++ b/make/lib/Lib-jdk.accessibility.gmk
+@@ -55,7 +55,7 @@ ifeq ($(OPENJDK_TARGET_OS), windows)
+         VERSIONINFO_RESOURCE := $(ROOT_SRCDIR)/common/AccessBridgeStatusWindow.rc, \
+     )
+ 
+-    $$(BUILD_JAVAACCESSBRIDGE$1): $(SUPPORT_OUTPUTDIR)/native/java.desktop/libjawt/jawt.lib
++    $$(BUILD_JAVAACCESSBRIDGE$1): $(call FindStaticLib, java.desktop, jawt, /libjawt)
+ 
+     TARGETS += $$(BUILD_JAVAACCESSBRIDGE$1)
+   endef
+diff --git a/make/lib/LibCommon.gmk b/make/lib/LibCommon.gmk
+index 7e25925c7d1..b7655a8da3a 100644
+--- a/make/lib/LibCommon.gmk
++++ b/make/lib/LibCommon.gmk
+@@ -63,24 +63,6 @@ else ifeq ($(TOOLCHAIN_TYPE), xlc)
+   endif
+ endif
+ 
+-################################################################################
+-# Find a library
+-# Param 1 - module name
+-# Param 2 - library name
+-# Param 3 - optional subdir for library
+-FindLib = \
+-    $(call FindLibDirForModule, \
+-        $(strip $1))$(strip $3)/$(LIBRARY_PREFIX)$(strip $2)$(SHARED_LIBRARY_SUFFIX)
+-
+-################################################################################
+-# Find a static library
+-# Param 1 - module name
+-# Param 2 - library name
+-# Param 3 - optional subdir for library
+-FindStaticLib = \
+-    $(addprefix $(SUPPORT_OUTPUTDIR)/native/, \
+-        $(strip $1)$(strip $3)/$(LIBRARY_PREFIX)$(strip $2)$(STATIC_LIBRARY_SUFFIX))
+-
+ # Put the libraries here.
+ INSTALL_LIBRARIES_HERE := $(call FindLibDirForModule, $(MODULE))
+ 
+diff --git a/test/make/TestCompileCommands.gmk b/test/make/TestCompileCommands.gmk
+new file mode 100644
+index 00000000000..d79805c4b0e
+--- /dev/null
++++ b/test/make/TestCompileCommands.gmk
+@@ -0,0 +1,54 @@
++
++# Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
++# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++#
++# This code is free software; you can redistribute it and/or modify it
++# under the terms of the GNU General Public License version 2 only, as
++# published by the Free Software Foundation.  Oracle designates this
++# particular file as subject to the "Classpath" exception as provided
++# by Oracle in the LICENSE file that accompanied this code.
++#
++# This code is distributed in the hope that it will be useful, but WITHOUT
++# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++# version 2 for more details (a copy is included in the LICENSE file that
++# accompanied this code).
++#
++# You should have received a copy of the GNU General Public License version
++# 2 along with this work; if not, write to the Free Software Foundation,
++# Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
++#
++# Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
++# or visit www.oracle.com if you need additional information or have any
++# questions.
++#
++
++include $(SPEC)
++include MakeBase.gmk
++
++default: all
++
++COMPILE_COMMANDS := $(OUTPUTDIR)/compile_commands.json
++
++# Perform basic compile_commands.json validation:
++#  - should start with [ and end with ]
++#  - should contain at least one entry (opening {)
++#  - last entry should not have a trailing comma (end with })
++verify-compile-commands-json:
++	$(HEAD) -n 1 $(COMPILE_COMMANDS) | $(GREP) -q -e "^\[$$"
++	$(TAIL) -1 $(COMPILE_COMMANDS) | $(GREP) -q -e "^\]$$"
++	$(HEAD) -n 2 $(COMPILE_COMMANDS) | $(GREP) -q -e "{"
++	$(TAIL) -2 $(COMPILE_COMMANDS) | $(GREP) -q -e "}$$"
++
++# Ensure that no native shared library for hotspot was created during the
++# build. Checking hotspot only since on Windows the jdk folders are prepopulated
++# with CRT DLLs. Also note that this test requires a clean build folder.
++verify-no-shared-libraries:
++	$(FIND) $(OUTPUTDIR)/hotspot -type f -name "*$(SHARED_LIBRARY_SUFFIX)" \
++	    -exec false {} +
++
++TEST_TARGETS += verify-compile-commands-json verify-no-shared-libraries
++
++all: $(TEST_TARGETS)
++
++.PHONY: default all verify-compile-commands
+diff --git a/test/make/TestMake.gmk b/test/make/TestMake.gmk
+index 258dcd56484..f274f7c2ea2 100644
+--- a/test/make/TestMake.gmk
++++ b/test/make/TestMake.gmk
+@@ -39,7 +39,10 @@ copy-files:
+ test-idea:
+ 	+$(MAKE) -f TestIdea.gmk $(TEST_SUBTARGET)
+ 
++test-compile-commands:
++	+$(MAKE) -f TestCompileCommands.gmk $(TEST_SUBTARGET)
++
+ 
+ all: make-base java-compilation copy-files test-idea
+ 
+-.PHONY: default all make-base java-compilation copy-files test-idea
++.PHONY: default all make-base java-compilation copy-files test-idea test-compile-commands

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spark 2.0 安装部署 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2016/09/24/spark-install-intro/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Spark 2.0 安装部署">
+      
+    <meta name="keywords" content="spark，big data">
+    <meta property="og:keywords" content="spark，big data">
+      
+    <meta name="description" content="Spark 2.0 安装部署">
+    <meta property="og:description" content="Spark 2.0 安装部署">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2016/09/24/spark-install-intro/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2016-09-24">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Spark 2.0 安装部署">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Spark 2.0 安装部署</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2016/09/24
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Spark" title="Spark">Spark</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="spark-20-安装部署">Spark 2.0 安装部署</h2>
+
+<p>本篇将简单部署 Spark 2.0 的环境，以及如何使用 Spark RDD/SQL/SHELL 访问数据</p>
+
+<h3 id="选择下载安装包"><strong>选择下载安装包</strong></h3>
+
+<p>可以在<a href="http://spark.apache.org/downloads.html">这里</a>下载相应版本的安装包。</p>
+
+<p>此处如下：</p>
+
+<p><img src="/images/posts/spark/spark-install-intro/spark_download.png" alt="" title="选择页面" /></p>
+
+<h3 id="配置-spark"><strong>配置 Spark</strong></h3>
+
+<p>将文件上传到各个节点，然后解压</p>
+
+<p><code class="language-plaintext highlighter-rouge">tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz</code></p>
+
+<p>配置 SPARK_HOME</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">SPARK_HOME</span><span class="o">=</span>/home/utf7/spark-2.0.0-bin-hadoop2.6	
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$SPARK_HOME</span>/bin:<span class="nv">$PATH</span>
+</code></pre></div></div>
+
+<p>修改配置文件:
+进入 spark 安装目录</p>
+
+<ul>
+  <li>spark-env.sh</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>conf
+<span class="nb">cp </span>spark-env.sh.template spark-env.sh
+vi spark
+<span class="nb">export </span><span class="nv">SPARK_HOME</span><span class="o">=</span>/home/utf7/spark-2.0.0-bin-hadoop2.6
+<span class="nb">export </span><span class="nv">HADOOP_CONF_DIR</span><span class="o">=</span>/home/utf7/hadoop/etc/hadoop
+<span class="nb">export </span><span class="nv">SPARK_MASTER_IP</span><span class="o">=</span>master
+<span class="nb">export </span><span class="nv">SPARK_MASTER_PORT</span><span class="o">=</span>7077
+<span class="nb">export </span><span class="nv">SPARK_MASTER_WEBUI_PORT</span><span class="o">=</span>8090
+<span class="nb">export </span><span class="nv">SPARK_WORKER_CORES</span><span class="o">=</span>2
+<span class="nb">export </span><span class="nv">SPARK_WORKER_MEMORY</span><span class="o">=</span>1g
+<span class="nb">export </span><span class="nv">SPARK_WORKER_PORT</span><span class="o">=</span>8091
+<span class="nb">export </span><span class="nv">SPARK_LOG_DIR</span><span class="o">=</span><span class="nv">$SPARK_HOME</span>/logs/spark
+<span class="nb">export </span><span class="nv">SPARK_PID_DIR</span><span class="o">=</span><span class="nv">$SPARK_HOME</span>/tmp/spark
+</code></pre></div></div>
+<hr />
+
+<ul>
+  <li>slaves</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat </span>slaves
+</code></pre></div></div>
+
+<blockquote>
+  <p>yc3</p>
+</blockquote>
+
+<hr />
+
+<ul>
+  <li>
+    <p>log4j.properties</p>
+
+    <p><code class="language-plaintext highlighter-rouge">cp log4j.properties.template log4j.properties</code></p>
+  </li>
+</ul>
+
+<p>根据需要修改，此处没有修改</p>
+
+<hr />
+
+<ul>
+  <li>引入 hadoop 配置</li>
+</ul>
+
+<p>此处将 core-site.xml 和 hdfs-site.xml 复制到了 spark 的 conf 目录下面。应该也可以通过其他方式去做
+将修改的文件同步到所有的节点中</p>
+
+<hr />
+
+<h3 id="启动"><strong>启动</strong></h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> <span class="nv">$SPARK_HOME</span>/sbin
+./start-all.sh
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="查看启动日志"><strong>查看启动日志</strong></h3>
+<p>日志记录在 $SPARK_HOME/logs/spark 目录下面</p>
+
+<h3 id="测试"><strong>测试</strong></h3>
+
+<ul>
+  <li>查看 spark 管理页面：
+http://master:8090</li>
+</ul>
+
+<hr />
+
+<h3 id="访问-spark"><strong>访问 Spark</strong></h3>
+
+<ul>
+  <li>使用 spark-shell</li>
+</ul>
+
+<p>首先，将 spark 的 README.MD 上传到 hdfs 上，后面我们需要用,上传文件：</p>
+
+<p><code class="language-plaintext highlighter-rouge">hdfs dfs -put /home/utf7/spark-2.0.0-bin-hadoop2.6/README.md /home/utf7/README.md</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> <span class="nv">$SPARK_HOME</span>/bin
+./spark-shell
+</code></pre></div></div>
+
+<blockquote>
+  <p>scala&gt;var textFile = sc.textFile(“/user/utf7/README.md”)
+textFile: org.apache.spark.rdd.RDD[String] = /user/utf7/README.md MapPartitionsRDD[7] at textFile at <console>:24</console></p>
+</blockquote>
+
+<blockquote>
+  <p>scala&gt;textFile.count()
+res2: Long = 99</p>
+</blockquote>
+
+<blockquote>
+  <p>scala&gt; textFile.first()
+res3: String = # Apache Spark</p>
+</blockquote>
+
+<blockquote>
+  <p>scala&gt; val linesWithSpark = textFile.filter(line =&gt; line.contains(“Spark”))
+linesWithSpark: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[8] at filter at <console>:26</console></p>
+</blockquote>
+
+<blockquote>
+  <p>scala&gt;  textFile.filter(line =&gt; line.contains(“Spark”)).count()
+res4: Long = 19</p>
+</blockquote>
+
+<p>更多，请参考<a href="http://spark.apache.org/docs/latest/quick-start.html">quick-start</a></p>
+
+<hr />
+
+<h3 id="编写-spark程序"><strong>编写 Spark程序</strong></h3>
+
+<p>使用maven管理包依赖：</p>
+
+<ul>
+  <li>pom.xml</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span>
+         <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+
+    <span class="nt">&lt;groupId&gt;</span>com.utf7<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>sparkLearn<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;build&gt;</span>
+        <span class="nt">&lt;plugins&gt;</span>
+            <span class="nt">&lt;plugin&gt;</span>
+                <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+                <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+                <span class="nt">&lt;configuration&gt;</span>
+                    <span class="nt">&lt;source&gt;</span>1.7<span class="nt">&lt;/source&gt;</span>
+                    <span class="nt">&lt;target&gt;</span>1.7<span class="nt">&lt;/target&gt;</span>
+                <span class="nt">&lt;/configuration&gt;</span>
+            <span class="nt">&lt;/plugin&gt;</span>
+        <span class="nt">&lt;/plugins&gt;</span>
+    <span class="nt">&lt;/build&gt;</span>
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.spark<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spark-core_2.11<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>2.0.0<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.spark<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spark-sql_2.11<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>2.0.0<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.hadoop<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>hadoop-client<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>2.6.0<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>mysql<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>mysql-connector-java<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>5.1.30<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</code></pre></div></div>
+
+<hr />
+
+<ul>
+  <li>使用 Java RDD API</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.apache.spark.SparkConf</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.JavaRDD</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.JavaSparkContext</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.function.Function</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.api.java.function.Function2</span><span class="o">;</span>
+
+<span class="cm">/**
+ * show how to use javardd api 
+ */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloSparkJavaRDD</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kd">static</span> <span class="nc">String</span> <span class="no">MASTER</span> <span class="o">=</span> <span class="s">"spark://master:7077"</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">SparkConf</span> <span class="n">conf</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SparkConf</span><span class="o">().</span><span class="na">setAppName</span><span class="o">(</span><span class="s">"helloSparkJava"</span><span class="o">).</span><span class="na">setMaster</span><span class="o">(</span><span class="no">MASTER</span><span class="o">);</span>
+        <span class="nc">JavaSparkContext</span> <span class="n">sc</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">JavaSparkContext</span><span class="o">(</span><span class="n">conf</span><span class="o">);</span>
+        <span class="nc">JavaSparkContext</span><span class="o">.</span><span class="na">jarOfClass</span><span class="o">(</span><span class="nc">HelloSparkJavaRDD</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="nc">JavaRDD</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">lines</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="na">textFile</span><span class="o">(</span><span class="s">"README.md"</span><span class="o">);</span>
+        <span class="c1">//java8</span>
+        <span class="nc">JavaRDD</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">lineLengths</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="k">new</span> <span class="nc">Function</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="nc">Integer</span> <span class="nf">call</span><span class="o">(</span><span class="nc">String</span> <span class="n">v1</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">v1</span><span class="o">.</span><span class="na">length</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+        <span class="kt">int</span> <span class="n">totalLength</span> <span class="o">=</span> <span class="n">lineLengths</span><span class="o">.</span><span class="na">reduce</span><span class="o">(</span><span class="k">new</span> <span class="nc">Function2</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="nc">Integer</span> <span class="nf">call</span><span class="o">(</span><span class="nc">Integer</span> <span class="n">v1</span><span class="o">,</span> <span class="nc">Integer</span> <span class="n">v2</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">v1</span> <span class="o">+</span> <span class="n">v2</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"total length is :"</span> <span class="o">+</span> <span class="n">totalLength</span><span class="o">);</span>
+       <span class="cm">/*  final String spark = "Spark";
+        long numSpark= lines.filter(new Function&lt;String, Boolean&gt;() {
+            public Boolean call(String v1) throws Exception {
+                return v1.contains(spark);
+            }
+        }).count();
+       System.out.println("find word '" + spark + "':" + numSpark);*/</span>
+
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>更加请参考:<a href="http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds">resilient-distributed-datasets-rdds</a></p>
+
+<hr />
+
+<ul>
+  <li>使用 Java Spark SQL API</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.apache.spark.api.java.function.MapFunction</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.Column</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.Dataset</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.Encoder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.Encoders</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.Row</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.spark.sql.SparkSession</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.Timestamp</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Properties</span><span class="o">;</span>
+
+<span class="cm">/**
+ * Created by utf7 on 2016/9/19.
+ * show how to user spark sql api
+ */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloSparkJavaSQL</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="nc">SparkSession</span> <span class="n">spark</span> <span class="o">=</span> <span class="nc">SparkSession</span><span class="o">.</span><span class="na">builder</span><span class="o">().</span><span class="na">appName</span><span class="o">(</span><span class="s">"Java Spark SQL Example "</span> <span class="o">+</span> <span class="k">new</span> <span class="nc">Timestamp</span><span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">())).</span><span class="na">config</span><span class="o">(</span><span class="s">"spark.some.config.option"</span><span class="o">,</span> <span class="s">"some-value"</span><span class="o">).</span><span class="na">getOrCreate</span><span class="o">();</span>
+        <span class="nc">Dataset</span><span class="o">&lt;</span><span class="nc">Row</span><span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="na">read</span><span class="o">().</span><span class="na">json</span><span class="o">(</span><span class="s">"file:/home/utf7/spark-2.0.0-bin-hadoop2.6/examples/src/main/resources/people.json"</span><span class="o">);</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"show df:"</span><span class="o">);</span>
+        <span class="n">df</span><span class="o">.</span><span class="na">show</span><span class="o">();</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"show printSchema:"</span><span class="o">);</span>
+        <span class="n">df</span><span class="o">.</span><span class="na">printSchema</span><span class="o">();</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"select name:"</span><span class="o">);</span>
+        <span class="n">df</span><span class="o">.</span><span class="na">select</span><span class="o">(</span><span class="s">"name"</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"select name,age+1 :"</span><span class="o">);</span>
+        <span class="n">df</span><span class="o">.</span><span class="na">select</span><span class="o">(</span><span class="k">new</span> <span class="nc">Column</span><span class="o">(</span><span class="s">"name"</span><span class="o">),</span> <span class="k">new</span> <span class="nc">Column</span><span class="o">(</span><span class="s">"age"</span><span class="o">).</span><span class="na">plus</span><span class="o">(</span><span class="mi">1</span><span class="o">)).</span><span class="na">show</span><span class="o">();</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"select age &gt;21:"</span><span class="o">);</span>
+        <span class="n">df</span><span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="k">new</span> <span class="nc">Column</span><span class="o">(</span><span class="s">"age"</span><span class="o">).</span><span class="na">gt</span><span class="o">(</span><span class="mi">21</span><span class="o">)).</span><span class="na">show</span><span class="o">();</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"select age,count(*) group by age :"</span><span class="o">);</span>
+        <span class="n">df</span><span class="o">.</span><span class="na">groupBy</span><span class="o">(</span><span class="s">"age"</span><span class="o">).</span><span class="na">count</span><span class="o">().</span><span class="na">show</span><span class="o">();</span>
+
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"show how create view and select from the view:"</span><span class="o">);</span>
+        <span class="n">df</span><span class="o">.</span><span class="na">createOrReplaceTempView</span><span class="o">(</span><span class="s">"people"</span><span class="o">);</span>
+        <span class="nc">Dataset</span><span class="o">&lt;</span><span class="nc">Row</span><span class="o">&gt;</span> <span class="n">sqlDF</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="na">sql</span><span class="o">(</span><span class="s">"select * from people"</span><span class="o">);</span>
+        <span class="n">sqlDF</span><span class="o">.</span><span class="na">show</span><span class="o">();</span>
+
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"show how to use dataset:"</span><span class="o">);</span>
+        <span class="n">testDatasets</span><span class="o">(</span><span class="n">spark</span><span class="o">);</span>
+        <span class="n">testReadFromMySQL</span><span class="o">(</span><span class="n">spark</span><span class="o">);</span>
+    <span class="o">}</span>
+
+
+    <span class="cm">/**
+     * show how to read from rdms use jdbc,here is mysql
+     * @param spark
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">testReadFromMySQL</span><span class="o">(</span><span class="nc">SparkSession</span> <span class="n">spark</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="no">MYSQL_CONNECTION_URL</span> <span class="o">=</span> <span class="s">"jdbc:mysql://yc1:3306/test"</span><span class="o">;</span>
+        <span class="nc">String</span> <span class="no">MYSQL_USERNAME</span> <span class="o">=</span> <span class="s">"utf7"</span><span class="o">;</span>
+        <span class="nc">String</span> <span class="no">MYSQL_PWD</span> <span class="o">=</span> <span class="s">"utf7"</span><span class="o">;</span>
+        <span class="nc">String</span> <span class="no">TABLE_NAME</span> <span class="o">=</span> <span class="s">"user"</span><span class="o">;</span>
+        <span class="nc">Person</span> <span class="n">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="o">();</span>
+        <span class="n">person</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">"utf7"</span><span class="o">);</span>
+        <span class="n">person</span><span class="o">.</span><span class="na">setAge</span><span class="o">(</span><span class="mi">28</span><span class="o">);</span>
+        <span class="c1">// Encoders are created for Java beans</span>
+
+        <span class="nc">Encoder</span><span class="o">&lt;</span><span class="nc">Person</span><span class="o">&gt;</span> <span class="n">personEncoder</span> <span class="o">=</span> <span class="nc">Encoders</span><span class="o">.</span><span class="na">bean</span><span class="o">(</span><span class="nc">Person</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="kd">final</span> <span class="nc">Properties</span> <span class="n">connectionProperties</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Properties</span><span class="o">();</span>
+        <span class="n">connectionProperties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"user"</span><span class="o">,</span> <span class="no">MYSQL_USERNAME</span><span class="o">);</span>
+        <span class="n">connectionProperties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"password"</span><span class="o">,</span> <span class="no">MYSQL_PWD</span><span class="o">);</span>
+
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"show how read from mysql:"</span><span class="o">);</span>
+        <span class="nc">Dataset</span><span class="o">&lt;</span><span class="nc">Person</span><span class="o">&gt;</span> <span class="n">peopleDS</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="na">read</span><span class="o">().</span><span class="na">jdbc</span><span class="o">(</span><span class="no">MYSQL_CONNECTION_URL</span><span class="o">,</span> <span class="no">TABLE_NAME</span><span class="o">,</span> <span class="n">connectionProperties</span><span class="o">).</span><span class="na">as</span><span class="o">(</span><span class="n">personEncoder</span><span class="o">);</span>
+        <span class="n">peopleDS</span><span class="o">.</span><span class="na">show</span><span class="o">();</span>
+
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * show how to convert file to dataset,here is local file "file://..."
+     * @param spark
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">testDatasets</span><span class="o">(</span><span class="nc">SparkSession</span> <span class="n">spark</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Person</span> <span class="n">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="o">();</span>
+        <span class="n">person</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">"utf7"</span><span class="o">);</span>
+        <span class="n">person</span><span class="o">.</span><span class="na">setAge</span><span class="o">(</span><span class="mi">28</span><span class="o">);</span>
+        <span class="c1">// Encoders are created for Java beans</span>
+        <span class="nc">Encoder</span><span class="o">&lt;</span><span class="nc">Person</span><span class="o">&gt;</span> <span class="n">personEncoder</span> <span class="o">=</span> <span class="nc">Encoders</span><span class="o">.</span><span class="na">bean</span><span class="o">(</span><span class="nc">Person</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="nc">Dataset</span><span class="o">&lt;</span><span class="nc">Person</span><span class="o">&gt;</span> <span class="n">javaBeanDS</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="na">createDataset</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonList</span><span class="o">(</span><span class="n">person</span><span class="o">),</span> <span class="n">personEncoder</span><span class="o">);</span>
+        <span class="n">javaBeanDS</span><span class="o">.</span><span class="na">show</span><span class="o">();</span>
+        <span class="c1">// +---+----+</span>
+        <span class="c1">// |age|name|</span>
+        <span class="c1">// +---+----+</span>
+        <span class="c1">// | 32|Andy|</span>
+        <span class="c1">// +---+----+</span>
+
+
+        <span class="c1">// Encoders for most common types are provided in class Encoders</span>
+        <span class="nc">Encoder</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">integerEncoder</span> <span class="o">=</span> <span class="nc">Encoders</span><span class="o">.</span><span class="na">INT</span><span class="o">();</span>
+        <span class="nc">Dataset</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">primitiveDS</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="na">createDataset</span><span class="o">(</span><span class="nc">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">),</span> <span class="n">integerEncoder</span><span class="o">);</span>
+        <span class="nc">Dataset</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">transformedDS</span> <span class="o">=</span> <span class="n">primitiveDS</span><span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="k">new</span> <span class="nc">MapFunction</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="nc">Integer</span> <span class="nf">call</span><span class="o">(</span><span class="nc">Integer</span> <span class="n">value</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">},</span> <span class="n">integerEncoder</span><span class="o">);</span>
+        <span class="n">transformedDS</span><span class="o">.</span><span class="na">collect</span><span class="o">();</span><span class="c1">// Returns [2,3,4]</span>
+
+        <span class="c1">// DataFrames can be converted to a Dataset by providing a class. Mapping based on name</span>
+        <span class="nc">String</span> <span class="n">path</span> <span class="o">=</span> <span class="s">"file:/home/utf7/spark-2.0.0-bin-hadoop2.6/examples/src/main/resources/people.json"</span><span class="o">;</span>
+        <span class="nc">Dataset</span><span class="o">&lt;</span><span class="nc">Person</span><span class="o">&gt;</span> <span class="n">peopleDS</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="na">read</span><span class="o">().</span><span class="na">json</span><span class="o">(</span><span class="n">path</span><span class="o">).</span><span class="na">as</span><span class="o">(</span><span class="n">personEncoder</span><span class="o">);</span>
+        <span class="n">peopleDS</span><span class="o">.</span><span class="na">show</span><span class="o">();</span>
+        <span class="c1">// +----+-------+</span>
+        <span class="c1">// | age|   name|</span>
+        <span class="c1">// +----+-------+</span>
+        <span class="c1">// |null|Michael|</span>
+        <span class="c1">// |  30|   Andy|</span>
+        <span class="c1">// |  19| Justin|</span>
+        <span class="c1">// +----+-------+</span>
+
+    <span class="o">}</span>
+
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Person</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="kt">int</span> <span class="n">age</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">name</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getAge</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">age</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAge</span><span class="o">(</span><span class="kt">int</span> <span class="n">age</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">age</span> <span class="o">=</span> <span class="n">age</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>更多请参考：<a href="http://spark.apache.org/docs/latest/sql-programming-guide.html">sql-programming-guide</a></p>
+
+<hr />
+
+<ul>
+  <li>提交 spark jar脚本</li>
+</ul>
+
+<p>将上面的程序打包，放到 spark 环境中执行，执行脚本为：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/usr/bin/env bash</span>
+<span class="c"># you can use this script to run spark app:</span>
+<span class="c"># ./runSpark.sh runRDD : run RDD example</span>
+<span class="c"># ./runSpark.sh runSQL : run SQL example</span>
+<span class="nb">export </span><span class="nv">JAR_HOME</span><span class="o">=</span>/home/utf7/
+<span class="k">function </span>runRDD<span class="o">(){</span>
+  <span class="nv">$SPARK_HOME</span>/bin/spark-submit <span class="se">\</span>
+  <span class="nt">--class</span> <span class="s2">"HelloSparkJavaRDD"</span> <span class="se">\</span>
+  <span class="nt">--executor-memory</span> 128m <span class="se">\</span>
+  <span class="nt">--total-executor-cores</span> 1 <span class="se">\</span>
+  <span class="nv">$JAR_HOME</span>/sparkLearn-1.0.jar
+<span class="o">}</span>
+
+<span class="k">function </span>runSQL<span class="o">(){</span>
+  <span class="nv">$SPARK_HOME</span>/bin/spark-submit <span class="se">\</span>
+  <span class="nt">--class</span> <span class="s2">"HelloSparkJavaSQL"</span> <span class="se">\</span>
+  <span class="nt">--executor-memory</span> 128m <span class="se">\</span>
+  <span class="nt">--total-executor-cores</span> 1 <span class="se">\</span>
+  <span class="nv">$JAR_HOME</span>/sparkLearn-1.0.jar
+<span class="o">}</span>
+
+
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$# </span><span class="nt">-gt</span> 0 <span class="o">]</span>
+<span class="k">then</span>
+        <span class="nv">$@</span>
+        <span class="nb">exit </span>0
+<span class="k">fi
+
+</span><span class="nb">echo</span> <span class="s2">"GUIDE:"</span>
+<span class="nb">echo</span> <span class="s2">"USE runRDD/runSQL"</span>
+</code></pre></div></div>
+
+<hr />
+
+<p>$ ./runSpark.sh runRDD ,执行如上命令，spark rdd 示例输出如下：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>16/09/26 17:44:41 WARN NativeCodeLoader: Unable to load native-hadoop library <span class="k">for </span>your platform... using builtin-java classes where applicable
+total length is :3729
+</code></pre></div></div>
+
+<p>$./runSpark.sh runSQL 执行如上命令，使用 spark sql 示例输出如下：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>16/09/26 17:39:31 WARN NativeCodeLoader: Unable to load native-hadoop library <span class="k">for </span>your platform... using builtin-java classes where applicable
+16/09/26 17:39:32 WARN Utils: Service <span class="s1">'SparkUI'</span> could not <span class="nb">bind </span>on port 4040. Attempting port 4041.
+16/09/26 17:39:32 WARN SparkContext: Use an existing SparkContext, some configuration may not take effect.
+show <span class="nb">df</span>:                                                                        
++----+-------+
+| age|   name|
++----+-------+
+|null|Michael|
+|  30|   Andy|
+|  19| Justin|
++----+-------+
+
+show printSchema:
+root
+ |-- age: long <span class="o">(</span>nullable <span class="o">=</span> <span class="nb">true</span><span class="o">)</span>
+ |-- name: string <span class="o">(</span>nullable <span class="o">=</span> <span class="nb">true</span><span class="o">)</span>
+
+<span class="k">select </span>name:
++-------+
+|   name|
++-------+
+|Michael|
+|   Andy|
+| Justin|
++-------+
+
+<span class="k">select </span>name,age+1 :
++-------+---------+
+|   name|<span class="o">(</span>age + 1<span class="o">)</span>|
++-------+---------+
+|Michael|     null|
+|   Andy|       31|
+| Justin|       20|
++-------+---------+
+
+<span class="k">select </span>age <span class="o">&gt;</span>21:
++---+----+
+|age|name|
++---+----+
+| 30|Andy|
++---+----+
+
+<span class="k">select </span>age,count<span class="o">(</span><span class="k">*</span><span class="o">)</span> group by age :
++----+-----+                                                                    
+| age|count|
++----+-----+
+|  19|    1|
+|null|    1|
+|  30|    1|
++----+-----+
+
+show how create view and <span class="k">select </span>from the view:
++----+-------+
+| age|   name|
++----+-------+
+|null|Michael|
+|  30|   Andy|
+|  19| Justin|
++----+-------+
+
+show how to use dataset:
++---+-----+
+|age| name|
++---+-----+
+| 28|seven|
++---+-----+
+
++----+-------+
+| age|   name|
++----+-------+
+|null|Michael|
+|  30|   Andy|
+|  19| Justin|
++----+-------+
+
+show how <span class="nb">read </span>from mysql:
++-------+---+
+|   name|age|
++-------+---+
+| seven|  1|
+|  utf7| 28|
++-------+---+
+</code></pre></div></div>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

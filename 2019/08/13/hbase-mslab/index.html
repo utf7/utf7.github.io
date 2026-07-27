@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HBase MSLAB &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2019/08/13/hbase-mslab/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="HBase MSLAB">
+      
+    <meta name="keywords" content="HBase,MSLAB">
+    <meta property="og:keywords" content="HBase,MSLAB">
+      
+    <meta name="description" content="HBase MSLAB">
+    <meta property="og:description" content="HBase MSLAB">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2019/08/13/hbase-mslab/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2019-08-13">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="HBase MSLAB">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">HBase MSLAB</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2019/08/13
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#HBase" title="HBase">HBase</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="hbase-mslab">HBase MSLAB</h2>
+
+<h3 id="hbase-mslab-作用">HBase MSLAB 作用：</h3>
+
+<p>MemStoreChunkPool  主要是为了减少 MemStore 导致的 GC
+思路是提前申请好一堆 Chunk，默认 2MB 一个，然后将插入的小Cell 放到 Chunk 中存储。
+hbase.hregion.memstore.mslab.max.allocation 这个参数决定cell小于多少，放入到Chunk中，默认是256*1024，即256K。
+当对象超过256KB的话，就没有必要使用chunk来存了。</p>
+
+<p>从而减少小对象不断GC带来的压力。</p>
+
+<h3 id="hbase-mslab-参数以及初始化">HBase MSLAB 参数以及初始化</h3>
+
+<p>RegionServer启动的时候，会调用 initializeMemStoreChunkCreator()方法初始化</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">initializeMemStoreChunkCreator</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//是否启用MSLBA ,配置为：hbase.hregion.memstore.mslab.enabled默认为true</span>
+    <span class="k">if</span> <span class="o">(</span><span class="nc">MemStoreLAB</span><span class="o">.</span><span class="na">isEnabled</span><span class="o">(</span><span class="n">conf</span><span class="o">))</span> <span class="o">{</span>
+      <span class="c1">// MSLAB is enabled. So initialize MemStoreChunkPool</span>
+      <span class="c1">// By this time, the MemstoreFlusher is already initialized. We can get the global limits from</span>
+      <span class="c1">// it.</span>
+      <span class="c1">//获取MemStore 全局最大内存配置，heap为：hbase.regionserver.global.memstore.size，默认为0.4*最大堆</span>
+      <span class="c1">//如果启用了MemStore Offheap ，属性 hbase.regionserver.offheap.global.memstore.size是否大于0 来决定是否启用offheap，</span>
+      <span class="c1">//默认为0，即不启用offheap memstore</span>
+      <span class="c1">//</span>
+      <span class="nc">Pair</span><span class="o">&lt;</span><span class="nc">Long</span><span class="o">,</span> <span class="nc">MemoryType</span><span class="o">&gt;</span> <span class="n">pair</span> <span class="o">=</span> <span class="nc">MemorySizeUtil</span><span class="o">.</span><span class="na">getGlobalMemStoreSize</span><span class="o">(</span><span class="n">conf</span><span class="o">);</span>
+      <span class="kt">long</span> <span class="n">globalMemStoreSize</span> <span class="o">=</span> <span class="n">pair</span><span class="o">.</span><span class="na">getFirst</span><span class="o">();</span>
+      <span class="kt">boolean</span> <span class="n">offheap</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">regionServerAccounting</span><span class="o">.</span><span class="na">isOffheap</span><span class="o">();</span>
+      <span class="c1">// When off heap memstore in use, take full area for chunk pool.</span>
+      <span class="c1">//offheap为1，</span>
+      <span class="c1">//heap 根据参数：hbase.hregion.memstore.chunkpool.maxsize 来定，这个默认是1.0。</span>
+      <span class="kt">float</span> <span class="n">poolSizePercentage</span> <span class="o">=</span> <span class="n">offheap</span><span class="o">?</span> <span class="mf">1.0</span><span class="nl">F:</span>
+          <span class="n">conf</span><span class="o">.</span><span class="na">getFloat</span><span class="o">(</span><span class="nc">MemStoreLAB</span><span class="o">.</span><span class="na">CHUNK_POOL_MAXSIZE_KEY</span><span class="o">,</span> <span class="nc">MemStoreLAB</span><span class="o">.</span><span class="na">POOL_MAX_SIZE_DEFAULT</span><span class="o">);</span>
+      <span class="c1">//初始化chunk的百分比，hbase.hregion.memstore.chunkpool.initialsize 默认是0，线上被设置为0.5，即初始化50%    </span>
+      <span class="kt">float</span> <span class="n">initialCountPercentage</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="na">getFloat</span><span class="o">(</span><span class="nc">MemStoreLAB</span><span class="o">.</span><span class="na">CHUNK_POOL_INITIALSIZE_KEY</span><span class="o">,</span>
+          <span class="nc">MemStoreLAB</span><span class="o">.</span><span class="na">POOL_INITIAL_SIZE_DEFAULT</span><span class="o">);</span>
+      <span class="c1">//chunk的大小，配置参数：hbase.hregion.memstore.mslab.chunksize，默认是2MB    </span>
+      <span class="kt">int</span> <span class="n">chunkSize</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="nc">MemStoreLAB</span><span class="o">.</span><span class="na">CHUNK_SIZE_KEY</span><span class="o">,</span> <span class="nc">MemStoreLAB</span><span class="o">.</span><span class="na">CHUNK_SIZE_DEFAULT</span><span class="o">);</span>
+      <span class="c1">// init the chunkCreator</span>
+      <span class="c1">//初始化chunk，初始化主要通过ChunkCreator 来实现</span>
+      <span class="nc">ChunkCreator</span> <span class="n">chunkCreator</span> <span class="o">=</span>
+          <span class="nc">ChunkCreator</span><span class="o">.</span><span class="na">initialize</span><span class="o">(</span><span class="n">chunkSize</span><span class="o">,</span> <span class="n">offheap</span><span class="o">,</span> <span class="n">globalMemStoreSize</span><span class="o">,</span> <span class="n">poolSizePercentage</span><span class="o">,</span>
+      <span class="n">initialCountPercentage</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">hMemManager</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+  
+</code></pre></div></div>
+
+<p>ChunkCreator chunk 的初始化</p>
+
+<p>ChunkCreator 调用init然后会new 一个ChunkCreator,最终调用initializePools 来初始化，
+讲解初始化之前，先介绍一下ChunkCreator的主要数据结构，方便理解
+ChunkCrator 的主要数据结构如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+  <span class="kd">private</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">Chunk</span><span class="o">&gt;</span> <span class="n">chunkIdMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ConcurrentHashMap</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">Chunk</span><span class="o">&gt;();</span>
+
+  <span class="kd">private</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">offheap</span><span class="o">;</span>
+  <span class="kd">static</span> <span class="nc">ChunkCreator</span> <span class="n">instance</span><span class="o">;</span>
+
+  <span class="kd">static</span> <span class="kt">boolean</span> <span class="n">chunkPoolDisabled</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">MemStoreChunkPool</span> <span class="n">dataChunksPool</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kt">int</span> <span class="n">chunkSize</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">MemStoreChunkPool</span> <span class="n">indexChunksPool</span><span class="o">;</span>
+  
+  <span class="o">/**</span>  <span class="n">chunkIdMap</span> <span class="n">创建的chunk的id和chunk对象的map</span><span class="err">，</span>
+   <span class="n">offheap</span><span class="err">：</span><span class="n">是否是offheap的</span>
+   <span class="n">instance</span>  <span class="nc">ChunkCreator</span> <span class="n">本身的示例</span><span class="err">，</span><span class="n">全局只有一个</span>
+   <span class="n">chunkSize</span><span class="err">，</span> <span class="n">一个chunk的大小</span><span class="err">，</span><span class="n">默认为2MB</span><span class="err">（</span><span class="mi">2048</span><span class="o">*</span><span class="mi">1024</span><span class="err">）</span>
+   <span class="nc">Chunk的pool</span><span class="err">，</span><span class="n">分为</span><span class="err">：</span>
+   <span class="n">dataChunksPool</span> <span class="n">默认占0</span><span class="o">.</span><span class="mi">9</span>
+   <span class="n">indexChunksPool</span> <span class="n">默认占0</span><span class="o">.</span><span class="mi">1</span><span class="o">,</span><span class="n">这块参数其实有问题</span><span class="err">，</span><span class="n">后续说</span>
+   
+   
+</code></pre></div></div>
+
+<p>类图：</p>
+
+<p><img src="/images/posts/hbase/hbase-mslab-uml1.png" alt="" title="HBase MSLAB 类图" /></p>
+
+<p>Chunk分为heap和offheap 2种实现，
+Chunk 的数据结构是由data、id、size、fromPool
+data:数据类型为ByteBuffer，实际存储HBase 写入MemStore 数据的地方
+id:一个标记id
+size：chunk 的大小
+fromPool：是否存在pool中，通常都是true</p>
+
+<p>MemStoreChunkPool
+label:便签，一般分为index和data 
+chunkSize：由多少个Chunk
+maxCount：最大能容纳多少个Chunk，这个是根据算出来： maxCount = (int) (globalMemStoreSize * poolSizePercentage / chunkSize);
+reclaimedChunks:可取回的chunk，其实是一个阻塞队列
+poolSizePercentage:比例</p>
+
+<p>initialize 方法如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="nc">ChunkCreator</span> <span class="nf">initialize</span><span class="o">(</span><span class="kt">int</span> <span class="n">chunkSize</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">offheap</span><span class="o">,</span> <span class="kt">long</span> <span class="n">globalMemStoreSize</span><span class="o">,</span>
+                                        <span class="kt">float</span> <span class="n">poolSizePercentage</span><span class="o">,</span> <span class="kt">float</span> <span class="n">initialCountPercentage</span><span class="o">,</span>
+                                        <span class="nc">HeapMemoryManager</span> <span class="n">heapMemoryManager</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">instance</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="n">instance</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ChunkCreator</span><span class="o">(</span><span class="n">chunkSize</span><span class="o">,</span> <span class="n">offheap</span><span class="o">,</span> <span class="n">globalMemStoreSize</span><span class="o">,</span> <span class="n">poolSizePercentage</span><span class="o">,</span>
+            <span class="n">initialCountPercentage</span><span class="o">,</span> <span class="n">heapMemoryManager</span><span class="o">,</span>
+            <span class="nc">MemStoreLABImpl</span><span class="o">.</span><span class="na">INDEX_CHUNK_PERCENTAGE_DEFAULT</span><span class="o">);</span>
+            <span class="c1">//INDEX_CHUNK_PERCENTAGE_DEFAULT 这个地方写死了，虽然配置了hbase.hregion.memstore.mslab.indexchunksize</span>
+            <span class="c1">//但是没用...可以改善一下，</span>
+    <span class="k">return</span> <span class="n">instance</span><span class="o">;</span>
+  <span class="o">}</span>
+</code></pre></div></div>
+
+<p>最后 ChunkCreator 调用了initializePools，初始化dataChunksPool和indexchunksPool</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">initializePools</span><span class="o">(</span><span class="kt">int</span> <span class="n">chunkSize</span><span class="o">,</span> <span class="kt">long</span> <span class="n">globalMemStoreSize</span><span class="o">,</span>
+                               <span class="kt">float</span> <span class="n">poolSizePercentage</span><span class="o">,</span> <span class="kt">float</span> <span class="n">indexChunkSizePercentage</span><span class="o">,</span>
+                               <span class="kt">float</span> <span class="n">initialCountPercentage</span><span class="o">,</span>
+                               <span class="nc">HeapMemoryManager</span> <span class="n">heapMemoryManager</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">//dataChunksPool的label为data，indexChunkSizePercentage 默认是0.1，</span>
+    <span class="c1">//所以就是比例是(1-0.1)*1.0=0.9,initialCountPercentage默认为0，线上设置了0.5                           </span>
+    <span class="k">this</span><span class="o">.</span><span class="na">dataChunksPool</span> <span class="o">=</span> <span class="n">initializePool</span><span class="o">(</span><span class="s">"data"</span><span class="o">,</span> <span class="n">globalMemStoreSize</span><span class="o">,</span>
+            <span class="o">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">indexChunkSizePercentage</span><span class="o">)</span> <span class="o">*</span> <span class="n">poolSizePercentage</span><span class="o">,</span>
+            <span class="n">initialCountPercentage</span><span class="o">,</span> <span class="n">chunkSize</span><span class="o">,</span> <span class="n">heapMemoryManager</span><span class="o">);</span>
+    <span class="c1">// The index chunks pool is needed only when the index type is CCM.</span>
+    <span class="c1">// Since the pools are not created at all when the index type isn't CCM,</span>
+    <span class="c1">// we don't need to check it here.</span>
+     <span class="c1">//dataChunksPool的label为index，indexChunkSizePercentage 默认是0.1，</span>
+    <span class="c1">//所以就是比例是(1-0.1)*1.0=0.1,其它和dataChunksPool一致</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">indexChunksPool</span> <span class="o">=</span> <span class="n">initializePool</span><span class="o">(</span><span class="s">"index"</span><span class="o">,</span> <span class="n">globalMemStoreSize</span><span class="o">,</span>
+            <span class="n">indexChunkSizePercentage</span> <span class="o">*</span> <span class="n">poolSizePercentage</span><span class="o">,</span>
+            <span class="n">initialCountPercentage</span><span class="o">,</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="o">(</span><span class="n">indexChunkSizePercentage</span> <span class="o">*</span> <span class="n">chunkSize</span><span class="o">),</span>
+            <span class="n">heapMemoryManager</span><span class="o">);</span>
+  <span class="o">}</span>
+
+</code></pre></div></div>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

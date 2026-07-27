@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HBase Bulkload 失败问题处理以及改进 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/06/10/hbase-bulkload-failed-case-and-improve/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="HBase Bulkload 失败问题处理以及改进">
+      
+    <meta name="keywords" content="HBase,Bulkload,LSM,HFile">
+    <meta property="og:keywords" content="HBase,Bulkload,LSM,HFile">
+      
+    <meta name="description" content="HBase,Bulkload,LSM,HFile">
+    <meta property="og:description" content="HBase,Bulkload,LSM,HFile">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/06/10/hbase-bulkload-failed-case-and-improve/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-06-10">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="HBase Bulkload ">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">HBase Bulkload 失败问题处理以及改进</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/06/10
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#HBase" title="HBase">HBase</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="hbase-bulkload-失败问题处理以及改进">HBase Bulkload 失败问题处理以及改进</h1>
+
+<p>某天某应用找到我，说线上 <code class="language-plaintext highlighter-rouge">bulkload</code> 导入数据到 <code class="language-plaintext highlighter-rouge">HBase</code> 失败</p>
+
+<p><code class="language-plaintext highlighter-rouge">check</code> 了一下 <code class="language-plaintext highlighter-rouge">MR</code> 日志，报错如下</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">java.util.concurrent.ExecutionException</span><span class="pi">:</span> <span class="na">org.apache.hadoop.hbase.io.hfile.CorruptHFileException</span><span class="pi">:</span> <span class="s">Problem reading HFile Trailer from file hdfs://******/*****/f1/2adb6a82818642aca73daf999063f655</span>
+       <span class="s">org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.groupOrSplitPhase(LoadIncrementalHFiles.java:584)</span>
+        <span class="s">at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.doBulkLoad(LoadIncrementalHFiles.java:440)</span>
+        <span class="s">at org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles.doBulkLoad(LoadIncrementalHFiles.java:327)</span>
+        <span class="s">at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</span>
+        <span class="s">at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)</span>
+        <span class="s">at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</span>
+        <span class="s">at java.lang.reflect.Method.invoke(Method.java:606)</span>
+        <span class="s">at sun.reflect.misc.Trampoline.invoke(MethodUtil.java:75)</span>
+        <span class="s">at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</span>
+        <span class="s">at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)</span>
+        <span class="s">at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</span>
+        <span class="s">at java.lang.reflect.Method.invoke(Method.java:606)</span>
+        <span class="s">at sun.reflect.misc.MethodUtil.invoke(MethodUtil.java:279)</span>
+
+</code></pre></div></div>
+
+<p>上面的报错很明显，<code class="language-plaintext highlighter-rouge">Bulkload </code> 导入最后一步，执行 <code class="language-plaintext highlighter-rouge">doBulkload</code> 的时候，将生成的 <code class="language-plaintext highlighter-rouge">HFile</code> 导入到 <code class="language-plaintext highlighter-rouge">HBase</code> 中出现问题，原因是执行 <code class="language-plaintext highlighter-rouge">doBulkload</code> 的客户端 没有 <code class="language-plaintext highlighter-rouge">snappy</code> 本地库。所以只需要添加 <code class="language-plaintext highlighter-rouge">snappy</code> 本地库即可。</p>
+
+<p>但是这样处理是否有问题呢：</p>
+
+<p>首先我们来看一下 <code class="language-plaintext highlighter-rouge">bulkload</code> 的原理：</p>
+
+<p><img src="/images/posts/hbase/bulkload/bulkload-arc1.png" alt="" title="bulkload arc" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">bulkload</code> 原理就是通过 <code class="language-plaintext highlighter-rouge">MR/Spark</code> 程序根据 <code class="language-plaintext highlighter-rouge">HBase</code> 表的 <code class="language-plaintext highlighter-rouge">region</code> 范围 <code class="language-plaintext highlighter-rouge">(startkey/endkey)</code> 来做 <code class="language-plaintext highlighter-rouge">partition</code> 直接生成 <code class="language-plaintext highlighter-rouge">HFile</code> ，然后通过 <code class="language-plaintext highlighter-rouge">doBulkload</code> 命令将 <code class="language-plaintext highlighter-rouge">HFile</code> <code class="language-plaintext highlighter-rouge">move</code> 到 <code class="language-plaintext highlighter-rouge">HBase RegionServer</code> 的 <code class="language-plaintext highlighter-rouge">Region</code> 对应的列族目录下， <code class="language-plaintext highlighter-rouge">StoreFileManager</code> 更新维护的 <code class="language-plaintext highlighter-rouge">HFile</code> 列表对象即可。<code class="language-plaintext highlighter-rouge">bulkload</code> 和 <code class="language-plaintext highlighter-rouge">doBulkload</code> 详细原理，由于涉及的内容比较多，后面有时间的话单独写个博客来介绍。这里就不展开了。</p>
+
+<p>所以这里面会使用到压缩的地方应该有三处：</p>
+
+<p>1、<code class="language-plaintext highlighter-rouge">MR</code>  生成 <code class="language-plaintext highlighter-rouge">HFile</code> 的时候</p>
+
+<p>2、<code class="language-plaintext highlighter-rouge">doBulkload</code>  的时候</p>
+
+<p>3、导入到 <code class="language-plaintext highlighter-rouge">HBase</code> ，然后 <code class="language-plaintext highlighter-rouge">HBase</code> 自身读取/写入/<code class="language-plaintext highlighter-rouge">compaction</code> 的时候</p>
+
+<p>集群是我们自己开发维护的 <code class="language-plaintext highlighter-rouge">HBase</code> 分支， 虽然默认已经集成了常用的 <code class="language-plaintext highlighter-rouge">native</code> 的库，比如 <code class="language-plaintext highlighter-rouge">snappy</code>，<code class="language-plaintext highlighter-rouge">zstd</code> ，但通常执行 <code class="language-plaintext highlighter-rouge">bulkload</code> 的 <code class="language-plaintext highlighter-rouge">MR</code> 程序或者 <code class="language-plaintext highlighter-rouge">doBulkload</code> 的客户端与 <code class="language-plaintext highlighter-rouge">HBase</code> 不在一个集群，例如这个本例就是。这会导致往压缩的 <code class="language-plaintext highlighter-rouge">HBase</code> 表中导入数据失败 。</p>
+
+<p>基于以上的原因和问题，对 <code class="language-plaintext highlighter-rouge">HBase Bulkload</code> 做了一个简单的改进：</p>
+
+<p>思路很简单：就是 <code class="language-plaintext highlighter-rouge">bulkload</code> 的时候，支持在客户端设置压缩格式，而不是直接使用原始表的压缩格式。</p>
+
+<p><img src="/images/posts/hbase/bulkload/bulkload-improve1.png" alt="" title="bulkload improve" /></p>
+
+<p>虽然这个改进很简单，但在我们的实际场景下，还是很有用的：</p>
+
+<p>1、<code class="language-plaintext highlighter-rouge">MR/doBulkload</code> 客户端可以设置非压缩的格式，从而避免因为没有本地库导致的失败，也就是本文中出现的情况</p>
+
+<p>2、<code class="language-plaintext highlighter-rouge">bulkload</code> 设置生成非压缩的 <code class="language-plaintext highlighter-rouge">HFile</code> 格式，性能更好，后续<code class="language-plaintext highlighter-rouge">compaction</code>，仍然会根据表的压缩格式来合并，存储容量影响很小的情况下，提高性能.</p>
+
+<p>这个特性在我们的版本中结合实现的 <code class="language-plaintext highlighter-rouge">flush</code>  、<code class="language-plaintext highlighter-rouge">compaction</code>  设置异构存储策略、压缩编码以及 <code class="language-plaintext highlighter-rouge">WAL ON SSD</code> 可以做到数据异构以及冷热分离，比如 <code class="language-plaintext highlighter-rouge">flush/bulkload</code> 生成的 <code class="language-plaintext highlighter-rouge">HFile</code> 到 <code class="language-plaintext highlighter-rouge">SSD</code> 中，并且不设置压缩和编码；通过<code class="language-plaintext highlighter-rouge">compaction</code> 执行<code class="language-plaintext highlighter-rouge">压缩/编码</code>到<code class="language-plaintext highlighter-rouge">HDD</code>中. 这样的话，发生在<code class="language-plaintext highlighter-rouge">HBase</code> 的关键路径的写入、导入、读取、<code class="language-plaintext highlighter-rouge">compaction </code>性能大幅提升。</p>
+
+<p>3、在跨数据中心同步中，使用 <code class="language-plaintext highlighter-rouge">bulkload replication</code> 的情况下，表是未压缩的，可以反过来，设置生成 <code class="language-plaintext highlighter-rouge">HFile</code> 压缩，这样可以减少跨数据中心的同步带宽消耗。</p>
+
+<p>后来改进贡献给了社区，感兴趣可参考：</p>
+
+<p>https://issues.apache.org/jira/browse/HBASE-21810</p>
+
+<p>https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf</p>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

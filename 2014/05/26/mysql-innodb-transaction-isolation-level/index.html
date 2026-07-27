@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MySQL InnoDB 事务隔离级别脏读、可重复读、幻读 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2014/05/26/mysql-innodb-transaction-isolation-level/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="MySQL InnoDB 事务隔离级别脏读、可重复读、幻读">
+      
+    <meta name="keywords" content="mysql，innodb,transaction">
+    <meta property="og:keywords" content="mysql，innodb,transaction">
+      
+    <meta name="description" content="MySQL InnoDB 事务隔离级别脏读、可重复读、幻读">
+    <meta property="og:description" content="MySQL InnoDB 事务隔离级别脏读、可重复读、幻读">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2014/05/26/mysql-innodb-transaction-isolation-level/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2014-05-26">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="MySQL InnoDB 事务">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">MySQL InnoDB 事务隔离级别脏读、可重复读、幻读</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2014/05/26
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#MySQL" title="MySQL">MySQL</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="mysql-innodb-事务隔离级别脏读可重复读幻读">MySQL InnoDB 事务隔离级别脏读、可重复读、幻读</h2>
+
+<p>希望通过本文，可以加深读者对 MySQL InnoDB 的四个事务隔离级别，以及脏读、不重复读、幻读的理解。</p>
+
+<h3 id="innodb-事务隔离级别"><strong>InnoDB 事务隔离级别</strong></h3>
+
+<p>MySQL InnoDB事务的隔离级别有四级，默认是“可重复读”（REPEATABLE READ）。</p>
+
+<ul>
+  <li>
+    <p>未提交读（READUNCOMMITTED）：
+  另一个事务修改了数据，但尚未提交，而本事务中的SELECT会读到这些未被提交的数据（脏读）。</p>
+  </li>
+  <li>
+    <p>提交读（READCOMMITTED）：
+  本事务读取到的是最新的数据（其他事务提交后的）。问题是，在同一个事务里，前后两次相同的 SELECT 会读到不同的结果（不重复读）。</p>
+  </li>
+  <li>
+    <p>可重复读（REPEATABLEREAD）：
+ 	在同一个事务里，SELECT的结果是事务开始时时间点的状态，因此，同样的 SELECT 操作读到的结果会是一致的。但是，会有幻读现象（稍后解释）。</p>
+  </li>
+  <li>
+    <p>串行化（SERIALIZABLE）：
+  读操作会隐式获取共享锁，可以保证不同事务间的互斥。</p>
+  </li>
+</ul>
+
+<p>四个级别逐渐增强，每个级别解决一个问题。</p>
+
+<ul>
+  <li>
+    <p>脏读：
+  最容易理解。另一个事务修改了数据，但尚未提交，而本事务中的 SELECT 会读到这些未被提交的数据。</p>
+  </li>
+  <li>
+    <p>不重复读：
+  解决了脏读后，会遇到，同一个事务执行过程中，另外一个事务提交了新数据，因此本事务先后两次读到的数据结果会不一致。</p>
+  </li>
+  <li>
+    <p>幻读：
+  解决了不重复读，保证了同一个事务里，查询的结果都是事务开始时的状态（一致性）。但是，如果另一个事务同时提交了新数据，本事务再更新时，就会“惊奇的”发现了这些新数据，貌似之前读到的数据是“鬼影”一样的幻觉。</p>
+  </li>
+</ul>
+
+<p>MySQL InnoDB事务隔离级别可设置为 global 和 session 级别。</p>
+
+<ul>
+  <li>事务隔离级别查看</li>
+</ul>
+
+<p>查看当前 session 的事务隔离级别：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">show</span> <span class="n">variables</span> <span class="k">like</span> <span class="s1">'%tx_isolation%'</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">---------------+--------------+  </span>
+<span class="o">|</span> <span class="n">Variable_name</span> <span class="o">|</span> <span class="n">Value</span>        <span class="o">|</span>  
+<span class="o">+</span><span class="c1">---------------+--------------+  </span>
+<span class="o">|</span> <span class="n">tx_isolation</span>  <span class="o">|</span> <span class="k">SERIALIZABLE</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">---------------+--------------+ </span>
+</code></pre></div></div>
+
+<ul>
+  <li>查看全局的事务隔离级别</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">show</span> <span class="k">global</span> <span class="n">variables</span> <span class="k">like</span> <span class="s1">'%tx_isolation%'</span><span class="p">;</span>
+<span class="o">+</span><span class="c1">---------------+-----------------+</span>
+<span class="o">|</span> <span class="n">Variable_name</span> <span class="o">|</span> <span class="n">Value</span>           <span class="o">|</span>
+<span class="o">+</span><span class="c1">---------------+-----------------+</span>
+<span class="o">|</span> <span class="n">tx_isolation</span>  <span class="o">|</span> <span class="k">REPEATABLE</span><span class="o">-</span><span class="k">READ</span> <span class="o">|</span>
+<span class="o">+</span><span class="c1">---------------+-----------------+</span>
+<span class="mi">1</span> <span class="k">row</span> <span class="k">in</span> <span class="k">set</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span> <span class="n">sec</span><span class="p">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li>设置事务隔离级别：<br />
+设置 global 事务隔离级别：
+ set global isolation level read committed;<br />
+注意一点的设置 global 并不会对当前 session 生效。</li>
+</ul>
+
+<p>比如设置 session 事务隔离级别命令如下：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">set</span> <span class="k">session</span> <span class="n">transaction</span> <span class="k">isolation</span> <span class="k">level</span> <span class="k">read</span> <span class="k">uncommitted</span><span class="p">;</span>      
+<span class="k">set</span> <span class="k">session</span> <span class="n">transaction</span> <span class="k">isolation</span> <span class="k">level</span> <span class="k">read</span> <span class="k">committed</span><span class="p">;</span>      
+<span class="k">set</span> <span class="k">session</span> <span class="n">transaction</span> <span class="k">isolation</span> <span class="k">level</span> <span class="k">REPEATABLE</span> <span class="k">READ</span><span class="p">;</span>   
+<span class="k">set</span> <span class="k">session</span> <span class="n">transaction</span> <span class="k">isolation</span> <span class="k">level</span> <span class="n">SERIALIZABL</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="实验理解-innodb-事物隔离级别">实验理解 InnoDB 事物隔离级别</h3>
+
+<p>上面的文字，读起来并不是那么容易让人理解，以下用几个实验对InnoDB的四个事务隔离级别做详细的解释，希望通过实验来加深大家对InnoDB的事务隔离级别理解。</p>
+
+<p>首先，我们来创建一张 innodb 表，插入几条数据</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="nv">`t`</span> <span class="p">(</span>  
+    <span class="nv">`a`</span> <span class="nb">INT</span> <span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span>  
+<span class="p">)</span> <span class="n">ENGINE</span> <span class="o">=</span> <span class="n">INNODB</span> <span class="k">DEFAULT</span> <span class="n">CHARSET</span> <span class="o">=</span> <span class="n">UTF8</span><span class="p">;</span>  
+  
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">t</span> <span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">1</span><span class="p">),(</span><span class="mi">2</span><span class="p">),(</span><span class="mi">3</span><span class="p">);</span>  
+</code></pre></div></div>
+
+<ul>
+  <li>实验一：解释脏读、可重复读问题</li>
+</ul>
+
+<p><img src="/images/posts/mysql/transaction/exp1.jpg" alt="解释脏读、可重复读问题" /></p>
+
+<ul>
+  <li>实验二：测试 READ-COMMITTED 与 REPEATABLE-READ</li>
+</ul>
+
+<p><img src="/images/posts/mysql/transaction/exp2.jpg" alt="测试 READ-COMMITTED与REPEATABLE-READ " /></p>
+
+<p>当然数据的可见性都是对不同事务来说的，同一个事务，都是可以读到此事务中最新数据的。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mysql</span><span class="o">&gt;</span><span class="k">start</span> <span class="n">transaction</span><span class="p">;</span>  
+<span class="n">mysql</span><span class="o">&gt;</span><span class="k">insert</span> <span class="k">into</span> <span class="n">t</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">4</span><span class="p">);</span>    
+<span class="n">mysql</span><span class="o">&gt;</span><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">t</span><span class="p">;</span>  
+<span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">;</span>    
+<span class="n">mysql</span><span class="o">&gt;</span><span class="k">insert</span> <span class="k">into</span> <span class="n">t</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">5</span><span class="p">);</span>	  
+<span class="n">mysql</span><span class="o">&gt;</span><span class="k">select</span>  <span class="o">*</span> <span class="k">from</span> <span class="n">t</span><span class="p">;</span>  	
+<span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">;</span> 	
+</code></pre></div></div>
+
+<ul>
+  <li>实验三：测试 SERIALIZABLE 事务对其他的影响</li>
+</ul>
+
+<p><img src="/images/posts/mysql/transaction/exp3.jpg" alt="测试 SERIALIZABLE 事务对其他的影响" /></p>
+
+<ul>
+  <li>实验四：幻读</li>
+</ul>
+
+<p>一些文章写到 InnoDB 的可重复读避免了“幻读”（phantom read），这个说法并不准确。
+做个试验：(以下所有试验要注意存储引擎和隔离级别)</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mysql</span><span class="o">&gt;</span><span class="k">show</span> <span class="k">create</span> <span class="k">table</span> <span class="n">t_bitfly</span><span class="err">\</span><span class="k">G</span><span class="p">;</span>  
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="nv">`t_bitfly`</span> <span class="p">(</span>  
+<span class="nv">`id`</span> <span class="nb">bigint</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">default</span> <span class="s1">'0'</span><span class="p">,</span>  
+<span class="nv">`value`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">default</span> <span class="k">NULL</span><span class="p">,</span>  
+<span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="nv">`id`</span><span class="p">)</span>  
+<span class="p">)</span> <span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span> <span class="k">DEFAULT</span> <span class="n">CHARSET</span><span class="o">=</span><span class="n">gbk</span>  
+<span class="n">mysql</span><span class="o">&gt;</span><span class="k">select</span> <span class="o">@@</span><span class="k">global</span><span class="p">.</span><span class="n">tx_isolation</span><span class="p">,</span> <span class="o">@@</span><span class="n">tx_isolation</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">-----------------------+-----------------+  </span>
+<span class="o">|</span> <span class="o">@@</span><span class="k">global</span><span class="p">.</span><span class="n">tx_isolation</span> <span class="o">|</span> <span class="o">@@</span><span class="n">tx_isolation</span>  <span class="o">|</span>  
+<span class="o">+</span><span class="c1">-----------------------+-----------------+  </span>
+<span class="o">|</span> <span class="k">REPEATABLE</span><span class="o">-</span><span class="k">READ</span>       <span class="o">|</span> <span class="k">REPEATABLE</span><span class="o">-</span><span class="k">READ</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">-----------------------+-----------------+  </span>
+</code></pre></div></div>
+
+<p>试验4-1：</p>
+
+<p><img src="/images/posts/mysql/transaction/exp4-1.png" alt="试验4-1" /></p>
+
+<p>(shit, 刚刚明明告诉我没有这条记录的)
+如此就出现了幻读，以为表里没有数据，其实数据已经存在了，傻乎乎的提交后，才发现数据冲突了。</p>
+
+<p>试验4-2：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SessionA</span>                                                                         <span class="k">Session</span> <span class="n">B</span>  
+  
+<span class="k">START</span> <span class="n">TRANSACTION</span><span class="p">;</span>                                                               <span class="k">START</span> <span class="n">TRANSACTION</span><span class="p">;</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+                                                                                  <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">t_bitfly</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">);</span>  
+                             
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+                                                                                   <span class="k">COMMIT</span><span class="p">;</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+  
+<span class="k">UPDATE</span> <span class="n">t_bitfly</span> <span class="k">SET</span> <span class="n">value</span><span class="o">=</span><span class="s1">'z'</span><span class="p">;</span>  
+<span class="k">Rows</span> <span class="n">matched</span><span class="p">:</span> <span class="mi">2</span>  <span class="n">Changed</span><span class="p">:</span><span class="mi">2</span>  <span class="n">Warnings</span><span class="p">:</span> <span class="mi">0</span>  
+<span class="p">(</span><span class="err">怎么多出来一行</span><span class="p">)</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span><span class="n">z</span>     <span class="o">|</span>  
+<span class="o">|</span>    <span class="mi">2</span> <span class="o">|</span><span class="n">z</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+</code></pre></div></div>
+
+<p>本事务中第一次读取出一行，做了一次更新后，另一个事务里提交的数据就出现了。也可以看做是一种幻读。</p>
+
+<p>那么，InnoDB 指出的可以避免幻读是怎么回事呢？</p>
+
+<p>http://dev.mysql.com/doc/refman/5.0/en/innodb-record-level-locks.html</p>
+
+<blockquote>
+  <p>By default, InnoDB operatesin REPEATABLE READ transaction isolation level and with the innodb_locks_unsafe_for_binlogsystem variable disabled. In this case, InnoDB uses next-key locks for searchesand index scans, which prevents phantom rows (see Section 13.6.8.5, &gt;“Avoidingthe Phantom Problem Using Next-Key Locking”).</p>
+</blockquote>
+
+<p>准备的理解是，当隔离级别是可重复读，且禁用 innodb_locks_unsafe_for_binlog 的情况下，在搜索和扫描 index 的时候使用的 next-keylocks 可以避免幻读。
+关键点在于，是 InnoDB 默认对一个普通的查询也会加next-key locks，还是说需要应用自己来加锁呢？如果单看这一句，可能会以为 InnoDB 对普通的查询也加了锁，如果是，那和序列化（SERIALIZABLE）的区别又在哪里呢？</p>
+
+<p>MySQL manual里还有一段：</p>
+
+<blockquote>
+  <p>Avoiding the PhantomProblem Using Next-Key Locking (http://dev.mysql.com/doc/refman/5.0/en/innodb-next-key-locking.html)
+Toprevent phantoms, InnoDB usesan algorithm called next-key locking that combinesindex-row locking with gap locking.
+Youcan use next-key locking to implement a uniqueness check in your application:If you read your data in share mode and do not see a duplicate for a row youare going to insert, then you can safely insert your row and know that thenext-key lock set on the successor of your row during the read prevents anyonemeanwhile inserting a duplicate for your row. Thus, the next-key lockingenables you to “lock” the nonexistence of something in your table.</p>
+</blockquote>
+
+<p>我的理解是说，InnoDB提供了next-key locks，但需要应用程序自己去加锁。manual里提供一个例子：</p>
+
+<p><code class="language-plaintext highlighter-rouge">SELECT * FROM child WHERE id&gt; 100 FOR UPDATE;</code></p>
+
+<p>这样，InnoDB 会给 id 大于 100 的行（假如 child 表里有一行 id 为 102），以及 100-102，102+ 的 gap 都加上锁。
+可以使用 show innodb status 来查看是否给表加上了锁。</p>
+
+<p>再看一个实验，要注意，表 t_bitfly 里的 id 为主键字段。</p>
+
+<p>实验4-3：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Session</span> <span class="n">A</span>                               <span class="k">Session</span> <span class="n">B</span>  
+  
+<span class="k">START</span> <span class="n">TRANSACTION</span><span class="p">;</span>                      <span class="k">START</span> <span class="n">TRANSACTION</span><span class="p">;</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span>  
+<span class="k">WHERE</span> <span class="n">id</span><span class="o">&lt;=</span><span class="mi">1</span>  
+<span class="k">FOR</span> <span class="k">UPDATE</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span> <span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+                                        <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">t_bitfly</span>  
+                                        <span class="k">VALUES</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">);</span>  
+                                        <span class="n">Query</span> <span class="n">OK</span><span class="p">,</span> <span class="mi">1</span> <span class="k">row</span> <span class="n">affected</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span> <span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+                                        <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">t_bitfly</span>  
+                                        <span class="k">VALUES</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">);</span>  
+                                        <span class="p">(</span><span class="n">waiting</span> <span class="k">for</span> <span class="k">lock</span> <span class="p">...</span>  
+                                        <span class="k">then</span> <span class="n">timeout</span><span class="p">)</span>  
+                                        <span class="n">ERROR</span> <span class="mi">1205</span> <span class="p">(</span><span class="n">HY000</span><span class="p">):</span>  
+                                        <span class="k">Lock</span> <span class="n">wait</span> <span class="n">timeout</span> <span class="n">exceeded</span><span class="p">;</span>  
+                                        <span class="n">try</span> <span class="n">restarting</span> <span class="n">transaction</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span> <span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+                                        <span class="k">COMMIT</span><span class="p">;</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span> <span class="n">id</span>   <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+<span class="o">|</span>    <span class="mi">1</span> <span class="o">|</span> <span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">------+-------+  </span>
+</code></pre></div></div>
+
+<p>可以看到，用 id&lt;=1 加的锁，只锁住了 id&lt;=1 的范围，可以成功添加 id 为 2 的记录，添加 id 为 0 的记录时就会等待锁的释放。</p>
+
+<p>MySQL manual 里对可重复读里的锁的详细解释：</p>
+
+<p>http://dev.mysql.com/doc/refman/5.0/en/set-transaction.html#isolevel_repeatable-read</p>
+
+<blockquote>
+  <p>For locking reads (SELECT with FORUPDATE or LOCK IN SHARE MODE),UPDATE, and DELETE statements, lockingdepends on whether the statement uses a unique index with a unique searchcondition, or a range-type search condition. For a unique index with a uniquesearch condition, InnoDB locksonly the index record found, not the gap before it. For other searchconditions, InnoDB locksthe index range scanned, using gap locks or next-key (gap plus index-record)locks to block insertions by other sessions into the gaps covered by the range.</p>
+</blockquote>
+
+<p>一致性读和提交读，先看实验:</p>
+
+<p>实验4-4：</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SessionA</span>                                                                  <span class="k">Session</span> <span class="n">B</span>  
+  
+<span class="k">START</span> <span class="n">TRANSACTION</span><span class="p">;</span>                                                         <span class="k">START</span> <span class="n">TRANSACTION</span><span class="p">;</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span> <span class="n">id</span> <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span>  <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+                                                                           <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">t_bitfly</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">);</span>  
+                                
+                                                                          <span class="k">COMMIT</span><span class="p">;</span>  
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span> <span class="n">id</span> <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span>  <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span> <span class="k">LOCK</span> <span class="k">IN</span> <span class="k">SHARE</span> <span class="k">MODE</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span> <span class="n">id</span> <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span>  <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">|</span>  <span class="mi">2</span> <span class="o">|</span><span class="n">b</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span> <span class="k">FOR</span> <span class="k">UPDATE</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span> <span class="n">id</span> <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span>  <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">|</span>  <span class="mi">2</span> <span class="o">|</span><span class="n">b</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+  
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">t_bitfly</span><span class="p">;</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span> <span class="n">id</span> <span class="o">|</span> <span class="n">value</span> <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+<span class="o">|</span>  <span class="mi">1</span> <span class="o">|</span><span class="n">a</span>     <span class="o">|</span>  
+<span class="o">+</span><span class="c1">----+-------+  </span>
+</code></pre></div></div>
+
+<p>如果使用普通的读，会得到一致性的结果，如果使用了加锁的读，就会读到“最新的”“提交”读的结果。</p>
+
+<p>本身，可重复读和提交读是矛盾的。在同一个事务里，如果保证了可重复读，就会看不到其他事务的提交，违背了提交读；如果保证了提交读，就会导致前后两次读到的结果不一致，违背了可重复读。</p>
+
+<p>可以这么讲，InnoDB 提供了这样的机制，在默认的可重复读的隔离级别里，可以使用加锁读去查询最新的数据。</p>
+
+<p>http://dev.mysql.com/doc/refman/5.0/en/innodb-consistent-read.html</p>
+
+<blockquote>
+  <p>If you want to see the “freshest” state of the database, you should use either theREAD COMMITTED isolation level or a locking read<br />
+<code class="language-plaintext highlighter-rouge">SELECT * FROM t_bitfly LOCK IN SHARE MODE;</code></p>
+</blockquote>
+
+<p>结论：MySQL InnoDB 的可重复读并不保证避免幻读，需要应用使用加锁读来保证。而这个加锁度使用到的机制就是 next-keylocks 。</p>
+
+<p>文章幻读部分直接转载了 bitfly 的文章： <a href="http://blog.bitfly.cn/post/mysql-innodb-phantom-read/">http://blog.bitfly.cn/post/mysql-innodb-phantom-read/</a></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

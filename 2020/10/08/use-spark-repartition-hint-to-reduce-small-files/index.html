@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出">
+      
+    <meta name="keywords" content="Spark SQL">
+    <meta property="og:keywords" content="Spark SQL">
+      
+    <meta name="description" content="在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出">
+    <meta property="og:description" content="在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-10-08">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="在 Spark SQL 使用 ">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/10/08
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Spark" title="Spark">Spark</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="1-问题">1. 问题</h2>
+
+<p>公司数仓业务有一个 <code class="language-plaintext highlighter-rouge">sql</code> 任务，每天会产生大量的小文件，每个文件只有几百 <code class="language-plaintext highlighter-rouge">KB</code>～几 <code class="language-plaintext highlighter-rouge">M</code> 大小，小文件过多会对 <code class="language-plaintext highlighter-rouge">HDFS</code> 性能造成比较大的影响，同时也影响数据的读写性能（Spark 任务某些情况下会缓存文件信息），虽然开发了小文件合并工具会去定期合并小文件，但还是想从源头上来解决这个问题，尽量生成比较合适的文件大小，而不是事后补救。</p>
+
+<p>下图是优化前一天 18 点这个分区的数据，可以看出小文件问题明显。</p>
+
+<p><img src="/images/posts/spark/spark-repartition-small-files/small-files.png" alt="small-files" /></p>
+
+<h2 id="2-分析">2. 分析</h2>
+
+<p>思路：</p>
+
+<p>1、统计每次生成的文件大小</p>
+
+<p>2、每个小文件的大小</p>
+
+<p>3、预期文件大小</p>
+
+<p>4、找到优化方法，使其满足预期大小</p>
+
+<p>统计一下每个分区的数据量，差不多每个小时 <code class="language-plaintext highlighter-rouge">1-6G</code> 数据</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span> hdfs dfs <span class="nt">-du</span> <span class="nt">-h</span>  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/
+3.4 G  10.2 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>00
+2.1 G  6.3 G   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>01
+1.4 G  4.3 G   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>02
+1.1 G  3.4 G   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>03
+1.2 G  3.6 G   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>04
+1.8 G  5.5 G   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>05
+3.1 G  9.3 G   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>06
+3.8 G  11.4 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>07
+3.8 G  11.5 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>08
+3.9 G  11.6 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>09
+4.1 G  12.2 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>10
+4.6 G  13.7 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>11
+5.4 G  16.3 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>12
+4.7 G  14.0 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>13
+4.1 G  12.4 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>14
+4.1 G  12.3 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>15
+4.1 G  12.4 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>16
+4.5 G  13.4 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>17
+4.6 G  13.8 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>18
+5.0 G  15.1 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>19
+5.5 G  16.6 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>20
+6.1 G  18.4 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>21
+6.2 G  18.7 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>22
+5.0 G  15.1 G  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>23
+</code></pre></div></div>
+
+<p>使用 <code class="language-plaintext highlighter-rouge">hour=18</code> 这个分区举例：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span> hdfs dfs <span class="nt">-ls</span> <span class="nt">-h</span> <span class="nt">-R</span>  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>18|wc <span class="nt">-l</span>
+800
+</code></pre></div></div>
+
+<p>可以看出有 <code class="language-plaintext highlighter-rouge">800</code> 个文件。</p>
+
+<p>详细看一下文件大小，有一半是 <code class="language-plaintext highlighter-rouge">9.2M</code> 左右和一半<code class="language-plaintext highlighter-rouge">2.6M</code>左右(实际是由 UNION ALL 分别生成 400个 )，其他就不列出来了.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>9.2 M  27.6 M  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>18/part-00397-13c5757b-294b-4010-a0f7-bbb7100455c8.c000
+9.3 M  27.8 M  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>18/part-00398-13c5757b-294b-4010-a0f7-bbb7100455c8.c000
+9.2 M  27.5 M  hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>18/part-00399-13c5757b-294b-4010-a0f7-bbb7100455c8.c000
+2.6 M  7.7 M   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>18/part-00400-13c5757b-294b-4010-a0f7-bbb7100455c8.c000
+2.6 M  7.7 M   hdfs://dw/test.db/testtable/p1<span class="o">=</span>a/dt<span class="o">=</span>2020-09-28/hour<span class="o">=</span>18/part-00401-13c5757b-294b-4010-a0f7-bbb7100455c8.c000
+</code></pre></div></div>
+
+<p>文件由 <code class="language-plaintext highlighter-rouge">SQL ETL</code> 生成，清洗入库的<code class="language-plaintext highlighter-rouge">sql</code> 如下：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span>
+	<span class="n">overwrite</span> <span class="k">TABLE</span> <span class="n">testdb</span><span class="p">.</span><span class="n">testtable</span> <span class="k">PARTITION</span> <span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">hour</span><span class="p">)</span>
+<span class="k">SELECT</span>
+	<span class="p">...</span>
+<span class="k">FROM</span>
+	<span class="n">t1</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span>
+	<span class="p">...</span>
+<span class="k">FROM</span>
+	<span class="n">t2</span>
+  
+</code></pre></div></div>
+
+<p>上面是很典型的一个业务，定时向某个时间点的分区导入数据。</p>
+
+<p>从上面的sql 可以看出 <code class="language-plaintext highlighter-rouge">2</code> 个重要信息：</p>
+
+<p>1、数据表有三个分区字段 <code class="language-plaintext highlighter-rouge">p1,dt,hour</code> 其中 <code class="language-plaintext highlighter-rouge">dt</code> 表示日期，<code class="language-plaintext highlighter-rouge">hour</code> 表示小时.</p>
+
+<p>2、 <code class="language-plaintext highlighter-rouge">insert overwrite SELECT</code> 导入，有 <code class="language-plaintext highlighter-rouge">1</code> 个 <code class="language-plaintext highlighter-rouge">UNION ALL</code></p>
+
+<p>应该是每个SELECT 有 400 个 partition 导致 2 个表 UNION ALL  加起来一共 800 个文件。</p>
+
+<p>我们理想的文件大小是保持在100-200M（建议略小于等于BLOCK 大小），比如HDFS BLOCK为128MB，则可以按照100M左右去算。</p>
+
+<p>目前每小时是1-6G数据量。</p>
+
+<h2 id="3-优化">3. 优化</h2>
+
+<p>Spark SQL 支持 使用 ` /*+ REPARTITION(N) */ ` hint 来重新 <code class="language-plaintext highlighter-rouge">repartition</code> 数据,</p>
+
+<p>按照每个分区1-6 G 的数据量，设置  <code class="language-plaintext highlighter-rouge">40/20个PARTITION</code></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span>
+	<span class="n">overwrite</span> <span class="k">TABLE</span> <span class="n">testdb</span><span class="p">.</span><span class="n">testtable</span> <span class="k">PARTITION</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">hour</span><span class="p">)</span>
+<span class="k">SELECT</span>
+<span class="cm">/*+ REPARTITION(40) */</span>
+	<span class="p">...</span>
+<span class="k">FROM</span>
+	<span class="n">t1</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span>
+<span class="cm">/*+ REPARTITION(20) */</span>
+	<span class="p">...</span>
+<span class="k">FROM</span>
+	<span class="n">t2</span>
+</code></pre></div></div>
+
+<p>优化以后，我们发现今天新生成的数据文件明显变大，大小都在95M 左右，小文件问题解决了。</p>
+
+<p><img src="/images/posts/spark/spark-repartition-small-files/big-files.png" alt="small-files" /></p>
+
+<p>有一个奇怪的点，优化以后数据量会比以前大一些，大概会多<code class="language-plaintext highlighter-rouge">5%-10%</code>  ，数据表格式是<code class="language-plaintext highlighter-rouge">ORC</code>， 按常理来说，ORC 合并的话，应该会稍微小一点，或者基本上没有变化，因为 <code class="language-plaintext highlighter-rouge">ORC</code> 里面有很多统计信息或者如果更多相同的数据，可以编码压缩掉，经过研究，发现应该是 <code class="language-plaintext highlighter-rouge">repartition</code> 是会重新做一次全量的<code class="language-plaintext highlighter-rouge">shuffle</code>，这样的话，不利于 <code class="language-plaintext highlighter-rouge">ORC</code> 编码和压缩,除了 REPARTITION，Spark 的 Partition 还支持 <code class="language-plaintext highlighter-rouge">COALESCE</code> ，我们可以使用<code class="language-plaintext highlighter-rouge">COALESCE</code> 来替代<code class="language-plaintext highlighter-rouge">REPARTITION</code>.</p>
+
+<blockquote>
+  <h4 id="partitioning-hints-types">Partitioning Hints Types</h4>
+
+  <ul>
+    <li><strong>COALESCE</strong></li>
+  </ul>
+
+  <p>The <code class="language-plaintext highlighter-rouge">COALESCE</code> hint can be used to reduce the number of partitions to the specified number of partitions. It takes a partition number as a parameter.</p>
+
+  <ul>
+    <li><strong>REPARTITION</strong></li>
+  </ul>
+
+  <p>The <code class="language-plaintext highlighter-rouge">REPARTITION</code> hint can be used to repartition to the specified number of partitions using the specified partitioning expressions. It takes a partition number, column names, or both as parameters.</p>
+
+  <ul>
+    <li><strong>REPARTITION_BY_RANGE</strong></li>
+  </ul>
+
+  <p>The <code class="language-plaintext highlighter-rouge">REPARTITION_BY_RANGE</code> hint can be used to repartition to the specified number of partitions using the specified partitioning expressions. It takes column names and an optional partition number as parameters.</p>
+</blockquote>
+
+<p>关于 coalesce 与 repartition 的区别，请参考链接[3]：</p>
+
+<blockquote>
+  <p>The repartition algorithm does a <strong>full shuffle</strong> of the data and creates equal sized partitions of data. coalesce combines existing partitions to avoid a <strong>full shuffle</strong>.</p>
+</blockquote>
+
+<p>实际上翻阅代码可以得到，RDD 的 repartition 就是调用的 coalesce 函数,只是shuffle 参数设置为了true，我们的目的是减少小文件，所以这块可以使用 <code class="language-plaintext highlighter-rouge">coalesce</code> 。</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+  <span class="cm">/**
+   * Return a new RDD that has exactly numPartitions partitions.
+   *
+   * Can increase or decrease the level of parallelism in this RDD. Internally, this uses
+   * a shuffle to redistribute data.
+   *
+   * If you are decreasing the number of partitions in this RDD, consider using `coalesce`,
+   * which can avoid performing a shuffle.
+   */</span>
+   <span class="c1">//这里的repartion 调用了 coalesce 函数，然后 shuffle 参数设置了true</span>
+  <span class="k">def</span> <span class="nf">repartition</span><span class="o">(</span><span class="n">numPartitions</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ord</span><span class="k">:</span> <span class="kt">Ordering</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="kc">null</span><span class="o">)</span><span class="k">:</span> <span class="kt">RDD</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="n">withScope</span> <span class="o">{</span>
+    <span class="nf">coalesce</span><span class="o">(</span><span class="n">numPartitions</span><span class="o">,</span> <span class="n">shuffle</span> <span class="k">=</span> <span class="kc">true</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**
+   * Return a new RDD that is reduced into `numPartitions` partitions.
+   *
+   * This results in a narrow dependency, e.g. if you go from 1000 partitions
+   * to 100 partitions, there will not be a shuffle, instead each of the 100
+   * new partitions will claim 10 of the current partitions. If a larger number
+   * of partitions is requested, it will stay at the current number of partitions.
+   *
+   * However, if you're doing a drastic coalesce, e.g. to numPartitions = 1,
+   * this may result in your computation taking place on fewer nodes than
+   * you like (e.g. one node in the case of numPartitions = 1). To avoid this,
+   * you can pass shuffle = true. This will add a shuffle step, but means the
+   * current upstream partitions will be executed in parallel (per whatever
+   * the current partitioning is).
+   *
+   * @note With shuffle = true, you can actually coalesce to a larger number
+   * of partitions. This is useful if you have a small number of partitions,
+   * say 100, potentially with a few partitions being abnormally large. Calling
+   * coalesce(1000, shuffle = true) will result in 1000 partitions with the
+   * data distributed using a hash partitioner. The optional partition coalescer
+   * passed in must be serializable.
+   */</span>
+  <span class="k">def</span> <span class="nf">coalesce</span><span class="o">(</span><span class="n">numPartitions</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">shuffle</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span>
+               <span class="n">partitionCoalescer</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">PartitionCoalescer</span><span class="o">]</span> <span class="k">=</span> <span class="nv">Option</span><span class="o">.</span><span class="py">empty</span><span class="o">)</span>
+              <span class="o">(</span><span class="k">implicit</span> <span class="n">ord</span><span class="k">:</span> <span class="kt">Ordering</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="kc">null</span><span class="o">)</span>
+      <span class="k">:</span> <span class="kt">RDD</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="n">withScope</span> <span class="o">{</span>
+    <span class="nf">require</span><span class="o">(</span><span class="n">numPartitions</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">,</span> <span class="n">s</span><span class="s">"Number of partitions ($numPartitions) must be positive."</span><span class="o">)</span>
+    <span class="nf">if</span> <span class="o">(</span><span class="n">shuffle</span><span class="o">)</span> <span class="o">{</span>
+      <span class="cm">/** Distributes elements evenly across output partitions, starting from a random partition. */</span>
+      <span class="k">val</span> <span class="nv">distributePartition</span> <span class="k">=</span> <span class="o">(</span><span class="n">index</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">items</span><span class="k">:</span> <span class="kt">Iterator</span><span class="o">[</span><span class="kt">T</span><span class="o">])</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="k">var</span> <span class="n">position</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Random</span><span class="o">(</span><span class="nv">hashing</span><span class="o">.</span><span class="py">byteswap32</span><span class="o">(</span><span class="n">index</span><span class="o">)).</span><span class="py">nextInt</span><span class="o">(</span><span class="n">numPartitions</span><span class="o">)</span>
+        <span class="nv">items</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
+          <span class="c1">// Note that the hash code of the key will just be the key itself. The HashPartitioner</span>
+          <span class="c1">// will mod it with the number of total partitions.</span>
+          <span class="n">position</span> <span class="k">=</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">1</span>
+          <span class="o">(</span><span class="n">position</span><span class="o">,</span> <span class="n">t</span><span class="o">)</span>
+        <span class="o">}</span>
+      <span class="o">}</span> <span class="k">:</span> <span class="kt">Iterator</span><span class="o">[(</span><span class="kt">Int</span>, <span class="kt">T</span><span class="o">)]</span>
+
+      <span class="c1">// include a shuffle step so that our upstream tasks are still distributed</span>
+      <span class="k">new</span> <span class="nc">CoalescedRDD</span><span class="o">(</span>
+        <span class="k">new</span> <span class="nc">ShuffledRDD</span><span class="o">[</span><span class="kt">Int</span>, <span class="kt">T</span>, <span class="kt">T</span><span class="o">](</span>
+          <span class="nf">mapPartitionsWithIndexInternal</span><span class="o">(</span><span class="n">distributePartition</span><span class="o">,</span> <span class="n">isOrderSensitive</span> <span class="k">=</span> <span class="kc">true</span><span class="o">),</span>
+          <span class="k">new</span> <span class="nc">HashPartitioner</span><span class="o">(</span><span class="n">numPartitions</span><span class="o">)),</span>
+        <span class="n">numPartitions</span><span class="o">,</span>
+        <span class="n">partitionCoalescer</span><span class="o">).</span><span class="py">values</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="k">new</span> <span class="nc">CoalescedRDD</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">numPartitions</span><span class="o">,</span> <span class="n">partitionCoalescer</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+</code></pre></div></div>
+
+<p>最后优化的<code class="language-plaintext highlighter-rouge">SQL</code> 语句</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span>
+	<span class="n">overwrite</span> <span class="k">TABLE</span> <span class="n">testdb</span><span class="p">.</span><span class="n">testtable</span> <span class="k">PARTITION</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">hour</span><span class="p">)</span>
+<span class="k">SELECT</span>
+<span class="cm">/*+ COALESCE(40) */</span>
+	<span class="p">...</span>
+<span class="k">FROM</span>
+	<span class="n">t1</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span>
+<span class="cm">/*+ COALESCE(20) */</span>
+	<span class="p">...</span>
+<span class="k">FROM</span>
+	<span class="n">t2</span>
+</code></pre></div></div>
+
+<p>修改以后，发现数据量基本上于以前保持一致。</p>
+
+<p><strong>思考：</strong></p>
+
+<ol>
+  <li>为什么之前会有 800 ( 400+400 ) 个 <code class="language-plaintext highlighter-rouge">partition</code> ？</li>
+  <li>是否通过设置如下参数  <code class="language-plaintext highlighter-rouge">spark.sql.shuffle.partitions=40</code>  解决这个问题，区别是什么？</li>
+  <li>repartition 与 coalesce 区别是什么？</li>
+  <li>Spark 有几种 repartition 方法</li>
+</ol>
+
+<h2 id="参考链接">参考链接</h2>
+
+<ol>
+  <li>https://spark.apache.org/docs/3.0.1/sql-ref-syntax-qry-select-hints.html</li>
+  <li>https://medium.com/@mrpowers/managing-spark-partitions-with-coalesce-and-repartition-4050c57ad5c4#.36o8a7b5j</li>
+  <li>https://stackoverflow.com/questions/54218006/why-does-the-repartition-method-increase-file-size-on-disk</li>
+</ol>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HBase 数据迁移 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2018/01/13/hbase-data-migration/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="HBase 数据迁移">
+      
+    <meta name="keywords" content="HBase，数据迁移,big data">
+    <meta property="og:keywords" content="HBase，数据迁移,big data">
+      
+    <meta name="description" content="本文介绍 HBase 常见的适合大数据量的迁移方法:DISTCP、SNAPSHOT">
+    <meta property="og:description" content="本文介绍 HBase 常见的适合大数据量的迁移方法:DISTCP、SNAPSHOT">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2018/01/13/hbase-data-migration/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2018-01-13">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="HBase 数据迁移">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">HBase 数据迁移</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2018/01/13
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#HBase" title="HBase">HBase</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>本文介绍 HBase 常见的适合大数据量的迁移方法:DISTCP、SNAPSHOT</p>
+
+<ul>
+  <li>
+    <p>1、DSTCP+FIX 元数据信息</p>
+  </li>
+  <li>
+    <p>2、SNAPSHOT快照导出迁移</p>
+  </li>
+</ul>
+
+<h2 id="distcp迁移"><strong>DISTCP迁移</strong></h2>
+
+<p>DISTCP的思路是，直接通过DISTCP拷贝HBase 的目录文件到目标集群，<br />
+然后在目标集群通过hbase提供的hbck 工具来执行元数据修复</p>
+
+<p>案例：
+0.94.11 版本迁移到1.1.3，0.94.11 版本是2013年的版本，是非常老的一个版本。
+社区从0.96版本开始 HBase 序列化协议和目录结构发生了变化
+0.96后的版本不需要步骤2、3</p>
+
+<p>解决步骤：
+确保网络互通，两个集群的 /etc/hosts 配置主机名映射</p>
+
+<p>如下所在步骤在新集群操作</p>
+
+<p>1、首先distcp 拷贝表目录  <br />
+2、创建表描述文件目录（0.96之前版本）  <br />
+3、移动表描述文件到如上目录(0.96之前版本）  <br />
+4、修改权限  <br />
+5、修改所属用户  <br />
+6、修复表 执行hbase hbck -fixMeta -fixAssignments  <br />
+7、登陆hbase shell 执行describe/count/scan 操作验证 <br />
+      数据量大的表建议使用hbase提供的MR RowCounter 工具进行统计：
+     hbase org.apache.hadoop.hbase.mapreduce.RowCounter ‘testTable’</p>
+
+<p>1-5 步骤使用hdfs 用户执行命令：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hadoop distcp   hftp://original_namenode1:port/hbase/test hdfs://new_namenode:8020/apps/hbase/data/data/default/
+hdfs dfs <span class="nt">-mkdir</span> /apps/hbase/data/data/default/test/.tabledesc
+hdfs dfs <span class="nt">-mv</span> /apps/hbase/data/data/default/test/.tableinfo.0000000001 /apps/hbase/data/data/default/test/.tabledesc/
+hdfs dfs <span class="nt">-chmod</span> <span class="nt">-R</span> 755 /apps/hbase/data/data/default/test
+hdfs dfs <span class="nt">-chown</span> <span class="nt">-R</span> hbase:hdfs /apps/hbase/data/data/default/test
+</code></pre></div></div>
+<p>6-7 切换到hbase 用户执行：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hbase hbck <span class="nt">-fixMeta</span>  <span class="nt">-fixAssignments</span> <span class="nb">test</span>
+</code></pre></div></div>
+
+<h2 id="snapshot快照迁移"><strong>SNAPSHOT快照迁移</strong></h2>
+
+<p>HBase 支持快照功能以及快照导出功能，组合利用此功能可以实现数据迁移。</p>
+
+<p>总体思路：</p>
+
+<p>1、启用快照配置  <br />
+2、原集群执行快照，然后执行ExportSnapshot 导出到老集群。注意权限问题。  <br />
+3）导出后，修改对应的权限，然后执行恢复即可</p>
+
+<p>注意点：
+1、注意文件目录权限  <br />
+2、注意配置各自的hostname和IP映射  <br />
+3、注意压缩库是否都配置了</p>
+
+<p>新集群：</p>
+
+<p>1）检查新老集群配置snappy压缩支持(可选，因为有些新老集群压缩不一定支持）  <br />
+在hbase-env.sh中添加如下属性：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">JAVA_LIBRARY_PATH</span><span class="o">=</span>/usr/lib/hadoop/lib/native/Linux-amd64-64:/usr/lib/hadoop/lib/native
+</code></pre></div></div>
+<p>默认加载hadoop的native类库。</p>
+
+<p>2）检查是否启用快照  <br />
+hbase-site.xml中添加  hbase.snapshot.enabled为true</p>
+
+<p>4)检查快照和压缩可用性（hbase 用户执行）  <br />
+（注意本步骤必不可少，即使知道快照和压缩已经可用，因为需要此步骤来自动生成 /apps/hbase/data/.hbase-snapshot 目录）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>su - hbase
+hbase&gt;create <span class="s1">'test_tmp_2017'</span>, <span class="o">{</span>NAME <span class="o">=&gt;</span> <span class="s1">'F'</span>, DATA_BLOCK_ENCODING <span class="o">=&gt;</span> <span class="s1">'NONE'</span>, BLOOMFILTER <span class="o">=&gt;</span> <span class="s1">'ROW'</span>,COMPRESSION <span class="o">=&gt;</span> <span class="s1">'SNAPPY'</span><span class="o">}</span>
+hbase&gt;flush ’test_tmp_2017<span class="s1">'
+hbase&gt;snapshot ’test_tmp_2017'</span>, ’test_tmp_2017_sp<span class="s1">'
+hbase&gt;list_snapshots
+hbase&gt;delete_snapshot ’test_tmp_2017_sp'</span>
+</code></pre></div></div>
+<p>5)修改新集群快照目录权限（hdfs用户执行）  <br />
+原集群为olduser用户，执行快照导出的时候，由于没有权限会导致导入失败。  <br />
+导出快照前，需要执行如下权限：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>su - hdfs
+hdfs dfs <span class="nt">-chmod</span> <span class="nt">-R</span> 777 /apps/hbase/data/.hbase-snapshot <span class="p">;</span>
+hdfs dfs <span class="nt">-chmod</span> <span class="nt">-R</span> 777 /apps/hbase/data/archive <span class="p">;</span>
+</code></pre></div></div>
+<p>如下步骤发生到老集群导入后：</p>
+
+<p>6）修改导出快照文件和信息的权限(hbase:hdfs)  <br />
+导入后为olduser用户权限，需要修改如下</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-chmod</span> <span class="nt">-R</span> 755 /apps/hbase/data/.hbase-snapshot<span class="p">;</span>
+hdfs dfs <span class="nt">-chmod</span> <span class="nt">-R</span> 755 /apps/hbase/data/archive <span class="p">;</span>
+hdfs dfs <span class="nt">-chown</span> <span class="nt">-R</span> hbase:hadoop /apps/hbase/data/.hbase-snapshot<span class="p">;</span>
+hdfs dfs <span class="nt">-chown</span> <span class="nt">-R</span> hbase:hadoop /apps/hbase/data/archive <span class="p">;</span>
+</code></pre></div></div>
+<p>11）恢复快照(hbase用户执行）</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hbase&gt;list_snapshots
+hase&gt;restore_snapshot <span class="s1">'snapshot_name'</span>
+</code></pre></div></div>
+<p>12）检查快照恢复后的表是否可用  <br />
+（a)先简单 hbase&gt; scan ‘tablename’,{LIMIT =&gt; 10}  <br />
+(b)后面再使用 hbase canary扫描全部的表  <br />
+(c)统计行数</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>su - hdfs
+hdfs dfs <span class="nt">-mkdir</span> <span class="nt">-p</span> /user/hbase<span class="p">;</span>
+hdfs dfs <span class="nt">-chown</span> <span class="nt">-R</span> hbase:hdfs /user/hbase<span class="p">;</span>
+su - hbase
+<span class="nb">export </span><span class="nv">HADOOP_HOME</span><span class="o">=</span>/usr/lib/hadoop<span class="p">;</span><span class="nb">export </span><span class="nv">HBASE_HOME</span><span class="o">=</span>/usr/lib/hbase<span class="p">;</span><span class="nb">export </span><span class="nv">HADOOP_CLASSPATH</span><span class="o">=</span><span class="sb">`</span><span class="k">${</span><span class="nv">HBASE_HOME</span><span class="k">}</span>/bin/hbase classpath<span class="sb">`</span><span class="p">;</span> <span class="k">${</span><span class="nv">HADOOP_HOME</span><span class="k">}</span>/bin/hadoop jar /usr/lib/hbase/lib/hbase-server-1.1.3.jar rowcounter &lt;tableName&gt;
+</code></pre></div></div>
+<p>原集群</p>
+
+<p>7）修改原集群的hbase.rootdir配置，在NameNode HA的情况下，原来的hbase.rootdir配置写的有问题，不需要nameservice 不需要端口</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;property&gt;</span>
+<span class="nt">&lt;name&gt;</span>hbase.rootdir<span class="nt">&lt;/name&gt;</span>
+<span class="nt">&lt;value&gt;</span>hdfs://cluster1:8020/hbase<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/property&gt;</span>
+</code></pre></div></div>
+<p>修改为</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;property&gt;</span>
+<span class="nt">&lt;name&gt;</span>hbase.rootdir<span class="nt">&lt;/name&gt;</span>
+<span class="nt">&lt;value&gt;</span>hdfs://cluster1/hbase<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/property&gt;</span>
+</code></pre></div></div>
+
+<p>8）添加新集群IP和主机名映射</p>
+
+<p>将新集群的/etc/hosts中主机名和IP映射添加到老集群所有节点。（ExportSnapshot MR要用到）</p>
+
+<p>9）对所有需要的历史表执行快照，快照命名规则为tablename_sp_YYYYMMDDHHMMmm</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>snapshot <span class="s1">'tablename'</span>,<span class="s1">'tablename_sp_20170821112930'</span>
+</code></pre></div></div>
+<p>10）从老集群导出快照到新集群</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hbase&gt;flush <span class="s1">'tablename'</span>
+hbase <span class="nt">--config</span> /usr/lib/hadoop/etc/hadoop:/usr/lib/hbase/conf/ org.apache.hadoop.hbase.snapshot.ExportSnapshot <span class="nt">-snapshot</span> <span class="o">{</span>snapshotname<span class="o">}</span> <span class="nt">-copy-to</span>
+<span class="o">{</span>hbase.rootdir<span class="o">}</span>
+</code></pre></div></div>
+<p>第一个参数为快照名称，第二个参数为新集群中hbase-site.xml中配置的hbase根目录  <br />
+备注：
+如果exportSnapshot执行失败，则需要在新集群删除</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs -rm -r /apps/hbase/data/.hbase-snapshot/.tmp/snapshotname
+</code></pre></div></div>
+<p>删除对应的临时目录</p>
+
+<p>常见错误：</p>
+
+<p>1、执行ExportSnapshot 报Wrong FS错误  <br />
+NN HA不需要加端口，只需要dfs.nameservices</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hbase <span class="nt">--config</span> /usr/lib/hadoop/etc/hadoop:/usr/lib/hbase/conf/ org.apache.hadoop.hbase.snapshot.ExportSnapshot <span class="nt">-snapshot</span> test_export <span class="nt">-copy-to</span> file:///home/old_user
+</code></pre></div></div>
+
+<blockquote>
+  <p>Exception in thread “main” java.lang.IllegalArgumentException: Wrong FS: hdfs://cluster1:8020/hbase/.hbase-snapshot/test_export/.snapshotinfo, expected: hdfs://cluster1</p>
+</blockquote>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;property&gt;</span>
+<span class="nt">&lt;namehbase.rootdir&gt;&lt;/name&gt;</span>
+<span class="nt">&lt;value&gt;</span>hdfs://cluster1:8020/hbase<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/property&gt;</span>
+</code></pre></div></div>
+<p>修改为</p>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;property&gt;</span>
+<span class="nt">&lt;name&gt;</span>hbase.rootdir<span class="nt">&lt;/name&gt;</span>
+<span class="nt">&lt;value&gt;</span>hdfs://cluster1/hbase<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/property&gt;</span>
+</code></pre></div></div>
+
+<p>2、执行快速结束了，没有MR信息</p>
+
+<blockquote>
+  <p>Exception in thread “main” org.apache.hadoop.hbase.snapshot.ExportSnapshotException: Failed to copy the snapshot directory: from=hdfs://cluster1/hbase/.hbase-snapshot/test_snapshot to=hdfs://new_cluster:8020/tmp/export/.hbase-snapshot/.tmp/test_snapshot
+at org.apache.hadoop.hbase.snapshot.ExportSnapshot.run(ExportSnapshot.java:742)
+at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:70
+at org.apache.hadoop.hbase.snapshot.ExportSnapshot.innerMain(ExportSnapshot.java:800)
+at org.apache.hadoop.hbase.snapshot.ExportSnapshot.main(ExportSnapshot.java:804)</p>
+</blockquote>
+
+<p>原因是导出新集群的目录没有权限（此处并没有报出错误信息）</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-chmod</span> 777 /tmp/export
+</code></pre></div></div>
+<p>3、UnknownHostException</p>
+
+<blockquote>
+  <p>17/08/18 16:14:51 INFO mapreduce.Job: Task Id : attempt_1503041014815_0006_m_000000_0, Status : FAILED
+Error: java.lang.IllegalArgumentException: java.net.UnknownHostException: new_cluster at org.apache.hadoop.security.SecurityUtil.buildTokenService(SecurityUtil.java:377)
+at org.apache.hadoop.hdfs.NameNodeProxies.createNonHAProxy(NameNodeProxies.java:237)
+at org.apache.hadoop.hdfs.NameNodeProxies.createProxy(NameNodeProxies.java:141)
+at org.apache.hadoop.hdfs.DFSClient.<init>(DFSClient.java:576)
+at org.apache.hadoop.hdfs.DFSClient.<init>(DFSClient.java:521)
+at org.apache.hadoop.hdfs.DistributedFileSystem.initialize(DistributedFileSystem.java:146)
+at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:368)
+at org.apache.hadoop.hbase.snapshot.ExportSnapshot$ExportMapper.setup(ExportSnapshot.java:142)
+....
+ Caused by: java.net.UnknownHostException: new_cluster</init></init></p>
+</blockquote>
+
+<p>将新集群的IP和主机名 添加到原集群中。</p>
+
+<p>4、导入失败</p>
+
+<blockquote>
+  <p>Exception in thread “main” org.apache.hadoop.hbase.snapshot.ExportSnapshotException: Failed to copy the snapshot directory: from=hdfs://cluster1/hbase/.hbase-snapshot/test_snapshot to=hdfs://new_cluster:8020/apps/hbase/data/.hbase-snapshot/.tmp/test_snapshot at org.apache.hadoop.hbase.snapshot.ExportSnapshot.run (ExportSnapshot.java:742)
+at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:70)
+at org.apache.hadoop.hbase.snapshot.ExportSnapshot.innerMain(ExportSnapshot.java:800)
+at org.apache.hadoop.hbase.snapshot.ExportSnapshot.main(ExportSnapshot.java:804)</p>
+</blockquote>
+
+<p>原来的老集群的用户old_user没有权限，导入新集群(hbase:hdfs)</p>
+
+<p>chmod 777 /apps/hbase/data/.hbase-snapshot snapshot描述信息目录</p>
+
+<p>chmod 777 /apps/hbase/data/archive 实际数据文件目录</p>
+
+<p>4、导出快照目录路径问题</p>
+
+<p>导出快照的路径不是随便写的，不然目的集群找不到快照名称。</p>
+
+<p>路径应该为新集群的hbase.rootdir</p>
+
+<p>导入的快照会在hbase.rootdir/.hbase-snapshot 中，该目录刚开始是没有的，需要在新集群，随便生生个表，然后执行一次快照即会出现。</p>
+
+<p>5、快照 may be in-progress</p>
+
+<blockquote>
+  <p>A snapshot with the same name ‘test_snapshot’ may be in-progress
+Please check hdfs://new_cluster:8020/apps/hbase/data/.hbase-snapshot/.tmp/test_snapshot. If the snapshot has completed,
+consider removing hdfs://new_cluster:8020/apps/hbase/data/.hbase-snapshot/.tmp/test_snapshot before retrying export</p>
+</blockquote>
+
+<p>原因是上次导出快照失败后，仍然会残留信息   <br />
+删除新集群的/apps/hbase/data/.hbase-snapshot/.tmp/test_snapshot 重新执行</p>
+
+<p>6、恢复权限时候报错：</p>
+
+<blockquote>
+  <p>Caused by: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.AccessControlException): Permission denied: user=hbase, access=WRITE, inode=”/apps/hbase/data/archive/data/default/test/55920779ef2f781d7b1195862a81e7b9/c1/.links-6186277fd0e14bcb98020b41437580fc”:e3base:hdfs:drwxr-xr-x</p>
+</blockquote>
+
+<p>导入的时候，是使用导入用户的权限。需要授权  <br />
+7、snappy 报错  <br />
+配置snappy压缩支持：  <br />
+在HC的hbase-env.sh中添加如下属性：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">JAVA_LIBRARY_PATH</span><span class="o">=</span>/usr/lib/hadoop/lib/native/Linux-amd64-64:/usr/lib/hadoop/lib/native
+</code></pre></div></div>
+<p>8、ClassNotFoundException：</p>
+<blockquote>
+  <p>java.lang.ClassNotFoundException：org.apache.hbadoop.hbase.codec.prefixetree.PrefixTreeCodec….</p>
+</blockquote>
+
+<p>yarn-site.xml中的yarn.application.classpath 添加hbase /lib 目录路径  <br />
+mapred-site.xml中的mapreduce.application.classpath 添加hbase /lib 目录路径  <br />
+尝试使用类似如下命令去执行hbase MR</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">HADOOP_HOME</span><span class="o">=</span>/usr/lib/hadoop<span class="p">;</span><span class="nb">export </span><span class="nv">HBASE_HOME</span><span class="o">=</span>/usr/lib/hbase<span class="p">;</span><span class="nb">export </span><span class="nv">HADOOP_CLASSPATH</span><span class="o">=</span><span class="sb">`</span><span class="k">${</span><span class="nv">HBASE_HOME</span><span class="k">}</span>/bin/hbase classpath<span class="sb">`</span><span class="p">;</span> <span class="k">${</span><span class="nv">HADOOP_HOME</span><span class="k">}</span>/bin/hadoop jar /usr/lib/hbase/lib/hbase-server-1.1.3.jar rowcounter testtable
+</code></pre></div></div>
+
+<hr />
+
+<p>注意线上环境执行distcp或者snapshot 需要限制带宽。可通过设置map数以及限制每个map的带宽来实现。</p>
+
+<p>限制带宽方法请执行如下命令查看帮助</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hadoop distcp
+</code></pre></div></div>
+<blockquote>
+  <p>-bandwidth <arg>              Specify bandwidth per map in MB  <br />
+-m <arg>                      Max number of concurrent maps to use for copy</arg></arg></p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hbase org.apache.hadoop.hbase.snapshot.ExportSnapshot
+</code></pre></div></div>
+<blockquote>
+  <p>-mappers                Number of mappers to use during the copy   (mapreduce.job.maps).<br />
+-bandwidth              Limit bandwidth to this value in MB/second.</p>
+</blockquote>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

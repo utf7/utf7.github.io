@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spark SQL 正确的传递 Hive 参数 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/10/18/spark-sql-params/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Spark SQL 正确的传递 Hive 参数">
+      
+    <meta name="keywords" content="Spark SQL">
+    <meta property="og:keywords" content="Spark SQL">
+      
+    <meta name="description" content="Spark SQL 正确的传递 Hive 参数">
+    <meta property="og:description" content="Spark SQL 正确的传递 Hive 参数">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/10/18/spark-sql-params/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-10-18">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Spark SQL 正确的传递">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Spark SQL 正确的传递 Hive 参数</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/10/18
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Spark" title="Spark">Spark</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>使用 <code class="language-plaintext highlighter-rouge">spark-sql</code> 导入动态分区时，出现来错误</p>
+<pre><code class="language-log">Error in query: org.apache.hadoop.hive.ql.metadata.HiveException: Number of dynamic partitions created is 1793, which is more than 1000. To solve this try to set hive.exec.max.dynamic.partitions to at least 1793.;
+</code></pre>
+<p>提示增加 <code class="language-plaintext highlighter-rouge">hive.exec.max.dynamic.partitions</code> 的值，
+可是我明明通过 <code class="language-plaintext highlighter-rouge">--conf  hive.exec.max.dynamic.partitions=1000000</code> 为什么还是报错了？难道是参数没有传递进去？？？
+执行 <code class="language-plaintext highlighter-rouge">spark-sql --help</code> ，通过查看 <code class="language-plaintext highlighter-rouge">spark-sql</code> 的帮助</p>
+
+<p>原来 hive的参数是通过 <code class="language-plaintext highlighter-rouge">--hiveconf</code> 来传递的而不是 <code class="language-plaintext highlighter-rouge">--conf</code></p>
+
+<p>使用 <code class="language-plaintext highlighter-rouge">--conf</code> 来传递 <code class="language-plaintext highlighter-rouge">spark</code> 参数
+使用 <code class="language-plaintext highlighter-rouge">--hiveconf</code> 来传递 <code class="language-plaintext highlighter-rouge">hive</code> 参数
+修改后为：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup </span>spark-sql  <span class="nt">--master</span> yarn  <span class="nt">--deploy-mode</span> client <span class="nt">--queue</span> root.test.myqueue  <span class="nt">--driver-memory</span> 24g   <span class="nt">--executor-cores</span> 2   <span class="nt">--executor-memory</span> 4g   <span class="nt">--num-executors</span> 256   <span class="nt">--conf</span> spark.driver.memoryOverhead<span class="o">=</span>1g   <span class="nt">--conf</span> spark.executor.memoryOverhead<span class="o">=</span>1g   <span class="nt">--conf</span> spark.speculation<span class="o">=</span><span class="nb">false</span> <span class="nt">--conf</span> spark.driver.maxResultSize<span class="o">=</span>12g <span class="nt">--conf</span> spark.sql.hive.filesourcePartitionFileCacheSize<span class="o">=</span>4621440000 <span class="nt">--conf</span> spark.sql.files.maxPartitionBytes<span class="o">=</span>268435456 <span class="nt">--conf</span> spark.sql.files.openCostInBytes<span class="o">=</span>0 <span class="nt">--conf</span> spark.sql.shuffle.partitions<span class="o">=</span>512 <span class="nt">--hiveconf</span> hive.exec.max.dynamic.partitions<span class="o">=</span>1000000 <span class="nt">--hiveconf</span> hive.exec.max.dynamic.partitions.pernode<span class="o">=</span>100000 <span class="nt">--hiveconf</span> hive.exec.max.created.files<span class="o">=</span>1000000 <span class="nt">-S</span> <span class="nt">-e</span> <span class="s2">"insert overwrite table tt partition(day,hour) select * from table1 where day&lt;='2020-10-11' distribute by day,hour , cast( floor(rand() * 8) as int);"</span>  <span class="o">&gt;</span> merge.log 2&gt;&amp;1 &amp; 
+</code></pre></div></div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

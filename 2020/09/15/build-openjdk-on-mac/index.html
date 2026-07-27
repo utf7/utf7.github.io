@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mac 上从源代码编译 OpenJDk &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/09/15/build-openjdk-on-mac/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Mac 上从源代码编译 OpenJDk">
+      
+    <meta name="keywords" content="JDK,JVM,Mac">
+    <meta property="og:keywords" content="JDK,JVM,Mac">
+      
+    <meta name="description" content="Mac 上从源代码编译 OpenJDk">
+    <meta property="og:description" content="Mac 上从源代码编译 OpenJDk">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/09/15/build-openjdk-on-mac/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-09-15">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Mac 上从源代码编译 Ope">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Mac 上从源代码编译 OpenJDk</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/09/15
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Java" title="Java">Java</a>
+          </span>
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Mac" title="Mac">Mac</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="mac-上从源代码编译-openjdk">Mac 上从源代码编译 OpenJDk</h1>
+
+<p>最近被问了一个关于 <code class="language-plaintext highlighter-rouge">YARN</code> 任务关于 <code class="language-plaintext highlighter-rouge">JVM</code> 启动内存参数相关的问题，上网搜索发现关于一些 <code class="language-plaintext highlighter-rouge">JVM</code> 参数的说法，通常质量都比较低，就想着去看一下 <code class="language-plaintext highlighter-rouge">OpenJDK</code> 的代码， <code class="language-plaintext highlighter-rouge">OpenJDK</code>  主要是使用 <code class="language-plaintext highlighter-rouge">C++ </code>写的,虽然没用过 <code class="language-plaintext highlighter-rouge">C++</code>,但我想一些简单的参数意义从代码中还是能看懂的，同时有感于对 <code class="language-plaintext highlighter-rouge">JVM</code> 一些参数总是一知半解，想通过看代码来加深印象，便于记忆。就像以前做 <code class="language-plaintext highlighter-rouge">HBase</code> 一样，各种参数很难记住或者理解不深刻，但是通过实践+看代码的方式来巩固加深理解。比如很多人会有这样的误解，对于 <code class="language-plaintext highlighter-rouge">JDK7/8</code> 只要不设置为 <code class="language-plaintext highlighter-rouge">G1</code>，就是默认 <code class="language-plaintext highlighter-rouge">CMS</code>, 其实并不是,比如 <code class="language-plaintext highlighter-rouge">JDK 8</code> 模式的 <code class="language-plaintext highlighter-rouge">GC</code> 既不是 <code class="language-plaintext highlighter-rouge">G1</code> 也不是<code class="language-plaintext highlighter-rouge">CMS</code>,并且仔细看的话，<code class="language-plaintext highlighter-rouge">CMS</code> 在其他版本中从来就没有被当作为默认的 <code class="language-plaintext highlighter-rouge">GC</code> 方式。刚开始在 <code class="language-plaintext highlighter-rouge">github</code> 上面在线看代码，看代码的过程中发现不是很方便，于是就想着把代码下载下来，在 <code class="language-plaintext highlighter-rouge">IDE</code> 中查看，也方便查找，然后就想着如何在 <code class="language-plaintext highlighter-rouge">Mac</code> 上面编译一下 <code class="language-plaintext highlighter-rouge">OpenJDK</code> ,于是就有了这篇文章。</p>
+
+<p>编译前一定请认真阅读一下：https://github.com/openjdk/jdk/blob/master/doc/building.md</p>
+
+<p>官方的编译指南。</p>
+
+<h3 id="准备源代码">准备源代码</h3>
+
+<p>git clone https://github.com/openjdk/jdk.git</p>
+
+<p>我这里编译的是 <code class="language-plaintext highlighter-rouge">JDK11</code>，所以我  <code class="language-plaintext highlighter-rouge">checkout</code> 了最新的 <code class="language-plaintext highlighter-rouge">JDK11</code> 的<code class="language-plaintext highlighter-rouge">tag </code></p>
+
+<p>git checkout -b jdk-11+28 jdk-11+28</p>
+
+<h3 id="编译所需要安装的软件">编译所需要安装的软件</h3>
+
+<p>brew install autoconf freetype ccache</p>
+
+<h4 id="安装配置xcode">安装配置Xcode</h4>
+
+<p>appstore  安装 xcode</p>
+
+<p>sudo Xcode-select –switch /Applications/Xcode.app/Contents/Developer</p>
+
+<h4 id="安装部署boot-jdk">安装部署boot-jdk</h4>
+
+<p>编译 jdk 源码需要使用boot-jdk，这里我使用的是 adoptopenjdk</p>
+
+<p>下载地址：</p>
+
+<p>https://adoptopenjdk.net/releases.html?variant=openjdk11&amp;jvmVariant=hotspot</p>
+
+<p>tar -zxvf OpenJDK11U-jdk_x64_mac_hotspot_11.0.8_10.tar.gz</p>
+
+<h4 id="安装-jtreg">安装 jtreg</h4>
+
+<p>下载</p>
+
+<p>https://ci.adoptopenjdk.net/view/Dependencies/job/jtreg/lastSuccessfulBuild/artifact/jtreg-5.1-b01.tar.gz</p>
+
+<p>tar -zxvf jtreg-5.1-b01.tar.gz</p>
+
+<h2 id="编译">编译</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash configure <span class="nt">--with-boot-jdk</span><span class="o">=</span>/Users/admin/jdk-11.0.8+10/Contents/Home <span class="nt">--with-jvm-variants</span><span class="o">=</span>server <span class="nt">--with-target-bits</span><span class="o">=</span>64  <span class="nt">--enable-dtrace</span> <span class="nt">--enable-ccache</span> <span class="nt">--with-num-cores</span><span class="o">=</span>4 <span class="nt">--with-memory-size</span><span class="o">=</span>4096 <span class="nt">--with-jtreg</span><span class="o">=</span>/Users/admin/jtreg <span class="nt">--with-freetype</span><span class="o">=</span>bundled <span class="nt">--disable-warnings-as-errors</span> <span class="nt">--enable-debug</span> <span class="nt">--enable-dtrace</span>
+</code></pre></div></div>
+
+<p><img src="/images/posts/java/build-jdk-config.png" alt="configure" /></p>
+
+<p>编译时间挺长的，请耐心等待。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make images
+</code></pre></div></div>
+
+<p><img src="/images/posts/java/build-jdk-image.jpg" alt="make-images-output" /></p>
+
+<p>验证：</p>
+
+<p>编译后的 JDK 路径为：</p>
+
+<p>./build/macosx-x86_64-normal-server-fastdebug/images/jdk/</p>
+
+<p>查看版本：</p>
+
+<p><img src="/images/posts/java/build-jdk-version.png" alt="buidl-jdk-show-version" /></p>
+
+<h3 id="错误汇总">错误汇总</h3>
+
+<h5 id="缺少xcode-报错">缺少Xcode 报错：</h5>
+
+<div class="language-verilog highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">checking</span> <span class="k">for</span> <span class="n">sdk</span> <span class="n">name</span><span class="p">...</span>
+<span class="nl">configure:</span> <span class="nl">error:</span> <span class="n">No</span> <span class="n">xcodebuild</span> <span class="n">tool</span> <span class="kt">and</span> <span class="n">no</span> <span class="nb">system</span> <span class="n">framework</span> <span class="n">headers</span> <span class="n">found</span><span class="p">,</span> <span class="k">use</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">sysroot</span> <span class="kt">or</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">sdk</span><span class="o">-</span><span class="n">name</span> <span class="n">to</span> <span class="n">provide</span> <span class="n">a</span> <span class="n">path</span> <span class="n">to</span> <span class="n">a</span> <span class="n">valid</span> <span class="n">SDK</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">admin</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">jdk</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="p">.</span><span class="n">configure</span><span class="o">-</span><span class="n">support</span><span class="o">/</span><span class="n">generated</span><span class="o">-</span><span class="n">configure</span><span class="p">.</span><span class="n">sh</span><span class="o">:</span> <span class="n">line</span> <span class="mi">82</span><span class="o">:</span> <span class="mi">5</span><span class="o">:</span> <span class="n">Bad</span> <span class="n">file</span> <span class="n">descriptor</span>
+<span class="n">configure</span> <span class="n">exiting</span> <span class="k">with</span> <span class="n">result</span> <span class="n">code</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>执行 <code class="language-plaintext highlighter-rouge">xcodebuild</code> 发现如下错误</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">xcode</span><span class="o">-</span><span class="nx">select</span><span class="p">:</span> <span class="nx">error</span><span class="p">:</span> <span class="nx">tool</span> <span class="dl">'</span><span class="s1">xcodebuild</span><span class="dl">'</span> <span class="nx">requires</span> <span class="nx">Xcode</span><span class="p">,</span> 
+<span class="nx">but</span> <span class="nx">active</span> <span class="nx">developer</span> <span class="nx">directory</span> 
+<span class="dl">'</span><span class="s1">/Library/Developer/CommandLineTools</span><span class="dl">'</span> <span class="nx">is</span> <span class="nx">a</span> <span class="nx">command</span> <span class="nx">line</span> <span class="nx">tools</span> <span class="nx">instance</span>
+</code></pre></div></div>
+
+<h5 id="缺少boot-jdk-错误">缺少boot-jdk 错误</h5>
+
+<div class="language-verilog highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">configure</span><span class="o">:</span> <span class="n">Potential</span> <span class="n">Boot</span> <span class="n">JDK</span> <span class="n">found</span> <span class="n">at</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Java</span><span class="o">/</span><span class="n">JavaVirtualMachines</span><span class="o">/</span><span class="n">jdk1</span><span class="mf">.8.0_261</span><span class="p">.</span><span class="n">jdk</span><span class="o">/</span><span class="n">Contents</span><span class="o">/</span><span class="n">Home</span> <span class="n">is</span> <span class="n">incorrect</span> <span class="n">JDK</span> <span class="n">version</span> <span class="p">(</span><span class="n">java</span> <span class="n">version</span> <span class="s">"1.8.0_261"</span><span class="p">);</span> <span class="n">ignoring</span>
+<span class="nl">configure:</span> <span class="p">(</span><span class="n">Your</span> <span class="n">Boot</span> <span class="n">JDK</span> <span class="n">version</span> <span class="n">must</span> <span class="n">be</span> <span class="n">one</span> <span class="n">of</span><span class="o">:</span> <span class="mi">10</span> <span class="mi">11</span><span class="p">)</span>
+<span class="nl">configure:</span> <span class="n">Could</span> <span class="kt">not</span> <span class="n">find</span> <span class="n">a</span> <span class="n">valid</span> <span class="n">Boot</span> <span class="n">JDK</span><span class="p">.</span> <span class="n">You</span> <span class="n">might</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span> <span class="n">fix</span> <span class="k">this</span> <span class="n">by</span> <span class="n">running</span> <span class="err">'</span><span class="n">brew</span> <span class="n">cask</span> <span class="n">install</span> <span class="n">java</span><span class="err">'</span><span class="p">.</span>
+<span class="nl">configure:</span> <span class="n">This</span> <span class="n">might</span> <span class="n">be</span> <span class="n">fixed</span> <span class="n">by</span> <span class="n">explicitly</span> <span class="n">setting</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">jdk</span>
+<span class="nl">configure:</span> <span class="nl">error:</span> <span class="n">Cannot</span> <span class="k">continue</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">admin</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">jdk</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="p">.</span><span class="n">configure</span><span class="o">-</span><span class="n">support</span><span class="o">/</span><span class="n">generated</span><span class="o">-</span><span class="n">configure</span><span class="p">.</span><span class="n">sh</span><span class="o">:</span> <span class="n">line</span> <span class="mi">82</span><span class="o">:</span> <span class="mi">5</span><span class="o">:</span> <span class="n">Bad</span> <span class="n">file</span> <span class="n">descriptor</span>
+<span class="n">configure</span> <span class="n">exiting</span> <span class="k">with</span> <span class="n">result</span> <span class="n">code</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>解决办法参考安装部署 <code class="language-plaintext highlighter-rouge">boot-jdk</code>，<code class="language-plaintext highlighter-rouge">configure</code> 配置的时候需要指定 <code class="language-plaintext highlighter-rouge">--with-boot-jdk=/Users/admin/jdk-11.0.8+10/Contents/Home</code></p>
+
+<h5 id="freetype-配置错误">freetype 配置错误</h5>
+
+<p>checking for cups/ppd.h… yes
+configure: error: Valid values for –with-freetype are ‘system’ and ‘bundled’
+/Users/admin/github/jdk/build/.configure-support/generated-configure.sh: line 82: 5: Bad file descriptor
+configure exiting with result code 1</p>
+
+<p>将  <code class="language-plaintext highlighter-rouge">--with-freetype=/usr/local/Cellar/freetype/2.10.2</code> 修改为<code class="language-plaintext highlighter-rouge">--with-freetype=bundled</code></p>
+
+<h5 id="缺少jtreg-报错">缺少jtreg 报错</h5>
+
+<div class="language-verilog highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Test</span> <span class="n">selection</span> <span class="err">'</span><span class="n">tier1</span><span class="err">'</span><span class="p">,</span> <span class="n">will</span> <span class="n">run</span><span class="o">:</span>
+<span class="o">*</span> <span class="n">jtreg</span><span class="o">:</span><span class="n">test</span><span class="o">/</span><span class="n">hotspot</span><span class="o">/</span><span class="n">jtreg</span><span class="o">:</span><span class="n">tier1</span>
+<span class="o">*</span> <span class="n">jtreg</span><span class="o">:</span><span class="n">test</span><span class="o">/</span><span class="n">jdk</span><span class="o">:</span><span class="n">tier1</span>
+<span class="o">*</span> <span class="n">jtreg</span><span class="o">:</span><span class="n">test</span><span class="o">/</span><span class="n">langtools</span><span class="o">:</span><span class="n">tier1</span>
+<span class="o">*</span> <span class="n">jtreg</span><span class="o">:</span><span class="n">test</span><span class="o">/</span><span class="n">jaxp</span><span class="o">:</span><span class="n">tier1</span>
+<span class="o">*</span> <span class="n">jtreg</span><span class="o">:</span><span class="n">test</span><span class="o">/</span><span class="n">lib</span><span class="o">-</span><span class="n">test</span><span class="o">:</span><span class="n">tier1</span>
+<span class="nl">Error:</span> <span class="n">jtreg</span> <span class="n">framework</span> <span class="n">is</span> <span class="kt">not</span> <span class="n">found</span><span class="p">.</span>
+<span class="n">Please</span> <span class="n">run</span> <span class="n">configure</span> <span class="n">using</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">jtreg</span><span class="p">.</span>
+<span class="n">RunTests</span><span class="p">.</span><span class="n">gmk</span><span class="o">:</span><span class="mi">1117</span><span class="o">:</span> <span class="o">***</span> <span class="n">Cannot</span> <span class="k">continue</span><span class="p">.</span>  <span class="n">Stop</span><span class="p">.</span>
+<span class="n">make</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">:</span> <span class="o">***</span> <span class="p">[</span><span class="n">test</span><span class="o">-</span><span class="n">tier1</span><span class="p">]</span> <span class="n">Error</span> <span class="mi">2</span>
+
+<span class="nl">ERROR:</span> <span class="n">Build</span> <span class="n">failed</span> <span class="k">for</span> <span class="n">target</span> <span class="err">'</span><span class="n">run</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">tier1</span><span class="err">'</span> <span class="n">in</span> <span class="n">configuration</span> <span class="err">'</span><span class="n">macosx</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="k">release</span><span class="err">'</span> <span class="p">(</span><span class="nb">exit</span> <span class="n">code</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">No</span> <span class="n">indication</span> <span class="n">of</span> <span class="n">failed</span> <span class="n">target</span> <span class="n">found</span><span class="p">.</span>
+<span class="nl">Hint:</span> <span class="n">Try</span> <span class="n">searching</span> <span class="n">the</span> <span class="n">build</span> <span class="n">log</span> <span class="k">for</span> <span class="err">'</span><span class="p">]</span> <span class="n">Error</span><span class="err">'</span><span class="p">.</span>
+<span class="nl">Hint:</span> <span class="n">See</span> <span class="n">doc</span><span class="o">/</span><span class="n">building</span><span class="p">.</span><span class="n">html</span><span class="p">#</span><span class="n">troubleshooting</span> <span class="k">for</span> <span class="n">assistance</span><span class="p">.</span>
+
+<span class="n">make</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">:</span> <span class="o">***</span> <span class="p">[</span><span class="n">main</span><span class="p">]</span> <span class="n">Error</span> <span class="mi">2</span>
+<span class="nl">make:</span> <span class="o">***</span> <span class="p">[</span><span class="n">run</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">tier1</span><span class="p">]</span> <span class="n">Error</span> <span class="mi">2</span>
+</code></pre></div></div>
+
+<p>参考链接：</p>
+
+<p>https://github.com/openjdk/jdk/blob/master/doc/building.md</p>
+
+<p>http://jdk.java.net/</p>
+
+<p>https://adoptopenjdk.net/releases.html?variant=openjdk11&amp;jvmVariant=hotspot</p>
+
+<p>https://cloud.tencent.com/developer/article/1522903</p>
+
+<p>https://ci.adoptopenjdk.net/view/Dependencies/job/jtreg/lastSuccessfulBuild/artifact/</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

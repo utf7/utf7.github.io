@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>编译 hadoop3 并绑定 native 库 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2020/09/06/build-hadoop-with-bundle-native-lib/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="编译 hadoop3 并绑定 native 库">
+      
+    <meta name="keywords" content="hadoop,zstd,snappy,isal,ISA-L,编译hadoop,native">
+    <meta property="og:keywords" content="hadoop,zstd,snappy,isal,ISA-L,编译hadoop,native">
+      
+    <meta name="description" content="hadoop,native">
+    <meta property="og:description" content="hadoop,native">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2020/09/06/build-hadoop-with-bundle-native-lib/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2020-09-06">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="编译 hadoop3 并绑定 ">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">编译 hadoop3 并绑定 native 库</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2020/09/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Hadoop" title="Hadoop">Hadoop</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="编译-hadoop3-并绑定-native-库">编译 hadoop3 并绑定 native 库</h1>
+
+<p>最近由于工作需要，需要编译hadoop3，hadoop 3本身编译比较简单；但是由于涉及到 native 库，社区提供的安装包中不包括 native 库，比如压缩算法的zstd、snappy 以及纠删码的ISA-L，所以会比较麻烦。 本文将介绍如何编译并绑定native库，记录一下，或许会对其他人有些帮助。</p>
+
+<h2 id="需要加入的native">需要加入的native</h2>
+
+<p>1、isa-l</p>
+
+<p>用于纠删码</p>
+
+<p>2、snappy</p>
+
+<p>谷歌出品的 snappy 压缩算法，hadoop生态很常用的压缩算法。​</p>
+
+<p>3、zstd
+Facebook 出品的 zstd 压缩算法，也是近年来 Hadoop 生态常用压缩库，强烈推荐。</p>
+
+<p>当然也可以根据需要添加一些其他的，比如 lzo 等等。</p>
+
+<h3 id="编译isa-l">编译isa-l</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/intel/isa-l.git
+<span class="nb">cd </span>isa-l/
+git tag
+git checkout v2.29.0 <span class="nt">-b</span> v2.29
+yum <span class="nb">install</span> <span class="nt">-y</span> yasm<span class="o">(</span>已经安装则不需要）
+yum <span class="nb">install</span> <span class="nt">-y</span> nasm（已经安装则不需要）
+yum <span class="nb">install</span> <span class="nt">-y</span> help2man（已经安装则不需要）
+
+
+
+./autogen.sh
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--libdir</span><span class="o">=</span>/usr/lib64
+make
+make <span class="nb">install</span>
+</code></pre></div></div>
+
+<p>查看编译后的 lib ：</p>
+
+<p><img src="/images/posts/hadoop/build-hadoop-with-native/isal-lib.png" alt="" title="isal-lib.png" /></p>
+
+<h3 id="编译zstd">编译zstd</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://github.com/facebook/zstd/tags 
+
+下载源代码 这里是1.4.5
+
+<span class="nb">tar</span> <span class="nt">-zxvf</span> zstd-1.4.5.tar.gz
+
+<span class="nb">cd </span>zstd-1.4.5/
+
+make <span class="o">&amp;&amp;</span> make <span class="nb">install
+
+</span>注意 zstd 默认 在 /usr/local/lib 下面 
+</code></pre></div></div>
+
+<p><img src="/images/posts/hadoop/build-hadoop-with-native/zstd-lib.png" alt="" title="zstd-lib.png" /></p>
+
+<h3 id="编译snappy">编译snappy</h3>
+
+<p>笔者的环境中 snappy 已经有了，这里就不编译了</p>
+
+<p><img src="/images/posts/hadoop/build-hadoop-with-native/snappy-lib.png" alt="" title="snappy-lib.png" /></p>
+
+<p>如果没有的话，则执行如下命令可以安装：</p>
+
+<p><code class="language-plaintext highlighter-rouge">yum install snappy snappy-devel</code></p>
+
+<h3 id="编译-protobuff">编译 protobuff</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#如果编译protobuf报错： error: C++ preprocessor "/lib/cpp" fails sanity check
+#则需要 yum install gcc-c++
+
+wget https://github.com/protocolbuffers/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
+tar -zxvf protobuf-2.5.0.tar.gz
+cd protobuf-2.5.0
+./configure
+make
+make check
+make install
+</code></pre></div></div>
+
+<h3 id="cmake">cmake</h3>
+
+<p>如果cmake 没有，或者版本过低的话，则执行如下</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[ERROR] Failed to execute goal org.apache.hadoop:hadoop-maven-plugins:3.2.1-xima-2022021512:cmake-compile (cmake-compile) on project hadoop-common: Error executing CMake: Cannot run program "cmake" (in directory "/root/project/hadoop/hadoop-common-project/hadoop-common/target/native"): error=2, 没有那个文件或目录 -&gt; [Help 1]
+
+ yum install -y cmake3
+
+ ln -s /usr/bin/cmake3 /usr/bin/cmake
+</code></pre></div></div>
+
+<h3 id="zlib">zlib</h3>
+
+<p>如果没有安装zlib的话，可以执行如下命令安装</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ING] CMake Error at /usr/share/cmake3/Modules/FindPackageHandleStandardArgs.cmake:164 (message):
+[WARNING]   Could NOT find ZLIB (missing: ZLIB_INCLUDE_DIR)
+
+yum install -y zlib-devel
+</code></pre></div></div>
+
+<h3 id="安装openssl">安装openssl</h3>
+
+<p>如果没有openssl的话，则</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[WARNING] CMake Error at /usr/share/cmake3/Modules/FindPackageHandleStandardArgs.cmake:164 (message):
+[WARNING]   Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the
+[WARNING]   system variable OPENSSL_ROOT_DIR (missing: OPENSSL_CRYPTO_LIBRARY
+
+yum install -y  openssl-devel
+</code></pre></div></div>
+
+<h3 id="编译hadoop3">编译hadoop3</h3>
+
+<p>上面的库都编译好以后，我们开始编译 <code class="language-plaintext highlighter-rouge">hadoop3</code>，并且支持 <code class="language-plaintext highlighter-rouge">ISA-L,zstd,snappy</code></p>
+
+<h4 id="编译-hadoop3-同时绑定-zstdsnappyisa-l">编译 hadoop3 同时绑定 zstd,snappy,isa-l</h4>
+
+<p>注意<code class="language-plaintext highlighter-rouge">zstd</code>与<code class="language-plaintext highlighter-rouge">isal</code> 和<code class="language-plaintext highlighter-rouge">snappy</code> 目录</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean <span class="nb">install</span> <span class="nt">-DskipTests</span> <span class="nt">-Pdist</span>,native  <span class="nt">-Dtar</span> <span class="nt">-Dbundle</span>.snappy<span class="o">=</span><span class="nb">true</span> <span class="nt">-Drequire</span>.snappy<span class="o">=</span><span class="nb">true</span>  <span class="nt">-Dsnappy</span>.prefix<span class="o">=</span>/usr/lib64  <span class="nt">-Dsnappy</span>.lib<span class="o">=</span>/usr/lib64  <span class="nt">-Drequire</span>.zstd<span class="o">=</span><span class="nb">true</span> <span class="nt">-Dbundle</span>.zstd<span class="o">=</span><span class="nb">true</span> <span class="nt">-Dzstd</span>.lib<span class="o">=</span>/usr/local/lib <span class="nt">-Dbundle</span>.isal<span class="o">=</span><span class="nb">true</span> <span class="nt">-Drequire</span>.isal<span class="o">=</span><span class="nb">true</span> <span class="nt">-Disal</span>.prefix<span class="o">=</span>/usr/lib64 <span class="nt">-Disal</span>.lib<span class="o">=</span>/usr/lib64  
+</code></pre></div></div>
+
+<p>bundle openssl</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean install -DskipTests -Pdist,native  -Dtar -Dbundle.snappy=true -Drequire.snappy=true  -Dsnappy.prefix=/usr/lib64  -Dsnappy.lib=/usr/lib64  -Drequire.zstd=true -Dbundle.zstd=true -Dzstd.lib=/usr/local/lib -Dbundle.isal=true -Drequire.isal=true -Disal.prefix=/usr/lib64 -Disal.lib=/usr/lib64  -Drequire.openssl=true -Dbundle.openssl=true -Dopenssl.lib=/usr/lib64
+</code></pre></div></div>
+
+<p>编译完成后，会在 hadoop-dist/target 目录下产生 hadoop-${version}.tar.gz 的包，如下图</p>
+
+<p><img src="/images/posts/hadoop/build-hadoop-with-native/hadoop-build-out-tar.png" alt="" title="hadoop-build-out-tar.png" /></p>
+
+<h4 id="查看-native-包是否存在">查看 <code class="language-plaintext highlighter-rouge">native</code> 包是否存在：</h4>
+
+<p><img src="/images/posts/hadoop/build-hadoop-with-native/native-list.png" alt="" title="native-list.png" /></p>
+
+<h4 id="验证-native">验证 native</h4>
+
+<p><code class="language-plaintext highlighter-rouge">export HADOOP_HOME=/root/cyc/hadoop/hadoop-dist/target/hadoop-3.2.1/</code></p>
+
+<p>然后切换到 <code class="language-plaintext highlighter-rouge">bin</code> 目录 <code class="language-plaintext highlighter-rouge">cd bin</code></p>
+
+<p>执行 <code class="language-plaintext highlighter-rouge">hadoop checknative </code></p>
+
+<p><img src="/images/posts/hadoop/build-hadoop-with-native/checknative.png" alt="" title="checknative.png" /></p>
+
+<h3 id="错误处理">错误处理：</h3>
+
+<p>可能出现如下错误的解决办法：</p>
+
+<p>yum install -y cyrus-sasl*（已经安装了cyrus 则不需要）</p>
+
+<div class="language-verilog highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="o">--</span> <span class="n">valgrind</span> <span class="n">location</span><span class="o">:</span> <span class="n">MEMORYCHECK_COMMAND</span><span class="o">-</span><span class="n">NOTFOUND</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="n">CMake</span> <span class="n">Error</span> <span class="n">at</span> <span class="n">main</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libhdfspp</span><span class="o">/</span><span class="n">CMakeLists</span><span class="p">.</span><span class="n">txt</span><span class="o">:</span><span class="mi">135</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="o">:</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span>   <span class="n">Cound</span> <span class="kt">not</span> <span class="n">find</span> <span class="n">a</span> <span class="n">SASL</span> <span class="k">library</span> <span class="p">(</span><span class="n">GSASL</span> <span class="p">(</span><span class="n">gsasl</span><span class="p">)</span> <span class="kt">or</span> <span class="n">Cyrus</span> <span class="n">SASL</span> <span class="p">(</span><span class="n">libsasl2</span><span class="p">).</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span>   <span class="n">Install</span><span class="o">/</span><span class="n">configure</span> <span class="n">one</span> <span class="n">of</span> <span class="n">them</span> <span class="kt">or</span> <span class="n">define</span> <span class="n">NO_SASL</span><span class="o">=</span><span class="mi">1</span> <span class="n">in</span> <span class="n">your</span> <span class="n">cmake</span> <span class="n">call</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="o">--</span> <span class="n">Configuring</span> <span class="n">incomplete</span><span class="p">,</span> <span class="n">errors</span> <span class="n">occurred</span><span class="o">!</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="n">See</span> <span class="n">also</span> <span class="s">"/root/cyc/hadoop/hadoop-hdfs-project/hadoop-hdfs-native-client/target/CMakeFiles/CMakeOutput.log"</span><span class="p">.</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="n">See</span> <span class="n">also</span> <span class="s">"/root/cyc/hadoop/hadoop-hdfs-project/hadoop-hdfs-native-client/target/CMakeFiles/CMakeError.log"</span><span class="p">.</span>
+</code></pre></div></div>
+
+<h3 id="编译好的地址">编译好的地址</h3>
+
+<p>编译 native 还是比较麻烦的，为了方便大家编译，我把在CentOS 7 中编译好的 native 放到了GitHub 上面，理论上centos/readhat 7 应该可以直接用。</p>
+
+<p>仓库地址如下：</p>
+
+<p>https://github.com/utf7/hadoop-native/tree/master/native</p>
+
+<p>参考链接：</p>
+
+<ol>
+  <li>https://github.com/facebook/zstd</li>
+  <li>https://github.com/google/snappy</li>
+  <li>https://github.com/intel/isa-l</li>
+  <li>https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/NativeLibraries.html</li>
+  <li>https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSErasureCoding.html</li>
+  <li>https://github.com/apache/hadoop/blob/rel/release-3.2.1/BUILDING.txt</li>
+</ol>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

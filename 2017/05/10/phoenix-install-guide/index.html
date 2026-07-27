@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>安装 Phoenix &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2017/05/10/phoenix-install-guide/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="安装 Phoenix">
+      
+    <meta name="keywords" content="Phoenix,big data,hbase">
+    <meta property="og:keywords" content="Phoenix,big data,hbase">
+      
+    <meta name="description" content="Phoenix 安装">
+    <meta property="og:description" content="Phoenix 安装">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2017/05/10/phoenix-install-guide/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-05-10">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="安装 Phoenix">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">安装 Phoenix</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/05/10
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Phoenix" title="Phoenix">Phoenix</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="一安装配置-phoenix"><strong>一、安装配置 Phoenix</strong></h2>
+
+<p>下载tar后解压phoenix</p>
+
+<p>tar -zxvf phoenix-4.10.0-HBase-1.1.tar.gz</p>
+
+<p>在解压目录找到如下文件 phoenix-4.10.0-HBase-1.1-server.jar</p>
+
+<p>将上面 jar 文件 放到 HBase 所有节点的HBase_HOME的lib目录下。</p>
+
+<p>增加如下属性到每个RegionServer的hbase-site.xml中（可以通过HC配置）
+配置参数</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>hbase.regionserver.wal.codec<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>org.apache.hadoop.hbase.regionserver.wal.IndexedWALEditCodec<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;property&gt;</span>  
+    <span class="nt">&lt;name&gt;</span>hbase.region.server.rpc.scheduler.factory.class<span class="nt">&lt;/name&gt;</span>  
+    <span class="nt">&lt;value&gt;</span>org.apache.hadoop.hbase.ipc.PhoenixRpcSchedulerFactory<span class="nt">&lt;/value&gt;</span>  
+    <span class="nt">&lt;description&gt;</span>Factory to create the Phoenix RPC Scheduler that uses separate queues for index and metadata updates<span class="nt">&lt;/description&gt;</span> 
+<span class="nt">&lt;/property&gt;</span> 
+<span class="nt">&lt;property&gt;</span>  
+    <span class="nt">&lt;name&gt;</span>hbase.rpc.controllerfactory.class<span class="nt">&lt;/name&gt;</span> 
+    <span class="nt">&lt;value&gt;</span>org.apache.hadoop.hbase.ipc.controller.ServerRpcControllerFactory<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;description&gt;</span>Factory to create the Phoenix RPC Scheduler that uses separate queues for index and metadata updates<span class="nt">&lt;/description&gt;</span> 
+<span class="nt">&lt;/property&gt;</span>
+</code></pre></div></div>
+
+<p>保存，然后重启HBase 集群使配置生效。</p>
+
+<h2 id="二sqlline-访问-phoenix"><strong>二、sqlline 访问 Phoenix</strong></h2>
+
+<p>启动sqlline</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">{</span>phoenix_home<span class="o">}</span>/bin/sqlline.py  zookeepr1,zookeepr2,zookeepr3：2181：/hbase
+</code></pre></div></div>
+
+<p>例子</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">!</span>tables
+CREATE TABLE IF NOT EXISTS user<span class="o">(</span><span class="nb">id </span>INTEGER NOT NULL PRIMARY KEY,name VARCHAR<span class="o">(</span>20<span class="o">))</span><span class="p">;</span>
+UPSERT INTO USER VALUES<span class="o">(</span>1,<span class="s1">'user1'</span><span class="o">)</span><span class="p">;</span>
+SELECT <span class="k">*</span> FROM user<span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="三安装常见问题"><strong>三、安装常见问题</strong></h2>
+
+<h4 id="1jdk版本问题">1、JDK版本问题：</h4>
+
+<p>执行sqlline.py出现:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">NoClassDefFoundError</span><span class="o">/</span><span class="nc">ClassNotFoundException</span>
+<span class="o">./</span><span class="n">sqlline</span><span class="o">.</span><span class="na">py</span> <span class="n">zk1</span><span class="o">,</span><span class="n">zk2</span><span class="o">,</span><span class="nl">zk3:</span><span class="mi">2181</span>
+<span class="nc">Exception</span> <span class="n">in</span> <span class="n">thread</span> <span class="s">"main"</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">NoClassDefFoundError</span><span class="o">:</span> <span class="n">sqlline</span><span class="o">/</span><span class="nc">SqlLine</span>
+<span class="nc">Caused</span> <span class="nl">by:</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">ClassNotFoundException</span><span class="o">:</span> <span class="n">sqlline</span><span class="o">.</span><span class="na">SqlLine</span>
+    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">net</span><span class="o">.</span><span class="na">URLClassLoader</span><span class="err">$</span><span class="mi">1</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="nc">URLClassLoader</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">217</span><span class="o">)</span>
+    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">AccessController</span><span class="o">.</span><span class="na">doPrivileged</span><span class="o">(</span><span class="nc">Native</span> <span class="nc">Method</span><span class="o">)</span>
+    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">net</span><span class="o">.</span><span class="na">URLClassLoader</span><span class="o">.</span><span class="na">findClass</span><span class="o">(</span><span class="nc">URLClassLoader</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">205</span><span class="o">)</span>
+    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">ClassLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="nc">ClassLoader</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">323</span><span class="o">)</span>
+    <span class="n">at</span> <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">Launcher</span><span class="n">$AppClassLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="nc">Launcher</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">294</span><span class="o">)</span>
+    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">ClassLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="nc">ClassLoader</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">268</span><span class="o">)</span>
+<span class="nc">Could</span> <span class="n">not</span> <span class="n">find</span> <span class="n">the</span> <span class="n">main</span> <span class="kd">class</span><span class="err">:</span> <span class="nc">sqlline</span><span class="o">.</span><span class="na">SqlLine</span><span class="o">.</span> <span class="nc">Program</span> <span class="n">will</span> <span class="n">exit</span><span class="o">.</span>
+</code></pre></div></div>
+<p>原因：安装环境中默认的JDK版本太低。</p>
+
+<p>验证Java 版本：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-version</span>
+java version <span class="s2">"1.6.0_28"</span>
+OpenJDK Runtime Environment <span class="o">(</span>IcedTea6 1.13.0pre<span class="o">)</span> <span class="o">(</span>rhel-1.66.1.13.0.el6-x86_64<span class="o">)</span>
+OpenJDK 64-Bit Server VM <span class="o">(</span>build 23.25-b01, mixed mode<span class="o">)</span>
+</code></pre></div></div>
+
+<p>需要设置export JAVA_HOME为 1.7或者以上的JDK</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/usr/jdk64/jdk1.7.0_67
+</code></pre></div></div>
+
+<p>加入到环境变量中</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

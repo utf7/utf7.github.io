@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HBase 文件路径 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2018/01/20/hbase-file-path/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="HBase 文件路径">
+      
+    <meta name="keywords" content="HBase,big data">
+    <meta property="og:keywords" content="HBase,big data">
+      
+    <meta name="description" content="HBase 文件路径本篇将分析 HBase 中的目录以及对应的作用，基于 Apache-HBase 1.2.6">
+    <meta property="og:description" content="HBase 文件路径本篇将分析 HBase 中的目录以及对应的作用，基于 Apache-HBase 1.2.6">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2018/01/20/hbase-file-path/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2018-01-20">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="HBase 文件路径">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">HBase 文件路径</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2018/01/20
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#HBase" title="HBase">HBase</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="hbase-文件路径">HBase 文件路径</h1>
+
+<p>本篇将分析 HBase 中的目录以及对应的作用，基于 Apache-HBase 1.2.6</p>
+
+<p>HBase 的数据文件、WAL、快照文件等信息会存储在 HDFS 中，HBase 在 HDFS 的根目录由 hbase.rootdir 参数决定,如下配置 /hbase/data</p>
+
+<p>查看 HDFS 中的目录可看到如下几个目录</p>
+
+<blockquote>
+
+  <p>/hbase/data/.hbase-snapshot<br />
+/hbase/data/.tmp<br />
+/hbase/data/MasterProcWALs<br />
+/hbase/data/WALs<br />
+/hbase/data/archive<br />
+/hbase/data/corrupt<br />
+/hbase/data/data<br />
+/hbase/data/hbase.id<br />
+/hbase/data/hbase.version<br />
+/hbase/data/oldWALs</p>
+</blockquote>
+
+<h2 id="hbase-snapshot-目录">.hbase-snapshot 目录</h2>
+
+<p>hbase 快照信息目录，保存快照信息 
+/hbase/data/.hbase-snapshot/.tmp
+/hbase/data/.hbase-snapshot/table1_sp/.inprogress
+/hbase/data/.hbase-snapshot/table1_sp/.snapshotinfo		
+/hbase/data/.hbase-snapshot/table1_sp/data.manifest   存储数据文件信息</p>
+
+<h4 id="snapshotinfo-文件">.snapshotinfo 文件</h4>
+
+<p>存储快照描述信息
+包括表名，快照名称，类型（0:DISABLE 1:FLUSH 2:SKIPFLUSH，默认为 1）</p>
+
+<h4 id="datamanifest-文件">data.manifest 文件</h4>
+<p>存储了表结构定义
+以及 region 信息和列簇以及 HFile 信息格式为：
+namespace+table+(startkey,endkey)+CF+hfile名称列表
+hfile 名称列表是如何找到对应的HFile（archive目录和未compcation之前回去实际表目录去找，什么逻辑？）</p>
+
+<p><img src="/images/posts/hbase/hbase-file-path/hbase_snapshot_data.manifest.jpg" alt="" title="data.manifest" /></p>
+
+<h2 id="tmp-目录">.tmp 目录</h2>
+<p>.tmp 目录为 HBase 的临时目录</p>
+
+<p>TODO : 需要梳理具体放哪些数据，/root/干什么的</p>
+
+<h2 id="masterprocwals-目录">MasterProcWALS 目录</h2>
+
+<p>该目录为 procedure2 放置 wal 目录使用的目录， procedure2 主要用于 DDL 操作，原理是实现了一个 2 阶段提交的事务，将一些 DDL 操作分为多个步骤，将各个步骤信息存储起来，用于处理如 HMaster 中断导致的 DDL 无法执行、回滚问题，目前实现了 <code class="language-plaintext highlighter-rouge">CreateTable、DeleteColumnFamily、DeleteTable、 EnableTable、ModifyTable、ModifyColumnFamily、TruncateTable</code> 等功能，具体请参考：
+<a href="https://issues.apache.org/jira/browse/HBASE-12439" title="HBASE-12439">https://issues.apache.org/jira/browse/HBASE-12439</a></p>
+
+<h2 id="wals-目录">WALS 目录</h2>
+<p>存放 WAL 日志，WAL 日志为 HBase 的预写日志，写入 Memstore 之前先写 WAL
+WAL 存储再 HDFS 中，当发生 RegionServer 宕机重启后，RS 会读取 HDFS中的 WAL 进行 REPLAY 回放从而实现故障恢复。
+WAL 类似 MySQL 的 BinLog ，从数据安全的角度，建议开启 WAL <br />
+下图是WAL 日志中的一个存储截图：
+<img src="/images/posts/hbase/hbase-file-path/hbase_wal_hdfs_path.png" alt="" title="WAL 日志路径" /></p>
+
+<p>wal 日志路径为 hbase.rootdir/WALs/serverName/URLEncoder.encode(serverName).default.Timestamp
+WAL 日志的命名规则如下
+<img src="/images/posts/hbase/hbase-file-path/hbase_wal_name.png" alt="" title="WAL 日志命名规则" /></p>
+
+<p>注意 meta 表使用单独的 WAL 日志保存</p>
+
+<p>每个 RegionServer 会有多个 WAL 目录，达到大小后就不停滚动生成。 超过阈值会被 move 到 oldWALs 下面</p>
+
+<p>相关 WAL 日志生成的代码，可参考 WALProvider.java 以及 FSHLog.java 两个类</p>
+
+<h2 id="archive-目录">archive 目录</h2>
+
+<p>archive 目录为 HFile archive 目录</p>
+
+<p>1、保存 snapshot 中的 HFile</p>
+
+<h2 id="corrupt-目录">corrupt 目录</h2>
+
+<p>此目录用于放置损坏的 HFile，执行 HBCK 的时候，如果指定了 -checkCorruptHFiles 或者 
+-sidelineCorruptHFiles 参数，则会调用 HFileCorruptionChecker 对表的 region 的列簇下的 HFile 进行检查，调用 reader 读取下面的表的 HFILE。此时如果发现 HFILE 损坏的话，
+1）如果指定的是 -sidelineCorruptHFiles 参数则会将 HFILE move 到此目录，移动的路径为 HBASE_DIR/corrupt/table/region/cf/hfile。
+2)如果只是 -checkCorruptHFiles 未指定 -sidelineCorruptHFiles, 则不会移动，仅仅打印损坏的文件信息</p>
+
+<p>HBaseFsck.java</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1">// if corrupt file mode is on, first fix them since they may be opened later</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">checkCorruptHFiles</span> <span class="o">||</span> <span class="n">sidelineCorruptHFiles</span><span class="o">)</span> <span class="o">{</span>
+        <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Checking all hfiles for corruption"</span><span class="o">);</span>
+        <span class="nc">HFileCorruptionChecker</span> <span class="n">hfcc</span> <span class="o">=</span> <span class="n">createHFileCorruptionChecker</span><span class="o">(</span><span class="n">sidelineCorruptHFiles</span><span class="o">);</span>
+        <span class="n">setHFileCorruptionChecker</span><span class="o">(</span><span class="n">hfcc</span><span class="o">);</span> <span class="c1">// so we can get result</span>
+        <span class="nc">Collection</span><span class="o">&lt;</span><span class="nc">TableName</span><span class="o">&gt;</span> <span class="n">tables</span> <span class="o">=</span> <span class="n">getIncludedTables</span><span class="o">();</span>
+        <span class="nc">Collection</span><span class="o">&lt;</span><span class="nc">Path</span><span class="o">&gt;</span> <span class="n">tableDirs</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Path</span><span class="o">&gt;();</span>
+        <span class="nc">Path</span> <span class="n">rootdir</span> <span class="o">=</span> <span class="nc">FSUtils</span><span class="o">.</span><span class="na">getRootDir</span><span class="o">(</span><span class="n">getConf</span><span class="o">());</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">tables</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">for</span> <span class="o">(</span><span class="nc">TableName</span> <span class="n">t</span> <span class="o">:</span> <span class="n">tables</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">tableDirs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="nc">FSUtils</span><span class="o">.</span><span class="na">getTableDir</span><span class="o">(</span><span class="n">rootdir</span><span class="o">,</span> <span class="n">t</span><span class="o">));</span>
+          <span class="o">}</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="n">tableDirs</span> <span class="o">=</span> <span class="nc">FSUtils</span><span class="o">.</span><span class="na">getTableDirs</span><span class="o">(</span><span class="nc">FSUtils</span><span class="o">.</span><span class="na">getCurrentFileSystem</span><span class="o">(</span><span class="n">getConf</span><span class="o">()),</span> <span class="n">rootdir</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">hfcc</span><span class="o">.</span><span class="na">checkTables</span><span class="o">(</span><span class="n">tableDirs</span><span class="o">);</span>
+        <span class="n">hfcc</span><span class="o">.</span><span class="na">report</span><span class="o">(</span><span class="n">errors</span><span class="o">);</span>
+      <span class="o">}</span>
+</code></pre></div></div>
+<p>HFileCorruptionChecker.checkTables（Path）</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">分别调用</span> <span class="o">:</span> <span class="n">checkTables</span><span class="o">-&gt;</span><span class="n">checkTableDir</span><span class="o">-&gt;</span><span class="n">checkRegionDir</span><span class="o">-&gt;</span><span class="n">checkColFamDir</span><span class="o">-</span><span class="n">checkHFile</span>
+
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">checkHFile</span><span class="o">(</span><span class="nc">Path</span> <span class="n">p</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+    <span class="nc">HFile</span><span class="o">.</span><span class="na">Reader</span> <span class="n">r</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">r</span> <span class="o">=</span> <span class="nc">HFile</span><span class="o">.</span><span class="na">createReader</span><span class="o">(</span><span class="n">fs</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">cacheConf</span><span class="o">,</span> <span class="n">conf</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">CorruptHFileException</span> <span class="n">che</span><span class="o">)</span> <span class="o">{</span>
+      <span class="no">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"Found corrupt HFile "</span> <span class="o">+</span> <span class="n">p</span><span class="o">,</span> <span class="n">che</span><span class="o">);</span>
+      <span class="n">corrupted</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+      <span class="c1">//inQuarantineMode 由sidelineCorruptHFiles参数决定，指定了则为true，默认为false</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">inQuarantineMode</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//损坏的目录路径为：HBASE_DIR/corrupt/table/region/cf/hfile</span>
+        <span class="nc">Path</span> <span class="n">dest</span> <span class="o">=</span> <span class="n">createQuarantinePath</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+        <span class="no">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"Quarantining corrupt HFile "</span> <span class="o">+</span> <span class="n">p</span> <span class="o">+</span> <span class="s">" into "</span> <span class="o">+</span> <span class="n">dest</span><span class="o">);</span>
+        <span class="kt">boolean</span> <span class="n">success</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="na">mkdirs</span><span class="o">(</span><span class="n">dest</span><span class="o">.</span><span class="na">getParent</span><span class="o">());</span>
+        <span class="c1">//将损坏的hfile移动到corrupt 目录</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">success</span> <span class="o">?</span> <span class="n">fs</span><span class="o">.</span><span class="na">rename</span><span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="n">dest</span><span class="o">):</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">success</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">failures</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="n">quarantined</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">dest</span><span class="o">);</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">FileNotFoundException</span> <span class="n">fnfe</span><span class="o">)</span> <span class="o">{</span>
+      <span class="no">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"HFile "</span> <span class="o">+</span> <span class="n">p</span> <span class="o">+</span> <span class="s">" was missing.  Likely removed due to compaction/split?"</span><span class="o">);</span>
+      <span class="n">missing</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">hfilesChecked</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">r</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">r</span><span class="o">.</span><span class="na">close</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+</code></pre></div></div>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析 &mdash; utf7</title>
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/collection.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/common.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/posts/index.css">
+    <link rel="stylesheet" href="https://utf7.github.io/assets/css/globals/prism.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2021/05/12/spark-shuffle-service-problems/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="https://utf7.github.io/favicon.ico">
+    
+    <meta property="og:title" content="Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析">
+      
+    <meta name="keywords" content="Spark">
+    <meta property="og:keywords" content="Spark">
+      
+    <meta name="description" content="Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析">
+    <meta property="og:description" content="Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2021/05/12/spark-shuffle-service-problems/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2021-05-12">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <script src="https://utf7.github.io/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="https://utf7.github.io/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Spark Shuffle S">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2021/05/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="https://utf7.github.io/categories/#Spark" title="Spark">Spark</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="1">1.</h2>
+
+<p>最近集群有 Spark 任务会出现失败，查看 Spark 日志发现会有 Executor 挂掉的信息。</p>
+
+<p>一般 Executor 挂掉话，通常会是几种情况：</p>
+
+<p>1、Executor 自己挂了，比如申请内存不够等，executor 运行过程中 OOM等。</p>
+
+<p>2、Executor 所在的节点出现问题，比如宕机 。</p>
+
+<p>3、Executor 所在节点的NodeManager 挂了。因为Executor 都是NodeManager 进程 fork 出来的，NodeManager 挂的话，Executor 通常也会挂掉</p>
+
+<p>4、操作系统内存紧张触发了OS的OOM Killer 功能，被操作系统干掉了。</p>
+
+<p>5、Executor 被NodeManager watch 到内存超过使用的界限等原因，被NodeManager 给干掉了。</p>
+
+<p>6、人为 kill （可能性较小）</p>
+
+<h2 id="2">2.</h2>
+
+<p>查看 Spark 日志并没有发现 Executor 有 OOM 的情况。</p>
+
+<p>登陆 Executor 所在的节点，发现机器也正常。查看 NodeManager 情况</p>
+
+<p>ps -ef|grep NodeManager|grep -v grep 
+查看发现 NodeManager 也在。后来仔细看了一下 NodeManager 的启动时间发现不对，是最近的时间，证明 NodeManager 之前挂过，现在又启动了</p>
+
+<p>（我们有 NodeManager 自动拉起的功能，所以挂掉以后立刻被拉起来了）</p>
+
+<p>check NodeManager 日志</p>
+
+<p>发现是 NodeManager OOM了</p>
+
+<pre><code class="language-log">
+WARN org.spark_project.io.netty.channel.AbstractChannelHandlerContext: An exception 'java.lang.OutOfMemoryError: Java heap space' [enable DEBUG level for full stacktrace] was thrown by a user handler's exceptionCaught() method while handling the following exception:
+java.lang.OutOfMemoryError: GC overhead limit exceeded
+ WARN org.spark_project.io.netty.channel.AbstractChannelHandlerContext: An exception '
+java.lang.OutOfMemoryError: Java heap space
+FATAL org.apache.hadoop.yarn.YarnUncaughtExceptionHandler: Thread Thread[DeletionService #3,5,main] threw an Error.  Shutting down now...
+java.lang.OutOfMemoryError: Java heap space
+
+</code></pre>
+
+<p>OK，那么到这里原因大概就知道了</p>
+
+<p>NodeManager OOM 导致的 Executor 挂掉。</p>
+
+<p>那么为什么会 OOM 呢？</p>
+
+<p>ps -ef|grep NodeManager|grep -v grep 
+check 了一下 NodeManager 进程，发现设置了4096的堆内存（-Xmx4096m)</p>
+
+<p>根据之前的经验线上应用 NodeManager 推荐大概内存是 8-12G 比较靠谱，4G 确实有点低了。</p>
+
+<p>是不是就设置一下8-12G内存就 ok了呢？当然我们还是要分析一下为什么会OOM，到底什么占用了内存？是不是有内存泄露？是个例还是很多类似的？</p>
+
+<p>使用 salt  全量统计了一下所有NodeManager日志关键字段，发现并不是个例有其他节点也存在 NodeManager OOM 的情况，找到另外一个节点来check一下（该节点其实GC不过来，已经卡死了）。</p>
+
+<h2 id="3">3.</h2>
+
+<p>首先是保留一些信息：</p>
+
+<p>1、保留堆栈信息：</p>
+
+<p>jstack 31549 &gt;nm-31459.jstack1;</p>
+
+<p>sleep 2s;</p>
+
+<p>jstack 31549 &gt;nm-31459.jstack2;</p>
+
+<p>sleep 5s;</p>
+
+<p>jstack 31549 &gt; nm-31459.jstack3;</p>
+
+<p>2、保留句柄</p>
+
+<p>lsof -p  31549 &gt;  nm-31459.fd</p>
+
+<p>3、check 一下GC</p>
+
+<p>jstat -gcutil 分析的gc 情况.</p>
+
+<p>图片</p>
+
+<p>4、jmap 看一下内存情况：</p>
+
+<p>jmap -histo 31549 &gt;jmap-nm-31549.jmap</p>
+
+<p>5、dump 内存</p>
+
+<p>jmap -dump:format=b,file=nm-31549.heap.bin 31549</p>
+
+<p>check 下 jmap 的信息</p>
+
+<p>图片</p>
+
+<p>发现有大量的LocalCache 对象以及ShuffleIndexInformation</p>
+
+<p>ps：</p>
+
+<p>[B 是指byte[] 数组</p>
+
+<p>[C 是char[] 数组</p>
+
+<p>一般 Java 进程 jmap 大部分都是 byte[],char[],String 这些，是比较正常的通常看不出来什么，基本上没啥关系。</p>
+
+<p>主要怀疑对象在 ShuffleIndexInformation 和 LocalCache 上面</p>
+
+<p>check 了一下代码，发现 Hadoop 中并没有这个代码。</p>
+
+<p>从名字看这块肯定是 Shuffle 相关的，所以自然而然就想到了Spark Shuffle Service 。这里简单说一下，通常 Shuffle 是在 Executor 中的，executor 挂的话，就会导致shuffle 数据丢失失败，所以spark 后来做了 Shuffle Service，原理是将 Shuffle 放到 NodeManager 中来做，NodeManager 一般不忙，用来做 Shuffle 也是可以的，这样的话，Executor 挂了，NodeManager 其实还在的，有一定的稳定性提高，当然现在还有一个 Shuffle 思路是将 shuffle 做成单独的服务放在外面，这是另外的一个话题了。</p>
+
+<p>查看 Spark 代码，Spark Shuffle Service 的代码在 NodeManager 中跑，ExternalShuffleBlockResolver 内部有一个</p>
+
+<p>LoadingCache&lt;File, ShuffleIndexInformation&gt; shuffleIndexCache
+该 cache 主要是用于 cache shuffle 的 index 信息。</p>
+
+<p>cache 默认配置的是100m，由参数spark.shuffle.service.index.cache.size来配置。</p>
+
+<p>查看当前配置发现是4096m</p>
+
+<p>grep  -A 1 “spark.shuffle.service.index.cache.size” /etc/apps/hadoop-conf/yarn-site.xml</p>
+<name>spark.shuffle.service.index.cache.size</name>
+<value>4096m</value>
+<p>当前 NodeManager 配置也就 4096m，所以当 cache 到一定程度的时候，oom 就可想而知了。</p>
+
+<p>cache 相关代码设置如下：</p>
+
+<p>ExternalShuffleBlockResolver(
+      TransportConf conf,
+      File registeredExecutorFile,
+      Executor directoryCleaner) throws IOException {
+    this.conf = conf;
+    this.registeredExecutorFile = registeredExecutorFile;
+    String indexCacheSize = conf.get(“spark.shuffle.service.index.cache.size”, “100m”);
+    CacheLoader&lt;File, ShuffleIndexInformation&gt; indexCacheLoader =
+        new CacheLoader&lt;File, ShuffleIndexInformation&gt;() {
+          public ShuffleIndexInformation load(File file) throws IOException {
+            return new ShuffleIndexInformation(file);
+          }
+        };
+    shuffleIndexCache = CacheBuilder.newBuilder()
+      .maximumWeight(JavaUtils.byteStringAsBytes(indexCacheSize))
+      .weigher(new Weigher&lt;File, ShuffleIndexInformation&gt;() {
+        public int weigh(File file, ShuffleIndexInformation indexInfo) {
+          return indexInfo.getSize();//这块计算其实是有点问题的
+        }
+      })
+      .build(indexCacheLoader);</p>
+
+<p>对 dump 出来的内存进行分析发现也是与上面的结论是一致的：</p>
+
+<p>发现4G内存，shuffleIndexCache 就占用了3.7G</p>
+
+<p>图片</p>
+
+<p>图片</p>
+
+<p>check 了代码其实感觉代码还是有一些改进的地方的：</p>
+
+<p>具体见注释</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>shuffleIndexCache = CacheBuilder.newBuilder()
+  .maximumWeight(JavaUtils.byteStringAsBytes(indexCacheSize))
+  .weigher(new Weigher&lt;File, ShuffleIndexInformation&gt;() {
+    public int weigh(File file, ShuffleIndexInformation indexInfo) {
+      //return indexInfo.getSize();
+      //这块计算其实是有点问题的，只计算了indexInfo文件size ，其实有会有ovehead的
+      //当然这个问题主要看应该不是overhead，而是堆内存一共就配置了4096m，而cache 也配置了这么大。
+      //实际上cache 是会超过配置的值的，比如文件多，但是index文件内容比较少的情况下。
+      //这块代码做了一点点稍微小小的改动，具体其实是可以参考HBase d等代码来实际计算java对象大小。
+      // 不过这块没有太大必要这么细，但是还是需要考虑overhead
+      //当然对于index.cache.size 设置成256m的话，内存8G的NM的话，即使有8倍的overhead，其实问题也不大。
+      //我们这里设置成了512m
+       return file.getAbsolutePath().length() + 128+file indexInfo.getSize();
+      
+
+    }
+  }) 最终做了如下三个修改：
+</code></pre></div></div>
+
+<p>1.修改 spark.shuffle.service.index.cache.size=512m</p>
+
+<p>2.同时修改NodeManager 内存为10240m（10G）</p>
+
+<p>3.同时对shuffleIndexCache内存占用的计算做了一些小小的修正（这里不是主要原因，这次主要还是内存配置于cache.size不匹配导致的，但是内存配置即使比较大的情况下，如果shuffleIndexCache配置也比较大，也有可能会出现可能shuffleIndexCache配置2g，实际上shuffleIndexCache占用远大于2g的情况会出现问题，所以规避一下风险。</p>
+
+<p>修改以后任务稳定了很多。</p>
+
+<p>观察了一段时间，发现再也没有 NodeManager OOM了</p>
+
+<p>后来搜了一下社区，确实有类似的关于 shuffleIndexCache 内存计算的改进的改进。相关jira：</p>
+
+<p>https://issues.apache.org/jira/browse/SPARK-21501</p>
+
+<p>https://issues.apache.org/jira/browse/SPARK-33206</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/blog-comments"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="https://utf7.github.io/assets/css/modules/sidebar-search.css">
+<script src="https://utf7.github.io/assets/js/lunr.min.js"></script>
+<script src="https://utf7.github.io/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="https://utf7.github.io/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7/Yechao Chen">utf7/Yechao Chen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="https://utf7.github.io/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="https://utf7.github.io/assets/js/geopattern.js"></script>
+    <script src="https://utf7.github.io/assets/js/prism.js"></script>
+    <script>
+      jQuery(document).ready(function($) {
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+      });
+    </script>
+    
+</body>
+</html>
