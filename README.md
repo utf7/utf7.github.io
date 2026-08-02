@@ -1,8 +1,18 @@
 # utf7
 
-我的个人博客：<https://utf7.github.io>，微信公众号： yechaotalk
+我的个人博客：<https://utf7.github.io>，
 
-关注大数据、云计算、摇滚乐
+微信：chenyechao003
+微信公众号： yechaotalk
+视频号：程序员乌托邦
+
+Data Infra/Pipeline/Platform
+
+AI Agent、AI Native 
+
+Cloud Native
+
+摇滚乐、电影
 
 ## 概览
 
