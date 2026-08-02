@@ -21,6 +21,7 @@ out="$root/assets/css/site.bundle.css"
   cat "$root/assets/css/globals/prism.css"
   cat "$root/assets/css/modules/sidebar-search.css"
   cat "$root/assets/css/components/share.css"
+  cat "$root/assets/css/components/site-extras.css"
   # Home-only rules are scoped under .home — safe to include globally.
   cat "$root/assets/css/pages/index.css"
 } > "$out"

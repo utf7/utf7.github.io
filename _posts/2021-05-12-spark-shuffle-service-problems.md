@@ -4,7 +4,8 @@ title: Spark Shuffle Service 配置不合理导致的任务失败以及NodeManag
 description: spark.shuffle.service.index.cache.size 参数配置不合理问题
 categories: [Spark]
 keywords: Spark
-excerpt: Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析
+excerpt: Spark Shuffle Service 配置不合理导致的任务失败以及 NodeManager OOM 问题分析
+pinned: true
 ---
 
 

@@ -1,6 +1,6 @@
 ---
 layout: categories
-title: Categories
+title: 分类
 description: 文章分类浏览
 keywords: 分类
 comments: false
@@ -16,7 +16,7 @@ permalink: /categories/
 {% for post in category.last %}
 <li class="posts-list-item">
 <span class="posts-list-meta">{{ post.date | date:"%Y-%m-%d" }}</span>
-<a class="posts-list-name" href="{{ site.url }}{{ post.url }}">{{ post.title }}</a>
+<a class="posts-list-name" href="{{ post.url | relative_url }}">{{ post.title }}</a>
 </li>
 {% endfor %}
 </ol>

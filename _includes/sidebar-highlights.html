@@ -1,0 +1,14 @@
+<h3>近期演讲</h3>
+<ul class="highlight-list">
+{% for talk in site.featured_talks %}
+  <li class="highlight-list-item">
+    <a href="{{ talk.url }}" target="_blank" rel="noopener noreferrer">{{ talk.title }}</a>
+    {% if talk.event %}
+    <span class="highlight-meta">{{ talk.event }}</span>
+    {% endif %}
+  </li>
+{% endfor %}
+</ul>
+<p class="highlight-more">
+  <a href="{{ '/about/' | relative_url }}">查看全部演讲与简介 →</a>
+</p>

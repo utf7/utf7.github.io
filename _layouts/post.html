@@ -33,6 +33,9 @@ layout: default
     <span data-pagefind-meta="title" hidden>{{ page.title }}</span>
     {{ content }}
     </article>
+    <div data-pagefind-ignore>
+      {% include author-card.html %}
+    </div>
     <div class="share" data-pagefind-ignore>
       {% include sns-share.html %}
     </div>

@@ -9,18 +9,17 @@ comments: false
         <div class="container">
             <div class="collection-title">
               <h1 class="collection-header" id="sub-title"><span>{{ site.subtitle }}</span></h1>
+              {% if site.tagline %}
+              <p class="collection-tagline">{{ site.tagline }}</p>
+              {% endif %}
                 <div class="collection-info">
                     <span class="meta-info mobile-hidden">
                         <span class="octicon octicon-location"></span>
                         {{ site.location }}
                     </span>
-                    <span class="meta-info">
-                        <span class="octicon octicon-organization"></span>
-                        <a href="{{ site.organization_url }}" target="_blank">{{ site.organization }}</a>
-                    </span>
                      <span class="meta-info">
                         <span class="octicon octicon-mark-github"></span>
-                        <a href="https://github.com/{{ site.github_username }}" target="_blank">{{ site.github_username }}</a>
+                        <a href="https://github.com/{{ site.github_username }}" target="_blank" rel="noopener noreferrer">{{ site.github_username }}</a>
                     </span>
                 </div>
             </div>
@@ -31,6 +30,53 @@ comments: false
 <section class="container content">
     <div class="columns">
         <div class="column two-thirds" >
+            {% if paginator.page == 1 %}
+            {% if site.featured_talks %}
+            <div class="home-featured" data-pagefind-ignore>
+              <h2 class="home-section-title">近期演讲</h2>
+              <ul class="featured-talk-list">
+                {% for talk in site.featured_talks %}
+                <li>
+                  <a href="{{ talk.url }}" target="_blank" rel="noopener noreferrer">{{ talk.title }}</a>
+                  {% if talk.event %}<span class="featured-talk-event">{{ talk.event }}</span>{% endif %}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            {% assign pinned_posts = site.posts | where: "pinned", true %}
+            {% if pinned_posts.size > 0 %}
+            <div class="home-featured">
+              <h2 class="home-section-title">精选文章</h2>
+              <ol class="repo-list">
+                {% for post in pinned_posts %}
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        {{ post.excerpt | strip_html | strip }}
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> {{ post.date | date: "%Y/%m/%d" }}
+                        </span>
+                        {% for cat in post.categories %}
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="{{ '/categories/' | relative_url }}#{{ cat }}/" title="{{ cat }}">{{ cat }}</a>
+                        </span>
+                        {% endfor %}
+                    </p>
+                </li>
+                {% endfor %}
+              </ol>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            <h2 class="home-section-title">最新文章</h2>
             <ol class="repo-list">
                 {% for post in paginator.posts %}
                 <li class="repo-list-item">
@@ -57,7 +103,7 @@ comments: false
         </div>
         <div class="column one-third" data-pagefind-ignore>
             {% include sidebar-search.html %}
-            {% include sidebar-popular-repo.html %}
+            {% include sidebar-highlights.html %}
         </div>
     </div>
     <div class="pagination text-align">

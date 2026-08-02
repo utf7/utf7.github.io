@@ -1,14 +1,15 @@
 ---
 layout: page
-title: About Me
-description: 做好人，做好事
-keywords: Seven,utf7
+title: 关于我
+description: utf7（陈叶超）——关注 AI Agent、AI Data Infra 与云原生的工程实践者
+keywords: utf7, 陈叶超, AI Agent, Data Infra, ChatBI, Cloud Native
 comments: true
 menu: 关于我
 permalink: /about/
 ---
 
-喜摇滚，爱编码。关注 AI Agent / AI Native、AI Data Infra，以及 Cloud Native。
+喜摇滚，爱编码。关注 **AI Agent / AI Native**、**AI Data Infra**，以及 **Cloud Native**。  
+目前在喜马拉雅从事数据智能相关工作，落地过 ChatBI、Data Agent Harness、数据上下文工程等实践。
 
 ## 联系
 
@@ -16,7 +17,11 @@ permalink: /about/
 * 微信：chenyechao003
 * 微信公众号：yechaotalk
 * 视频号：程序员乌托邦
-* 微博：[@utf7](http://weibo.com/chenyechao)
+* 微博：[@utf7](https://weibo.com/chenyechao)
+
+## 经历
+
+* 喜马拉雅 — 数据智能 / Data Infra（ChatBI、Data Agent、数据平台与上云等）
 
 ## 公开演讲
 
@@ -77,25 +82,10 @@ permalink: /about/
 
 * 谷歌开发者社区 HBase 101
 
-## Skill Keywords
+## 擅长领域
 
-#### AI Agent
-<div class="btn-inline">
-    {% for keyword in site.skill_ai_keywords %}
-    <button class="btn btn-outline" type="button">{{ keyword }}</button>
-    {% endfor %}
-</div>
+**AI Agent：** {% for keyword in site.skill_ai_keywords %}{{ keyword }}{% unless forloop.last %} · {% endunless %}{% endfor %}
 
-#### Data Infra
-<div class="btn-inline">
-    {% for keyword in site.skill_data_keywords %}
-    <button class="btn btn-outline" type="button">{{ keyword }}</button>
-    {% endfor %}
-</div>
+**Data Infra：** {% for keyword in site.skill_data_keywords %}{{ keyword }}{% unless forloop.last %} · {% endunless %}{% endfor %}
 
-#### Cloud & Architecture
-<div class="btn-inline">
-    {% for keyword in site.skill_cloud_keywords %}
-    <button class="btn btn-outline" type="button">{{ keyword }}</button>
-    {% endfor %}
-</div>
+**Cloud & Architecture：** {% for keyword in site.skill_cloud_keywords %}{{ keyword }}{% unless forloop.last %} · {% endunless %}{% endfor %}

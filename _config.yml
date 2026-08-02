@@ -5,30 +5,39 @@ baseurl:
 url: https://utf7.github.io
 date_format: "ordinal"
 title: utf7
-subtitle: "做好人,做好事"
-description: "utf7 的个人博客/欢迎关注公众号yechaotalk"
-keywords: utf7, seven,HBase
+subtitle: "Keep Building"
+tagline: "AI Agent · AI Data Infra · Cloud Native"
+description: "utf7（陈叶超）的个人博客，记录 AI Agent、AI Data Infra、云原生与大数据工程实践。"
+keywords: utf7, AI Agent, Data Infra, ChatBI, Cloud Native, 大数据
 favicon: /favicon.ico
 timezone: Asia/Shanghai
 encoding: "utf-8"
 source_code: https://github.com/utf7/utf7.github.io
 side_bar_repo_limit: 5
 repository: utf7/utf7.github.io
-# Prefer explicit list so the sidebar works without GitHub API metadata.
-# If empty/removed, falls back to site.github.public_repositories (needs token in CI).
-side_bar_repos:
+
+# Homepage / sidebar highlights (recent public talks)
+featured_talks:
   -
-    name: utf7.github.io
-    html_url: https://github.com/utf7/utf7.github.io
-    description: utf7 的个人博客
+    title: "DataClaw：构建可进化的数据智能体"
+    event: GIAC 2026
+    url: https://thegiac.com/2026sz/course/19332
+  -
+    title: "多智能体驱动的企业级 ChatBI 落地实践"
+    event: QCon 2025
+    url: https://qcon.infoq.cn/2025/shanghai/presentation/6704
+  -
+    title: "喜马拉雅 AI 原生数据上下文工程实践"
+    event: OpenClaw 研讨会 2026
+    url: https://mp.weixin.qq.com/s/lZwfkkX-TUONV6FaZ1qxvw
 
 
 # ---------------- #
 #      Author      #
 # ---------------- #
-author: utf7/Yechao Chen
-organization: utf7, Inc.
-organization_url: https://utf7.github.io
+author: utf7 / 陈叶超
+organization:
+organization_url:
 location: Shanghai, China
 email: chenyechao@gmail.com
 
@@ -98,6 +107,12 @@ exclude:
   - scripts
   - pagefind.yml
   - node_modules
+  - docs/todolist.md
+  - docs/*.patch
+  - _posts/template.md
+  - _wiki/template.md
+  - _drafts
+  - images/posts/bigdata-fucked-up
 
 
 # ---------------- #

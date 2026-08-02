@@ -1,16 +1,27 @@
 ---
 layout: page
-title: Links
-description: 常用链接
-keywords: 常用链接
-comments: true
+title: 链接
+description: 关注渠道与常用入口
+keywords: utf7, 链接, 公众号, GitHub
+comments: false
 menu: 链接
 permalink: /links/
 ---
 
-> 关于我的链接
+## 关注我
 
-* [微博](http://weibo.com/chenyechao "我的微博，欢迎关注")
-* [CSDN](http://blog.csdn.net/seven_3306 "原 CSDN 博客")
-* [Blog](http://utf7.github.io "我的博客地址，欢迎阅读")
-* [GitHub](https://github.com/utf7 "my github")
+* [GitHub @utf7](https://github.com/utf7)
+* 微信公众号：yechaotalk
+* 视频号：程序员乌托邦
+* [微博 @utf7](https://weibo.com/chenyechao)
+* [关于我（演讲与简介）](/about/)
+
+## 精选演讲
+
+{% for talk in site.featured_talks %}
+* [{{ talk.title }}]({{ talk.url }}){% if talk.event %}（{{ talk.event }}）{% endif %}
+{% endfor %}
+
+## 归档
+
+* [原 CSDN 博客](https://blog.csdn.net/seven_3306)
