@@ -79,16 +79,23 @@ permalink: /about/
 
 ## Skill Keywords
 
-#### Software Engineer Keywords
+#### AI Agent
 <div class="btn-inline">
-    {% for keyword in site.skill_programing_keywords %}
+    {% for keyword in site.skill_ai_keywords %}
     <button class="btn btn-outline" type="button">{{ keyword }}</button>
     {% endfor %}
 </div>
 
-#### Database and Big Data Keywords
+#### Data Infra
 <div class="btn-inline">
-    {% for keyword in site.skill_big_data_keywords %}
+    {% for keyword in site.skill_data_keywords %}
+    <button class="btn btn-outline" type="button">{{ keyword }}</button>
+    {% endfor %}
+</div>
+
+#### Cloud & Architecture
+<div class="btn-inline">
+    {% for keyword in site.skill_cloud_keywords %}
     <button class="btn btn-outline" type="button">{{ keyword }}</button>
     {% endfor %}
 </div>

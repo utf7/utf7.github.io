@@ -136,5 +136,6 @@ google:
 # ---------------- #
 #      Datas       #
 # ---------------- #
-skill_programing_keywords: [Java, Design Patterns]
-skill_big_data_keywords: [HBase,Hadoop,Hive,Spark,Presto,MySQL]
+skill_ai_keywords: [AI Agent, 智能体, Harness]
+skill_data_keywords: [Data Infra, Data Pipeline, Lakehouse, 大数据平台, 数据引擎]
+skill_cloud_keywords: [云原生, 上云/云迁移, System Design]
