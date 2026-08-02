@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://utf7.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://utf7.github.io/" rel="alternate" type="text/html" /><updated>2026-08-02T22:42:30+08:00</updated><id>https://utf7.github.io/feed.xml</id><title type="html">utf7</title><subtitle>utf7 的个人博客/欢迎关注公众号yechaotalk</subtitle><author><name>utf7/Yechao Chen</name></author><entry><title type="html">2023 H2 生活 OKR</title><link href="https://utf7.github.io/2023/09/03/my-life-okr-for-2023H2/" rel="alternate" type="text/html" title="2023 H2 生活 OKR" /><published>2023-09-03T00:00:00+08:00</published><updated>2023-09-03T00:00:00+08:00</updated><id>https://utf7.github.io/2023/09/03/my-life-okr-for-2023H2</id><content type="html" xml:base="https://utf7.github.io/2023/09/03/my-life-okr-for-2023H2/"><![CDATA[<h1 id="2023-h2-生活-okr">2023 H2 生活 OKR</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://utf7.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://utf7.github.io/" rel="alternate" type="text/html" /><updated>2026-08-02T23:28:44+08:00</updated><id>https://utf7.github.io/feed.xml</id><title type="html">utf7</title><subtitle>utf7（陈叶超）的个人博客，记录 AI Agent、AI Data Infra、云原生与大数据工程实践。</subtitle><author><name>utf7 / 陈叶超</name></author><entry><title type="html">2023 H2 生活 OKR</title><link href="https://utf7.github.io/2023/09/03/my-life-okr-for-2023H2/" rel="alternate" type="text/html" title="2023 H2 生活 OKR" /><published>2023-09-03T00:00:00+08:00</published><updated>2023-09-03T00:00:00+08:00</updated><id>https://utf7.github.io/2023/09/03/my-life-okr-for-2023H2</id><content type="html" xml:base="https://utf7.github.io/2023/09/03/my-life-okr-for-2023H2/"><![CDATA[<h1 id="2023-h2-生活-okr">2023 H2 生活 OKR</h1>
 
 <h2 id="o1-健康管理升级通过引入良好的健康管理机制并在日常生活中落地以改善睡眠质量增强免疫力保持精力延缓衰老提高观感使得更加健康活力">O1 【健康管理升级】通过引入良好的健康管理机制并在日常生活中落地，以改善睡眠质量，增强免疫力、保持精力，延缓衰老，提高观感，使得更加健康活力。</h2>
 
@@ -28,7 +28,7 @@
 
 <h2 id="o4-无用技能升级调研至少1个无用技能比如乐器拳击摩托车等考虑学习掌握一个无用技能">O4 【无用技能升级】调研至少1个无用技能，比如乐器、拳击、摩托车等，考虑学习掌握一个无用技能。</h2>
 
-<h3 id="kr1----调研乐器口琴吉他等拳击等无用技能丰富日常生活">KR1    调研乐器（口琴、吉他等）、拳击等无用技能，丰富日常生活。</h3>]]></content><author><name>utf7/Yechao Chen</name></author><category term="生活" /><summary type="html"><![CDATA[2023 H2 生活 OKR]]></summary></entry><entry><title type="html">大数据资源使用效率统计</title><link href="https://utf7.github.io/2022/07/20/spark-resource-used-metrics/" rel="alternate" type="text/html" title="大数据资源使用效率统计" /><published>2022-07-20T00:00:00+08:00</published><updated>2022-07-20T00:00:00+08:00</updated><id>https://utf7.github.io/2022/07/20/spark-resource-used-metrics</id><content type="html" xml:base="https://utf7.github.io/2022/07/20/spark-resource-used-metrics/"><![CDATA[<p>大数据资源使用情况统计：</p>
+<h3 id="kr1----调研乐器口琴吉他等拳击等无用技能丰富日常生活">KR1    调研乐器（口琴、吉他等）、拳击等无用技能，丰富日常生活。</h3>]]></content><author><name>utf7 / 陈叶超</name></author><category term="生活" /><summary type="html"><![CDATA[2023 H2 生活 OKR]]></summary></entry><entry><title type="html">大数据资源使用效率统计</title><link href="https://utf7.github.io/2022/07/20/spark-resource-used-metrics/" rel="alternate" type="text/html" title="大数据资源使用效率统计" /><published>2022-07-20T00:00:00+08:00</published><updated>2022-07-20T00:00:00+08:00</updated><id>https://utf7.github.io/2022/07/20/spark-resource-used-metrics</id><content type="html" xml:base="https://utf7.github.io/2022/07/20/spark-resource-used-metrics/"><![CDATA[<p>大数据资源使用情况统计：</p>
 
 <p>物理内存使用率：
 物理CPU使用率：</p>
@@ -59,7 +59,7 @@ YARN 内存使用率（白天/晚上）：</p>
 <p>平均每个Spark 任务的 Task 数量. 
 平均每个Spark shuffle 读的数据量. 
 平均每个Spark shuffle 写的数据量. 
-。。。。</p>]]></content><author><name>utf7/Yechao Chen</name></author><category term="大数据" /><summary type="html"><![CDATA[大数据资源使用效率统计]]></summary></entry><entry><title type="html">程序员书写用词规范</title><link href="https://utf7.github.io/2022/06/12/word-specification/" rel="alternate" type="text/html" title="程序员书写用词规范" /><published>2022-06-12T00:00:00+08:00</published><updated>2022-06-12T00:00:00+08:00</updated><id>https://utf7.github.io/2022/06/12/word-specification</id><content type="html" xml:base="https://utf7.github.io/2022/06/12/word-specification/"><![CDATA[<p>书写用词规范,特别需要注意大小组合，否则会显得不专业：比如 hbase,mysql,sla,hadoop,clickhouse 都是不推荐的，常见的名词需要注意大小写</p>
+。。。。</p>]]></content><author><name>utf7 / 陈叶超</name></author><category term="大数据" /><summary type="html"><![CDATA[大数据资源使用效率统计]]></summary></entry><entry><title type="html">程序员书写用词规范</title><link href="https://utf7.github.io/2022/06/12/word-specification/" rel="alternate" type="text/html" title="程序员书写用词规范" /><published>2022-06-12T00:00:00+08:00</published><updated>2022-06-12T00:00:00+08:00</updated><id>https://utf7.github.io/2022/06/12/word-specification</id><content type="html" xml:base="https://utf7.github.io/2022/06/12/word-specification/"><![CDATA[<p>书写用词规范,特别需要注意大小组合，否则会显得不专业：比如 hbase,mysql,sla,hadoop,clickhouse 都是不推荐的，常见的名词需要注意大小写</p>
 
 <p>常见的名词规范如下：</p>
 
@@ -77,9 +77,9 @@ Flink<br />
 Kafka<br />
 TensorFlow 或者 TF<br />
 Elasticsearch 或者 ES<br />
-Kylin<br />
-Hudi<br />
 Iceberg<br />
+Paimon<br />
+Hudi
 Parquet<br />
 ORC<br />
 Presto<br />
@@ -87,7 +87,7 @@ Trino<br />
 ClickHouse 或者 CK<br />
 Doris<br />
 StarRocks<br />
-Impala<br />
+Milvus<br />
 Zookeeper 或者 ZK<br />
 RocksDB<br />
 Java<br />
@@ -96,7 +96,10 @@ CentOS<br />
 Docker<br />
 Kubernetes  或者 K8s<br />
 SLA<br />
-Tableau</p>]]></content><author><name>utf7/Yechao Chen</name></author><category term="文档" /><summary type="html"><![CDATA[程序员书写用词规范]]></summary></entry><entry><title type="html">将github 代码push 到自己的仓库并保留commit log</title><link href="https://utf7.github.io/2022/03/29/push-remote-repo-to-your-git/" rel="alternate" type="text/html" title="将github 代码push 到自己的仓库并保留commit log" /><published>2022-03-29T00:00:00+08:00</published><updated>2022-03-29T00:00:00+08:00</updated><id>https://utf7.github.io/2022/03/29/push-remote-repo-to-your-git</id><content type="html" xml:base="https://utf7.github.io/2022/03/29/push-remote-repo-to-your-git/"><![CDATA[<h2 id="1将github-某个版本放到自己的仓库保留commit-log">1.将github 某个版本放到自己的仓库，保留commit log</h2>
+Tableau<br />
+Agent<br />
+LLM<br />
+Harness</p>]]></content><author><name>utf7 / 陈叶超</name></author><category term="文档" /><summary type="html"><![CDATA[程序员书写用词规范]]></summary></entry><entry><title type="html">将github 代码push 到自己的仓库并保留commit log</title><link href="https://utf7.github.io/2022/03/29/push-remote-repo-to-your-git/" rel="alternate" type="text/html" title="将github 代码push 到自己的仓库并保留commit log" /><published>2022-03-29T00:00:00+08:00</published><updated>2022-03-29T00:00:00+08:00</updated><id>https://utf7.github.io/2022/03/29/push-remote-repo-to-your-git</id><content type="html" xml:base="https://utf7.github.io/2022/03/29/push-remote-repo-to-your-git/"><![CDATA[<h2 id="1将github-某个版本放到自己的仓库保留commit-log">1.将github 某个版本放到自己的仓库，保留commit log</h2>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:apache/hbase.git
 cd hbase/
@@ -108,7 +111,7 @@ git branch test
 git checkout test
 git push origin test:2.4.11
 
-</code></pre></div></div>]]></content><author><name>utf7/Yechao Chen</name></author><category term="git" /><summary type="html"><![CDATA[将github 代码push 到自己的仓库并保留commit log]]></summary></entry><entry><title type="html">给容器镜像瘦身的一个小技巧</title><link href="https://utf7.github.io/2022/03/14/reduce-docker-image-size/" rel="alternate" type="text/html" title="给容器镜像瘦身的一个小技巧" /><published>2022-03-14T00:00:00+08:00</published><updated>2022-03-14T00:00:00+08:00</updated><id>https://utf7.github.io/2022/03/14/reduce-docker-image-size</id><content type="html" xml:base="https://utf7.github.io/2022/03/14/reduce-docker-image-size/"><![CDATA[<h2 id="1镜像瘦身">1.镜像瘦身</h2>
+</code></pre></div></div>]]></content><author><name>utf7 / 陈叶超</name></author><category term="git" /><summary type="html"><![CDATA[将github 代码push 到自己的仓库并保留commit log]]></summary></entry><entry><title type="html">给容器镜像瘦身的一个小技巧</title><link href="https://utf7.github.io/2022/03/14/reduce-docker-image-size/" rel="alternate" type="text/html" title="给容器镜像瘦身的一个小技巧" /><published>2022-03-14T00:00:00+08:00</published><updated>2022-03-14T00:00:00+08:00</updated><id>https://utf7.github.io/2022/03/14/reduce-docker-image-size</id><content type="html" xml:base="https://utf7.github.io/2022/03/14/reduce-docker-image-size/"><![CDATA[<h2 id="1镜像瘦身">1.镜像瘦身</h2>
 
 <p>执行完 <code class="language-plaintext highlighter-rouge">yum</code> 命令以后，可以删除 <code class="language-plaintext highlighter-rouge">cache</code></p>
 
@@ -122,7 +125,7 @@ git push origin test:2.4.11
 
 <p>这个镜像清理yum cache 可以减少 130多M</p>
 
-<p><img width="998" alt="镜像大小的比较" src="/images/posts/k8s/dockerfile/clear-yum.jpg" /></p>]]></content><author><name>utf7/Yechao Chen</name></author><category term="Docker" /><summary type="html"><![CDATA[给容器镜像瘦身的一个小tip]]></summary></entry><entry><title type="html">Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析</title><link href="https://utf7.github.io/2021/05/12/spark-shuffle-service-problems/" rel="alternate" type="text/html" title="Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析" /><published>2021-05-12T00:00:00+08:00</published><updated>2021-05-12T00:00:00+08:00</updated><id>https://utf7.github.io/2021/05/12/spark-shuffle-service-problems</id><content type="html" xml:base="https://utf7.github.io/2021/05/12/spark-shuffle-service-problems/"><![CDATA[<h2 id="1">1.</h2>
+<p><img width="998" alt="镜像大小的比较" src="/images/posts/k8s/dockerfile/clear-yum.jpg" /></p>]]></content><author><name>utf7 / 陈叶超</name></author><category term="Docker" /><summary type="html"><![CDATA[给容器镜像瘦身的一个小tip]]></summary></entry><entry><title type="html">Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析</title><link href="https://utf7.github.io/2021/05/12/spark-shuffle-service-problems/" rel="alternate" type="text/html" title="Spark Shuffle Service 配置不合理导致的任务失败以及NodeManager OOM 问题分析" /><published>2021-05-12T00:00:00+08:00</published><updated>2021-05-12T00:00:00+08:00</updated><id>https://utf7.github.io/2021/05/12/spark-shuffle-service-problems</id><content type="html" xml:base="https://utf7.github.io/2021/05/12/spark-shuffle-service-problems/"><![CDATA[<h2 id="1">1.</h2>
 
 <p>最近集群有 Spark 任务会出现失败，查看 Spark 日志发现会有 Executor 挂掉的信息。</p>
 
@@ -317,7 +320,7 @@ check 了一下 NodeManager 进程，发现设置了4096的堆内存（-Xmx4096m
 
 <p>https://issues.apache.org/jira/browse/SPARK-21501</p>
 
-<p>https://issues.apache.org/jira/browse/SPARK-33206</p>]]></content><author><name>utf7/Yechao Chen</name></author><category term="Spark" /><summary type="html"><![CDATA[spark.shuffle.service.index.cache.size 参数配置不合理问题]]></summary></entry><entry><title type="html">salt 中执行 awk 注意事项</title><link href="https://utf7.github.io/2020/11/10/salt-exec-awk-failed-case/" rel="alternate" type="text/html" title="salt 中执行 awk 注意事项" /><published>2020-11-10T00:00:00+08:00</published><updated>2020-11-10T00:00:00+08:00</updated><id>https://utf7.github.io/2020/11/10/salt-exec-awk-failed-case</id><content type="html" xml:base="https://utf7.github.io/2020/11/10/salt-exec-awk-failed-case/"><![CDATA[<p>使用 <code class="language-plaintext highlighter-rouge">salt</code> 执行 awk 时，发现会执行失败</p>
+<p>https://issues.apache.org/jira/browse/SPARK-33206</p>]]></content><author><name>utf7 / 陈叶超</name></author><category term="Spark" /><summary type="html"><![CDATA[spark.shuffle.service.index.cache.size 参数配置不合理问题]]></summary></entry><entry><title type="html">salt 中执行 awk 注意事项</title><link href="https://utf7.github.io/2020/11/10/salt-exec-awk-failed-case/" rel="alternate" type="text/html" title="salt 中执行 awk 注意事项" /><published>2020-11-10T00:00:00+08:00</published><updated>2020-11-10T00:00:00+08:00</updated><id>https://utf7.github.io/2020/11/10/salt-exec-awk-failed-case</id><content type="html" xml:base="https://utf7.github.io/2020/11/10/salt-exec-awk-failed-case/"><![CDATA[<p>使用 <code class="language-plaintext highlighter-rouge">salt</code> 执行 awk 时，发现会执行失败</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salt "*" cmd.run " ps -ef|grep NodeManager|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print $2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"
 
@@ -328,7 +331,7 @@ $2 前面需要加转义符号</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salt "*" cmd.run " ps -ef|grep NodeManager|grep -v grep|grep org.apache.hadoop.yarn.server.nodemanager.NodeManager|awk '{print \$2}'|xargs lsof -p|grep REG|grep /usr/lib/locale/locale-archive"
 
-</code></pre></div></div>]]></content><author><name>utf7/Yechao Chen</name></author><category term="Salt" /><summary type="html"><![CDATA[salt 中执行 awk 注意事项]]></summary></entry><entry><title type="html">salt 中关于locale的问题</title><link href="https://utf7.github.io/2020/11/10/salt-locale-problem/" rel="alternate" type="text/html" title="salt 中关于locale的问题" /><published>2020-11-10T00:00:00+08:00</published><updated>2020-11-10T00:00:00+08:00</updated><id>https://utf7.github.io/2020/11/10/salt-locale-problem</id><content type="html" xml:base="https://utf7.github.io/2020/11/10/salt-locale-problem/"><![CDATA[<h2 id="记录一次诡异的-hivespark-乱码问题">记录一次诡异的 Hive/Spark 乱码问题</h2>
+</code></pre></div></div>]]></content><author><name>utf7 / 陈叶超</name></author><category term="Salt" /><summary type="html"><![CDATA[salt 中执行 awk 注意事项]]></summary></entry><entry><title type="html">salt 中关于locale的问题</title><link href="https://utf7.github.io/2020/11/10/salt-locale-problem/" rel="alternate" type="text/html" title="salt 中关于locale的问题" /><published>2020-11-10T00:00:00+08:00</published><updated>2020-11-10T00:00:00+08:00</updated><id>https://utf7.github.io/2020/11/10/salt-locale-problem</id><content type="html" xml:base="https://utf7.github.io/2020/11/10/salt-locale-problem/"><![CDATA[<h2 id="记录一次诡异的-hivespark-乱码问题">记录一次诡异的 Hive/Spark 乱码问题</h2>
 
 <p>最近遇到一个诡异的事情，Hive/Spark 写入汉字乱码。</p>
 
@@ -479,7 +482,7 @@ $2 前面需要加转义符号</p>
 
 <p>1.https://wiki.archlinux.org/index.php/locale<br />
 2.https://man7.org/linux/man-pages/man1/localedef.1.html<br />
-3.https://linuxhint.com/locales_debian/</p>]]></content><author><name>utf7/Yechao Chen</name></author><category term="Salt" /><summary type="html"><![CDATA[salt 中关于locale的问题]]></summary></entry><entry><title type="html">Spark SQL 正确的传递 Hive 参数</title><link href="https://utf7.github.io/2020/10/18/spark-sql-params/" rel="alternate" type="text/html" title="Spark SQL 正确的传递 Hive 参数" /><published>2020-10-18T00:00:00+08:00</published><updated>2020-10-18T00:00:00+08:00</updated><id>https://utf7.github.io/2020/10/18/spark-sql-params</id><content type="html" xml:base="https://utf7.github.io/2020/10/18/spark-sql-params/"><![CDATA[<p>使用 <code class="language-plaintext highlighter-rouge">spark-sql</code> 导入动态分区时，出现来错误</p>
+3.https://linuxhint.com/locales_debian/</p>]]></content><author><name>utf7 / 陈叶超</name></author><category term="Salt" /><summary type="html"><![CDATA[salt 中关于locale的问题]]></summary></entry><entry><title type="html">Spark SQL 正确的传递 Hive 参数</title><link href="https://utf7.github.io/2020/10/18/spark-sql-params/" rel="alternate" type="text/html" title="Spark SQL 正确的传递 Hive 参数" /><published>2020-10-18T00:00:00+08:00</published><updated>2020-10-18T00:00:00+08:00</updated><id>https://utf7.github.io/2020/10/18/spark-sql-params</id><content type="html" xml:base="https://utf7.github.io/2020/10/18/spark-sql-params/"><![CDATA[<p>使用 <code class="language-plaintext highlighter-rouge">spark-sql</code> 导入动态分区时，出现来错误</p>
 <pre><code class="language-log">Error in query: org.apache.hadoop.hive.ql.metadata.HiveException: Number of dynamic partitions created is 1793, which is more than 1000. To solve this try to set hive.exec.max.dynamic.partitions to at least 1793.;
 </code></pre>
 <p>提示增加 <code class="language-plaintext highlighter-rouge">hive.exec.max.dynamic.partitions</code> 的值，
@@ -493,7 +496,7 @@ $2 前面需要加转义符号</p>
 修改后为：</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup </span>spark-sql  <span class="nt">--master</span> yarn  <span class="nt">--deploy-mode</span> client <span class="nt">--queue</span> root.test.myqueue  <span class="nt">--driver-memory</span> 24g   <span class="nt">--executor-cores</span> 2   <span class="nt">--executor-memory</span> 4g   <span class="nt">--num-executors</span> 256   <span class="nt">--conf</span> spark.driver.memoryOverhead<span class="o">=</span>1g   <span class="nt">--conf</span> spark.executor.memoryOverhead<span class="o">=</span>1g   <span class="nt">--conf</span> spark.speculation<span class="o">=</span><span class="nb">false</span> <span class="nt">--conf</span> spark.driver.maxResultSize<span class="o">=</span>12g <span class="nt">--conf</span> spark.sql.hive.filesourcePartitionFileCacheSize<span class="o">=</span>4621440000 <span class="nt">--conf</span> spark.sql.files.maxPartitionBytes<span class="o">=</span>268435456 <span class="nt">--conf</span> spark.sql.files.openCostInBytes<span class="o">=</span>0 <span class="nt">--conf</span> spark.sql.shuffle.partitions<span class="o">=</span>512 <span class="nt">--hiveconf</span> hive.exec.max.dynamic.partitions<span class="o">=</span>1000000 <span class="nt">--hiveconf</span> hive.exec.max.dynamic.partitions.pernode<span class="o">=</span>100000 <span class="nt">--hiveconf</span> hive.exec.max.created.files<span class="o">=</span>1000000 <span class="nt">-S</span> <span class="nt">-e</span> <span class="s2">"insert overwrite table tt partition(day,hour) select * from table1 where day&lt;='2020-10-11' distribute by day,hour , cast( floor(rand() * 8) as int);"</span>  <span class="o">&gt;</span> merge.log 2&gt;&amp;1 &amp; 
-</code></pre></div></div>]]></content><author><name>utf7/Yechao Chen</name></author><category term="Spark" /><summary type="html"><![CDATA[Spark SQL 传递 Hive 参数]]></summary></entry><entry><title type="html">在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出</title><link href="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/" rel="alternate" type="text/html" title="在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出" /><published>2020-10-08T00:00:00+08:00</published><updated>2020-10-08T00:00:00+08:00</updated><id>https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files</id><content type="html" xml:base="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/"><![CDATA[<h2 id="1-问题">1. 问题</h2>
+</code></pre></div></div>]]></content><author><name>utf7 / 陈叶超</name></author><category term="Spark" /><summary type="html"><![CDATA[Spark SQL 传递 Hive 参数]]></summary></entry><entry><title type="html">在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出</title><link href="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/" rel="alternate" type="text/html" title="在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出" /><published>2020-10-08T00:00:00+08:00</published><updated>2020-10-08T00:00:00+08:00</updated><id>https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files</id><content type="html" xml:base="https://utf7.github.io/2020/10/08/use-spark-repartition-hint-to-reduce-small-files/"><![CDATA[<h2 id="1-问题">1. 问题</h2>
 
 <p>公司数仓业务有一个 <code class="language-plaintext highlighter-rouge">sql</code> 任务，每天会产生大量的小文件，每个文件只有几百 <code class="language-plaintext highlighter-rouge">KB</code>～几 <code class="language-plaintext highlighter-rouge">M</code> 大小，小文件过多会对 <code class="language-plaintext highlighter-rouge">HDFS</code> 性能造成比较大的影响，同时也影响数据的读写性能（Spark 任务某些情况下会缓存文件信息），虽然开发了小文件合并工具会去定期合并小文件，但还是想从源头上来解决这个问题，尽量生成比较合适的文件大小，而不是事后补救。</p>
 
@@ -747,4 +750,4 @@ $2 前面需要加转义符号</p>
   <li>https://spark.apache.org/docs/3.0.1/sql-ref-syntax-qry-select-hints.html</li>
   <li>https://medium.com/@mrpowers/managing-spark-partitions-with-coalesce-and-repartition-4050c57ad5c4#.36o8a7b5j</li>
   <li>https://stackoverflow.com/questions/54218006/why-does-the-repartition-method-increase-file-size-on-disk</li>
-</ol>]]></content><author><name>utf7/Yechao Chen</name></author><category term="Spark" /><summary type="html"><![CDATA[在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出]]></summary></entry></feed>
+</ol>]]></content><author><name>utf7 / 陈叶超</name></author><category term="Spark" /><summary type="html"><![CDATA[在 Spark SQL 使用 REPARTITION Hint 来减少小文件输出]]></summary></entry></feed>

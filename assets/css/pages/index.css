@@ -27,6 +27,40 @@
     color: #fff
 }
 
+.home .collection-tagline {
+    margin: .5em 0 .25em;
+    font-size: 1em;
+    opacity: .85;
+}
+
+.home-section-title {
+    margin: 0 0 .75rem;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #333;
+}
+
+.home-featured {
+    margin-bottom: 1.5rem;
+    padding-bottom: .75rem;
+    border-bottom: 1px solid #eee;
+}
+
+.featured-talk-list {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.featured-talk-list li {
+    margin-bottom: .4em;
+}
+
+.featured-talk-event {
+    margin-left: .5em;
+    color: #888;
+    font-size: .9em;
+}
+
 
 @media (max-width:50em) {
   .home .collapsed .icon-bar {
