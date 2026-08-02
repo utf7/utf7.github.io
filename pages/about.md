@@ -1,10 +1,10 @@
 ---
 layout: page
-title: About
+title: About Me
 description: 做好人，做好事
 keywords: Seven,utf7
 comments: true
-menu: 关于
+menu: 关于我
 permalink: /about/
 ---
 

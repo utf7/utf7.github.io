@@ -26,9 +26,9 @@ Flink
 Kafka  
 TensorFlow 或者 TF  
 Elasticsearch 或者 ES  
-Kylin  
-Hudi  
 Iceberg  
+Paimon  
+Hudi
 Parquet  
 ORC  
 Presto  
@@ -36,7 +36,7 @@ Trino
 ClickHouse 或者 CK  
 Doris  
 StarRocks  
-Impala  
+Milvus  
 Zookeeper 或者 ZK  
 RocksDB  
 Java  
@@ -45,4 +45,7 @@ CentOS
 Docker  
 Kubernetes  或者 K8s  
 SLA  
-Tableau   
+Tableau  
+Agent  
+LLM  
+Harness  
