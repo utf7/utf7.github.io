@@ -64,6 +64,10 @@ _待补充_
 
 - [主会场分享](https://mp.weixin.qq.com/s/vaQUXepOZ0nEF3FKT5O6fQ)
 
+**钛媒体：云栖战略参考**
+
+- [耳朵经济快速增长背后，喜马拉雅数据价值如何释放](https://mp.weixin.qq.com/s/neA_Z5cY1v8ZiTefDc04uQ)
+
 ### 2019
 
 - [HBaseCon Asia 2019：HBase 在中国移动的实践](https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf)
