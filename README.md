@@ -2,17 +2,17 @@
 
 我的个人博客：<https://utf7.github.io>，
 
-微信：chenyechao003
-微信公众号： yechaotalk
-视频号：程序员乌托邦
+微信：chenyechao003  
+微信公众号： yechaotalk  
+视频号：程序员乌托邦  
 
-## **AI Agent、AI Native** 
+**AI Agent、AI Native** 
 
-AI Data Infra/Pipeline/Platform
+**AI Data Infra/Pipeline/Platform**
 
-Cloud Native
+**Cloud Native**
 
-摇滚乐、电影
+**摇滚乐、电影**
 
 ## 工作经历
 
@@ -21,29 +21,55 @@ Cloud Native
 
 ## 公开演讲
 
-2017:
-[谷歌开发者社区 HBase 101 ] ()
+**2026**  
 
-2019:  
-[HBase 在中国移动的实践 HBaseCon Asia 2019 ](https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf)  
+GIAC 全球智能应用开发与架构大会
 
-2023:
+[《DataClaw：构建可进化的数据智能体》喜马拉雅 Data Agent Harness 工程实践](https://thegiac.com/2026sz/course/19332)
 
-[2023 云栖大会 陈叶超-喜马拉雅数据业务全面上云实践](https://yunqi.aliyun.com/2023/subforum/YQ-Club-HLW-0001?userCode=okjhlpr5)  
+第三届AI企业应用落地场景峰会暨OpenClaw研讨会  
 
-[2023 Flink Forward Asia 2023 主会场的分享 ](https://mp.weixin.qq.com/s/vaQUXepOZ0nEF3FKT5O6fQ)  
+[圆桌:OpenClaw 场景化能力与产品化突围](https://mp.weixin.qq.com/s/eFEdvhGqgaJX-mvKeq4Vrg)  
 
-2024:  
-[DataFun 喜马拉雅基于大模型ChatBl实践探索](https://mp.weixin.qq.com/s/erbfKIgSf02YTgPIso2k5w)  
+[喜马拉雅AI原生数据上下文工程实践](https://mp.weixin.qq.com/s/lZwfkkX-TUONV6FaZ1qxvw)。
 
-[Top 100全球软件案例研究峰会 喜马拉雅 ChatBI 落地实践](https://www.top100summit.com/2024-Detail?id=17854)  
+**2025** 
 
-[Flink Forward Asia 2024 主会场圆桌：AI 时代下大数据技术未来路在何方？](https://mp.weixin.qq.com/s/KEr_4Vbjph7KRLBCI_4few)  
+QCon 全球软件开发大会  
 
-2025:  
 [多智能体驱动的企业级 ChatBI 落地实践](https://qcon.infoq.cn/2025/shanghai/presentation/6704)  
 
-2026:  
-[第三届AI企业应用落地场景峰会暨OpenClaw研讨会 圆桌](https://mp.weixin.qq.com/s/eFEdvhGqgaJX-mvKeq4Vrg)
-[第三届AI企业应用落地场景峰会暨OpenClaw研讨会 喜马拉雅AI原生数据上下文工程实践](https://mp.weixin.qq.com/s/lZwfkkX-TUONV6FaZ1qxvw)
-[GIAC 全球智能应用开发与架构大会《DataClaw：构建可进化的数据智能体》喜马拉雅 Data Agent Harness 工程实践](https://thegiac.com/2026sz/course/19332)
+
+**2024**   
+
+DataFun    
+[喜马拉雅基于大模型ChatBl实践探索](https://mp.weixin.qq.com/s/erbfKIgSf02YTgPIso2k5w)  
+
+Top 100 全球软件案例研究峰会  
+
+[喜马拉雅 ChatBI 落地实践](https://www.top100summit.com/2024-Detail?id=17854) 
+
+Flink Forward Asia 2024   
+
+[主会场圆桌：AI 时代下大数据技术未来路在何方？](https://mp.weixin.qq.com/s/KEr_4Vbjph7KRLBCI_4few)  
+
+2024 SACC 中国系统架构师大会  
+
+[圆桌讨论话题：大数据前沿技术和数据平台](https://sacc.it168.com/sh/yicheng.html)
+
+**2023**
+云栖大会：
+[ 陈叶超-喜马拉雅数据业务全面上云实践](https://yunqi.aliyun.com/2023/subforum/YQ-Club-HLW-0001?userCode=okjhlpr5)  
+
+[Flink Forward Asia 2023： 主会场的分享 ](https://mp.weixin.qq.com/s/vaQUXepOZ0nEF3FKT5O6fQ)  
+
+**2019**  
+[HBaseCon Asia 2019： HBase 在中国移动的实践](https://utf7.github.io/docs/hbaseconasia2019track31430-190819225905.pdf)  
+
+**2017**  
+
+[谷歌开发者社区 HBase 101 ]()
+
+
+
+
