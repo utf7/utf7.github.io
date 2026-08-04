@@ -1,0 +1,13 @@
+---
+description: Git 提交作者规范——禁止使用 Cursor Agent 作为作者
+alwaysApply: true
+---
+
+# Git 提交作者
+
+提交代码时：
+
+- **不要**将作者设为 Cursor Agent、Cursor、或任何 AI/Agent 相关身份
+- **不要**添加 `Co-authored-by: Cursor` / `Co-authored-by: Cursor Agent` 等署名
+- **不要**通过环境变量覆盖 `GIT_AUTHOR_NAME` / `GIT_COMMITTER_NAME` 为 Agent
+- 使用仓库既有作者身份（当前为 `utf7 <chenyechao@gmail.com>`），沿用本地 git 配置即可

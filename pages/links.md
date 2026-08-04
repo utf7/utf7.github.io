@@ -14,7 +14,7 @@ permalink: /links/
 * 微信公众号：yechaotalk
 * 视频号：程序员乌托邦
 * [微博 @utf7](https://weibo.com/chenyechao)
-* [关于我（演讲与简介）](/about/)
+* [关于我](/about/)
 
 ## 精选演讲
 
