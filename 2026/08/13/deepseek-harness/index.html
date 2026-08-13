@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DeepSeek Harness 终于来了并重磅开源：模型之外，还有更重要的一层 &mdash; utf7</title>
+    <link rel="stylesheet" href="/assets/css/site.bundle.css">
+    
+
+    
+    <link rel="canonical" href="https://utf7.github.io/2026/08/13/deepseek-harness/">
+    <link rel="alternate" type="application/atom+xml" title="utf7" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="DeepSeek Harness 终于来了并重磅开源：模型之外，还有更重要的一层">
+      
+    <meta name="keywords" content="DeepSeek, Harness, AI Agent, Cordis, DataClaw">
+    <meta property="og:keywords" content="DeepSeek, Harness, AI Agent, Cordis, DataClaw">
+      
+    <meta name="description" content="模型负责思考，Harness 负责让它干活。DeepSeek Harness 开源后，模型与 Harness 的 Co-Design 才是更值得关注的一层。">
+    <meta property="og:description" content="模型负责思考，Harness 负责让它干活。DeepSeek Harness 开源后，模型与 Harness 的 Co-Design 才是更值得关注的一层。">
+      
+    
+    
+    <meta property="og:url" content="https://utf7.github.io/2026/08/13/deepseek-harness/">
+    <meta property="og:site_name" content="utf7">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2026-08-13">
+    
+    <script>
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header" data-pagefind-ignore>
+        <div class="container">
+            <h1><a href="/" title="utf7"><span class="octicon octicon-mark-github"></span> utf7</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="_self" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="_self" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="_self" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="_self" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="_self" title="关于我">关于我</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="DeepSeek Harnes">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">DeepSeek Harness 终于来了并重磅开源：模型之外，还有更重要的一层</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2026/08/13
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#AI Agent" title="AI Agent">AI Agent</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body" data-pagefind-body>
+    <span data-pagefind-meta="title" hidden>DeepSeek Harness 终于来了并重磅开源：模型之外，还有更重要的一层</span>
+    <p>就在刚刚，DeepSeek Harness 重磅发布。超哥没注意点开 DeepSeek 的 GitHub，本想去看看 DeepSeek V4 Pro 相关的文档，结果意外发现 DeepSeek Harness 已经在仓库里开源了。</p>
+
+<p>对关注 DeepSeek Agent 方向的人来说，这次发布的分量不轻。它不是新模型，也不是给 DeepSeek API 套一个聊天界面，而是把模型放进真实工作环境的那套运行系统。</p>
+
+<p>简单说，<strong>模型负责思考，Harness 负责让它干活。</strong></p>
+
+<h2 id="harness-到底是什么">Harness 到底是什么？</h2>
+
+<p>关于 DeepSeek Harness，前几天在我的视频号聊过。有兴趣可以听一听：</p>
+
+<p><a href="https://weixin.qq.com/sph/A71bgxIgl6">https://weixin.qq.com/sph/A71bgxIgl6</a></p>
+
+<p>直接调用模型并不难。难的是模型决定「下一步要做什么」之后，系统如何接住它。</p>
+
+<p>模型想读文件，谁来检查路径？想运行命令，在哪个环境执行？操作有风险，是直接放行还是先让用户确认？任务跑到一半中断，下次能不能接着做？</p>
+
+<p>这些都不是 Prompt 能解决的问题。</p>
+
+<p>DeepSeek Harness 做的，就是把模型、工具、文件系统、终端、会话记录、沙箱和权限控制接到一起，组成一套完整的 Agent Runtime。</p>
+
+<p>它提供 Web UI，也支持 Headless 模式和 Python SDK，可以独立使用，也能嵌入评测平台、CI 流程或企业内部系统。</p>
+
+<h2 id="从算法与-infra-co-design到模型与-harness-co-design">从算法与 Infra Co-Design，到模型与 Harness Co-Design</h2>
+
+<p>我一直有个观点：AI 的进步从来不只靠算法。</p>
+
+<p>大模型训练阶段，算法与 Infra 一直在共同演进。新算法会带来新的计算、通信和显存需求，基础设施的能力也会反过来决定哪些算法真正跑得起来。</p>
+
+<p>Agent 时代也是同样的道理，只是关系变成了 Model 与 Harness 的 Co-Design。模型为什么进度这么快，个人感觉和 Agent Skill 的发明以及 Harness 协同设计有巨大的关系。</p>
+
+<p>模型需要 Harness 提供上下文、工具和执行环境；Harness 也需要根据模型的真实表现调整工具定义、上下文组织、重试机制和权限策略。</p>
+
+<p>两边不能各做各的。</p>
+
+<p>模型工具调用不准，问题可能不在模型，也可能是 Tool Schema 写得不清楚。任务执行到一半跑偏，可能是规划能力不足，也可能是 Harness 返回的信息不适合模型理解。</p>
+
+<p>只有把模型放进真实任务里跑，完整记录中间过程，才能知道问题究竟出在哪里。</p>
+
+<h2 id="一套系统两个优化方向">一套系统，两个优化方向</h2>
+
+<p>DeepSeek Harness 使用追加式事件日志记录用户消息、模型输出、工具调用和执行结果。这些记录不仅可以用来恢复和回放会话，也为后续评测和数据分析留下了基础。</p>
+
+<p>从这个角度看，模型与 Harness 可以形成下面的协同关系：</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/model-harness-codesign.png" alt="模型与 Harness 协同优化" /></p>
+
+<p>一边是模型优化，例如规划、工具选择、参数生成和错误恢复。</p>
+
+<p>另一边是 Harness 优化，例如 Prompt 组装、工具协议、上下文管理、模型路由、重试逻辑和安全策略。</p>
+
+<p>真实任务产生执行轨迹，轨迹经过清洗和评测，再分别反馈给模型与 Harness。系统变好以后，可以处理更多任务，进而产生覆盖面更广的数据。</p>
+
+<p>这才是数据飞轮：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>真实任务 → 执行轨迹 → 失败归因 → 模型与 Harness 同时改进 → 更高的任务完成率 → 更多真实任务
+</code></pre></div></div>
+
+<p>需要说明的是，DeepSeek Harness 目前并没有宣称会自动把会话数据用于训练。它提供的是事件日志、持久化、回放和遥测等基础能力。训练回流、数据脱敏和用户授权仍然需要团队自己完成。</p>
+
+<h2 id="话不多说把代码拉下来跑跑看">话不多说，把代码拉下来跑跑看</h2>
+
+<p>内测声明还没有去掉：</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/preview-notice.png" alt="DeepSeek Harness 内测声明" /></p>
+
+<p>首页可以添加本地项目，有好几种模式：标准模式、PTC 模式、极简模式、创造模式。</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/homepage-modes.png" alt="DeepSeek Harness 首页与运行模式" /></p>
+
+<p>看来 DeepSeek 还是很在乎 Trace 链路的。这点和我们开发的喜马 DataClaw 智能体不谋而合，不能说有点类似，几乎是一模一样！哈哈哈😊，特别是倒数第二个红色框起来的。</p>
+
+<p>让它了解一下 DataClaw：</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/chat-dataclaw.png" alt="向 DeepSeek Harness 介绍 DataClaw" /></p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/dataclaw-intro.png" alt="DataClaw 介绍回复" /></p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/architecture-review.png" alt="DeepSeek Harness 对 DataClaw 架构的评价" /></p>
+
+<p>操，情绪价值拉满啊：</p>
+
+<blockquote>
+  <p>设计者的架构品味和踩坑经验都体现在代码里，这是一个「有经验的人带着 AI 辅助高速迭代」的产物；但它是靠个人纪律在运转的——一旦核心维护者离开或 AI 提交失控，没有 CI 和 lint 门禁会让债务快速恶化。</p>
+</blockquote>
+
+<p>继续继续。</p>
+
+<p>通用设置：</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/general-settings.png" alt="通用设置" /></p>
+
+<p>模型设置：</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/model-settings.png" alt="模型设置" /></p>
+
+<p>插件设置：</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/plugin-settings.png" alt="插件设置" /></p>
+
+<p>Agent 预设：</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/agent-preset.png" alt="Agent 预设" /></p>
+
+<h2 id="一切皆插件">「一切皆插件」</h2>
+
+<p>DeepSeek Harness 基于 Cordis 构建，采用「一切皆插件」的架构。</p>
+
+<h3 id="架构先看全貌">架构先看全貌</h3>
+
+<p>我把仓库和架构文档过了一遍。DeepSeek Harness 最鲜明的地方不是 Web UI，而是它把整个运行系统拆成了一棵 Cordis 插件树。</p>
+
+<p><img loading="lazy" decoding="async" src="/images/posts/ai/deepseek-harness/cordis-plugin-tree.png" alt="DeepSeek Harness 技术架构" /></p>
+
+<p>模型适配器是插件，工具系统是插件，会话日志是插件，Agent Loop 本身也是插件。开发者可以在不修改整套框架的情况下，更换模型，为自己的场景配置插件和权限。</p>
+
+<p>这套设计很适合做对比实验。</p>
+
+<p>固定 Harness 更换模型，可以比较不同模型的任务完成率；固定模型调整工具和上下文，可以判断系统层改动是否有效。只有能够控制变量，Co-Design 才有实际意义。</p>
+
+<h2 id="prompt-不是安全边界">Prompt 不是安全边界</h2>
+
+<p>DeepSeek Harness 另一个比较务实的地方，是没有把安全全部交给模型。</p>
+
+<p>模型发起工具调用后，请求还要经过参数检查、权限策略、用户审批和沙箱，才能真正访问文件或执行命令。</p>
+
+<p>这比在系统提示词里写一句「不要执行危险操作」可靠得多。</p>
+
+<p>模型可以犯错，权限系统不能跟着碰运气。</p>
+
+<h2 id="如何运行">如何运行？</h2>
+
+<p>安装 Node.js 后，可以直接启动 Web UI：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npx @deepseek-ai/dsh web
+</code></pre></div></div>
+
+<p>默认地址为：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://127.0.0.1:3080
+</code></pre></div></div>
+
+<p>配置模型并选择工作目录后，就可以创建任务。</p>
+
+<p>项目也提供 Python SDK：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python <span class="nt">-m</span> pip <span class="nb">install </span>deepseek-harness-sdk
+</code></pre></div></div>
+
+<p>模型方面并不只支持 DeepSeek，也可以配置 OpenAI、Anthropic、自托管服务和其他兼容接口。详见 <a href="https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/guide/providers.zh.md">模型配置文档</a>。</p>
+
+<h2 id="现在还很早">现在还很早</h2>
+
+<p>DeepSeek Harness 目前仍处于 Developer Preview，官方明确提醒后续会有破坏兼容性的修改。</p>
+
+<p>它也不是一款开箱即用的普通 AI 编程助手。Cordis、Profile、Bundle 和插件配置都有学习成本。现阶段更适合正在搭建 Agent 平台、设计受控执行环境，或者研究模型与工具协同的团队。</p>
+
+<p>但方向已经很清楚。</p>
+
+<p>过去我们更多关注模型本身。到了 Agent 阶段，模型能力只是系统的一部分。真正决定 Agent 能不能进入生产环境的，是模型、Harness 和 Infra 能否一起设计、一起迭代。</p>
+
+<p>模型产生行动，Harness 执行动作并记录结果，数据再推动两边继续改进。</p>
+
+<p>这可能才是 DeepSeek Harness 最值得期待的地方。</p>
+
+<p>项目地址：<a href="https://github.com/deepseek-ai/deepseek-harness">deepseek-ai/deepseek-harness</a></p>
+
+<p>PS：第一时间让 DeepWiki 索引了 DeepSeek Harness 代码库：</p>
+
+<p><a href="https://deepwiki.com/deepseek-ai/deepseek-harness">https://deepwiki.com/deepseek-ai/deepseek-harness</a></p>
+
+<hr />
+
+<p>本文同步自公众号「程序员乌托邦」：<a href="https://mp.weixin.qq.com/s/wXRoFXFeW0Q9QSGOeRx1TQ">DeepSeek Harness 终于来了并重磅开源：模型之外，还有更重要的一层</a></p>
+
+    </article>
+    <div data-pagefind-ignore>
+      <div class="author-card">
+  <p class="author-card-name">utf7 / 陈叶超</p>
+  <p class="author-card-bio">关注 AI Agent / AI Data Infra / 云原生。</p>
+  <p class="author-card-links">
+    <a href="/about/">关于我</a>
+    ·
+    <a href="https://github.com/utf7" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </p>
+</div>
+
+    </div>
+    <div class="share" data-pagefind-ignore>
+      <div class="share-bar" role="group" aria-label="分享">
+  <a href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Futf7.github.io%2F2026%2F08%2F13%2Fdeepseek-harness%2F&title=DeepSeek+Harness+%E7%BB%88%E4%BA%8E%E6%9D%A5%E4%BA%86%E5%B9%B6%E9%87%8D%E7%A3%85%E5%BC%80%E6%BA%90%EF%BC%9A%E6%A8%A1%E5%9E%8B%E4%B9%8B%E5%A4%96%EF%BC%8C%E8%BF%98%E6%9C%89%E6%9B%B4%E9%87%8D%E8%A6%81%E7%9A%84%E4%B8%80%E5%B1%82" target="_blank" rel="noopener noreferrer">微博</a>
+  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Futf7.github.io%2F2026%2F08%2F13%2Fdeepseek-harness%2F&text=DeepSeek+Harness+%E7%BB%88%E4%BA%8E%E6%9D%A5%E4%BA%86%E5%B9%B6%E9%87%8D%E7%A3%85%E5%BC%80%E6%BA%90%EF%BC%9A%E6%A8%A1%E5%9E%8B%E4%B9%8B%E5%A4%96%EF%BC%8C%E8%BF%98%E6%9C%89%E6%9B%B4%E9%87%8D%E8%A6%81%E7%9A%84%E4%B8%80%E5%B1%82" target="_blank" rel="noopener noreferrer">X</a>
+  <button type="button" id="share-copy-link" data-url="https://utf7.github.io/2026/08/13/deepseek-harness/">复制链接</button>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('share-copy-link');
+  if (!btn || !navigator.clipboard) return;
+  btn.addEventListener('click', function () {
+    navigator.clipboard.writeText(btn.getAttribute('data-url')).then(function () {
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = old; }, 1500);
+    });
+  });
+})();
+</script>
+
+    </div>
+    <div class="comment" data-pagefind-ignore>
+      
+  
+      
+      <script src="https://utteranc.es/client.js"
+              repo="utf7/utf7.github.io"
+              issue-term="pathname"
+              theme="github-light"
+              crossorigin="anonymous"
+              async>
+      </script>
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth" data-pagefind-ignore>
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="搜索文章…" autocomplete="off">
+    <button class="btn btn-default" id="site_search_do" type="button" aria-label="搜索"><span class="octicon octicon-search"></span></button>
+</div>
+<ul id="search_results"></ul>
+<script type="module" src="/assets/js/search.js"></script>
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/toc.js" defer></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container" data-pagefind-ignore>
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2026
+                    <span title="utf7 / 陈叶超">utf7 / 陈叶超</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/utf7/utf7.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="_self">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="_self">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="_self">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="_self">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于我" target="_self">关于我</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/js/geopattern.js" defer></script>
+    <script src="/assets/js/prism.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
+    
+</body>
+</html>
