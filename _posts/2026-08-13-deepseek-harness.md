@@ -5,6 +5,7 @@ description: 模型负责思考，Harness 负责让它干活。DeepSeek Harness 
 categories: [AI Agent]
 keywords: DeepSeek, Harness, AI Agent, Cordis, DataClaw
 excerpt: 模型负责思考，Harness 负责让它干活。DeepSeek Harness 开源后，模型与 Harness 的 Co-Design 才是更值得关注的一层。
+pinned: true
 ---
 
 就在刚刚，DeepSeek Harness 重磅发布。超哥没注意点开 DeepSeek 的 GitHub，本想去看看 DeepSeek V4 Pro 相关的文档，结果意外发现 DeepSeek Harness 已经在仓库里开源了。
