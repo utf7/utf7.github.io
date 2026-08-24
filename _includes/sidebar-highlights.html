@@ -1,4 +1,14 @@
-<h3>近期演讲</h3>
+<h3>演讲与专利</h3>
+{% if site.patents %}
+<ul class="highlight-list">
+{% for patent in site.patents %}
+  <li class="highlight-list-item">
+    <a href="{{ patent.url }}" target="_blank" rel="noopener noreferrer">{{ patent.title }}</a>
+    <span class="highlight-meta">专利 · {{ patent.number }} · {{ patent.year }} {{ patent.status }}</span>
+  </li>
+{% endfor %}
+</ul>
+{% endif %}
 <ul class="highlight-list">
 {% for talk in site.featured_talks %}
   <li class="highlight-list-item">
@@ -10,5 +20,5 @@
 {% endfor %}
 </ul>
 <p class="highlight-more">
-  <a href="{{ '/about/' | relative_url }}">查看全部演讲与简介 →</a>
+  <a href="{{ '/about/' | relative_url }}">查看全部演讲与专利 →</a>
 </p>

@@ -31,9 +31,22 @@ comments: false
     <div class="columns">
         <div class="column two-thirds" >
             {% if paginator.page == 1 %}
-            {% if site.featured_talks %}
+            {% if site.patents or site.featured_talks %}
             <div class="home-featured" data-pagefind-ignore>
-              <h2 class="home-section-title">近期演讲</h2>
+              <h2 class="home-section-title">演讲与专利</h2>
+              {% if site.patents %}
+              <p class="home-featured-kicker">专利</p>
+              <ul class="featured-talk-list">
+                {% for patent in site.patents %}
+                <li>
+                  <a href="{{ patent.url }}" target="_blank" rel="noopener noreferrer">{{ patent.title }}</a>
+                  <span class="featured-talk-event">{{ patent.number }} · {{ patent.year }} {{ patent.status }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+              {% if site.featured_talks %}
+              <p class="home-featured-kicker">近期演讲</p>
               <ul class="featured-talk-list">
                 {% for talk in site.featured_talks %}
                 <li>
@@ -42,6 +55,7 @@ comments: false
                 </li>
                 {% endfor %}
               </ul>
+              {% endif %}
             </div>
             {% endif %}
 

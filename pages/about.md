@@ -2,7 +2,7 @@
 layout: page
 title: 关于我
 description: utf7（陈叶超）——关注 AI Agent、AI Data Infra 与云原生的工程实践者
-keywords: utf7, 陈叶超, AI Agent, Data Infra, ChatBI, Cloud Native
+keywords: utf7, 陈叶超, AI Agent, Data Infra, ChatBI, Cloud Native, 专利
 comments: true
 menu: 关于我
 permalink: /about/
@@ -23,7 +23,20 @@ permalink: /about/
 
 * 喜马拉雅 — 数据智能 / Data Infra（ChatBI、Data Agent、数据平台与上云等）
 
-## 公开演讲
+## 演讲与专利
+
+### 专利
+
+{% for patent in site.patents %}
+**[{{ patent.title }}]({{ patent.url }})**（{{ patent.number }}，{{ patent.status }}）
+
+* 发明人：{{ patent.inventors }}
+* 申请人：{{ patent.assignee }}
+* 技术要点：{{ patent.summary }}
+
+{% endfor %}
+
+### 公开演讲
 
 ### 2026
 

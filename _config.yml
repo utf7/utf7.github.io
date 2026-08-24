@@ -16,7 +16,28 @@ source_code: https://github.com/utf7/utf7.github.io
 side_bar_repo_limit: 5
 repository: utf7/utf7.github.io
 
-# Homepage / sidebar highlights (recent public talks)
+# Homepage / about: patents + featured talks
+patents:
+  -
+    title: 一种数据加载方法和装置
+    number: CN108121745B
+    year: 2021
+    status: 已授权
+    inventors: 陈叶超、刘云飞、齐骥、金振江、柯亮、钱岭
+    assignee: 中移（苏州）软件技术有限公司、中国移动通信集团公司
+    granted: true
+    url: https://patents.google.com/patent/CN108121745B/zh
+    summary: 按主键字段排序 → 两级采样生成分区信息 → 预分区 → 数据文件分组归并 → 加载到对应分区，解决大数据加载时的分区倾斜和负载不均衡问题。
+  -
+    title: 一种数据平台及其应用方法
+    number: CN114579560A
+    year: 2022
+    status: 在审
+    inventors: 李天梅、陈叶超、陶捷
+    assignee: 中移（苏州）软件技术有限公司、中国移动通信集团有限公司
+    url: https://patents.google.com/patent/CN114579560A/zh
+    summary: 计算与存储分离数据平台架构——第一类服务器（运行速率高，部署计算引擎，如 X86+SSD 热数据）＋第二类服务器（存储性能强，部署数据仓库，如 ARM+HDD 冷数据），兼顾性能与成本。
+
 featured_talks:
   -
     title: "DataClaw：构建可进化的数据智能体"
