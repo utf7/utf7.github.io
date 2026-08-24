@@ -658,6 +658,10 @@ code[class*=language-],pre[class*=language-]{color:#000;text-shadow:0 1px #fff;f
     color: #888;
 }
 
+.highlight-list + .highlight-list {
+    margin-top: .25rem;
+}
+
 .highlight-more {
     margin: 0 0 1.5rem;
     font-size: .9rem;
@@ -746,6 +750,18 @@ code[class*=language-],pre[class*=language-]{color:#000;text-shadow:0 1px #fff;f
     margin-left: .5em;
     color: #888;
     font-size: .9em;
+}
+
+.home-featured-kicker {
+    margin: .85rem 0 .35rem;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: .04em;
+}
+
+.home-featured .home-featured-kicker:first-of-type {
+    margin-top: 0;
 }
 
 
